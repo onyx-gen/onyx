@@ -63,15 +63,17 @@ function generateHTMLFromTree(tree: UnoTree, depth: number = 0): string {
   const indent = '  '.repeat(depth)
   const hasChildren = tree.children && tree.children.length > 0
 
-  let html = `${indent}<div class="${tree.css}">`
+  const css = tree.css ? ` class="${tree.css}"` : ''
+  let html = `${indent}<div${css}>`
 
   if (hasChildren) {
     html += '\n'
     tree.children.forEach((child) => {
       html += generateHTMLFromTree(child, depth + 1)
     })
+    html += indent
   }
 
-  html += `${indent}</div>\n`
+  html += `</div>\n`
   return html
 }
