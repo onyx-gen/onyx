@@ -46,7 +46,9 @@ function recursiveGeneration(node: SceneNode): UnoTree {
 
   const cssTree: UnoTree = { css, children: [] }
 
-  if ('children' in node && node.children.length > 0) {
+  const hasChildren = 'children' in node && node.children.length > 0
+
+  if (hasChildren) {
     node.children.forEach((child) => {
       cssTree.children.push(recursiveGeneration(child))
     })
