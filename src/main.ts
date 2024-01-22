@@ -26,7 +26,8 @@ figma.codegen.on('generate', async () => {
 
   if (node.type === 'COMPONENT') {
     const unoTree = recursiveGeneration(node)
-    html = generateHTMLFromTree(unoTree)
+    if (unoTree)
+      html = generateHTMLFromTree(unoTree)
   }
 
   else { console.log('Please select a component') }
@@ -40,19 +41,29 @@ figma.codegen.on('generate', async () => {
   ]
 })
 
-function recursiveGeneration(node: SceneNode): UnoTree {
+function recursiveGeneration(node: SceneNode): UnoTree | null {
   const builder = new UnocssBuilder(node)
   const css = builder.build()
 
-  const cssTree: UnoTree = { css, children: [] }
-
   const hasChildren = 'children' in node && node.children.length > 0
+
+  // If it's a leaf node with empty CSS, return null
+  if (!hasChildren && css === '') {
+    console.log('Skipping leaf with empty CSS')
+    return null
+  }
+
+  const cssTree: UnoTree = { css, children: [] }
 
   if (hasChildren) {
     node.children
       .filter(child => child.visible)
       .forEach((child) => {
-        cssTree.children.push(recursiveGeneration(child))
+        const childTree = recursiveGeneration(child)
+
+        // Only add the child if it's not null
+        if (childTree)
+          cssTree.children.push(childTree)
       })
   }
 
