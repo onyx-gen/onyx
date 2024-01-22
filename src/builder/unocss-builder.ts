@@ -11,13 +11,15 @@ export class UnocssBuilder {
     this.tokens = getAppliedTokens(node)
 
     if (node.type === 'COMPONENT') {
-      this.commonShapeStyles(node)
+      this.color(node)
       this.autoLayout(node)
     }
-  }
 
-  commonShapeStyles(node: MinimalFillsMixin & SceneNode) {
-    this.color(node.fills)
+    if (node.type === 'TEXT') {
+      this.color(node)
+      this.autoLayout(node)
+      this.typography(node)
+    }
   }
 
   autoLayout(node: GeometryMixin & BlendMixin & SceneNode) {
@@ -46,17 +48,29 @@ export class UnocssBuilder {
     return this
   }
 
-  color(paint: MinimalFillsMixin['fills']): this {
+  typography(node: SceneNode) {
+    if (this.tokens.typography)
+      this.attributes.push(`font-$${this.tokens.typography}`)
+  }
+
+  color(node: MinimalFillsMixin & SceneNode): this {
+    const paint: MinimalFillsMixin['fills'] = node.fills
+
     const fill = retrieveTopFill(paint)
 
-    if (fill && fill.type === 'SOLID') {
-      this.attributes.push(`bg-$${this.tokens.fill}`)
+    if (!fill)
+      return this
 
-      console.log('tokens', this.tokens)
+    if (fill.type === 'SOLID') {
+      console.log('solid')
+      if (node.type === 'TEXT')
+        this.attributes.push(`color-$${this.tokens.fill}`)
+      else
+        this.attributes.push(`bg-$${this.tokens.fill}`)
     }
-    else {
-      console.error('fill is not solid')
-    }
+
+    // TODO MF
+    else { console.error('fill is not solid', fill) }
 
     return this
   }

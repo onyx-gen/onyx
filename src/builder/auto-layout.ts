@@ -1,10 +1,6 @@
 // TODO MF
 import type { DesignTokens } from '../tokens'
 
-function pxToLayoutSize(value: number): string {
-  return `${value}px`
-}
-
 function getFlexDirection(node: InferredAutoLayoutResult): string {
   return node.layoutMode === 'HORIZONTAL' ? '' : 'flex-col'
 }
@@ -39,10 +35,11 @@ function getGap(node: InferredAutoLayoutResult, tokens: DesignTokens): string {
   const hasGap = node.itemSpacing > 0 && node.primaryAxisAlignItems !== 'SPACE_BETWEEN'
 
   if (hasGap) {
-    if (tokens.spacing === undefined)
-      console.error('You\'re using the gap property, but you haven\'t set the spacing token.')
+    console.log(tokens)
+    if (tokens.itemSpacing === undefined)
+      console.error('You\'re using the gap property, but you haven\'t set the itemSpacing token.')
     else
-      return `gap-${tokens.spacing}`
+      return `gap-$${tokens.itemSpacing}`
   }
 
   return ''

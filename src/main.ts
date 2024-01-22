@@ -17,7 +17,7 @@ figma.codegen.on('generate', async (event) => {
 
   return [
     {
-      language: 'JSON',
+      language: 'PLAINTEXT',
       code: css,
       title: 'UnoCSS & Tokens Studio for Figma',
     },
