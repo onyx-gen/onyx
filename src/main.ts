@@ -10,6 +10,9 @@
 
 import { UnocssBuilder } from './builder/unocss-builder'
 
+// Skip over invisible nodes and their descendants inside instances for faster performance.
+figma.skipInvisibleInstanceChildren = true
+
 figma.codegen.on('generate', async () => {
   const selection = figma.currentPage.selection
   const node = selection[0]
