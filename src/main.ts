@@ -7,39 +7,70 @@
 // full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
 
 // This provides the callback to generate the code.
-import { getAppliedTokens } from './tokens'
+
+import { getUnoCSSAutoLayoutProps } from './builder/auto-layout'
+import { UnocssBuilder } from './builder/unocss-builder'
 
 figma.codegen.on('generate', async (event) => {
   const node: SceneNode = event.node
 
-  const appliedTokens = getAppliedTokens(node)
-  console.log('appliedTokens', appliedTokens)
+  let css = ''
 
-  let textStrings: string[] = []
-
-  if ('findAll' in node)
-    textStrings = node.findAll(node => node.type === 'TEXT').map(node => (node as TextNode).characters)
-
-  const jsonStringDictionary: {
-    [key: string]: { string: string }
-  } = {}
-
-  for (const textString of textStrings) {
-    const jsonKey = createJsonKey(textString)
-
-    jsonStringDictionary[jsonKey] = { string: textString }
+  switch (node.type) {
+    case 'COMPONENT':
+      console.log('a component', node.type)
+      css += handleFrame(node)
+      break
   }
 
   return [
     {
       language: 'JSON',
-      code: JSON.stringify(jsonStringDictionary, null, 2),
-      title: 'i18n-dict',
+      code: css,
+      title: 'UnoCSS & Tokens Studio for Figma',
     },
   ]
 })
 
-// Function to create a JSON key from a string
-function createJsonKey(inputString: string) {
-  return inputString.toLowerCase().replace(/\s/g, '_')
+function handleFrame(node: ComponentNode) {
+  console.log('node', node)
+
+  // User has explicitly set auto-layout
+  if (node.layoutMode !== 'NONE') {
+    console.log('node.layoutMode')
+    const rowColumn = getUnoCSSAutoLayoutProps(node, node)
+    return handleContainer(node, '', rowColumn)
+  }
+
+  // User has not explicitly set auto-layout, but Figma has inferred auto-layout
+  // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
+  else if (node.inferredAutoLayout !== null) {
+    console.log('node.inferredAutoLayout')
+  }
+
+  // No explicitly set or automatically inferred auto-layout
+  else {
+    // Auto-layout is disabled
+    console.log('node.layoutMode NONE')
+  }
+
+  return 'px-6'
+}
+
+type ContainerNode =
+  & SceneNode
+  & SceneNodeMixin
+  & BlendMixin
+  & LayoutMixin
+  & GeometryMixin
+  & MinimalBlendMixin
+
+function handleContainer(
+  node: ContainerNode,
+  children: string,
+  additionalAttr: string,
+): string {
+  const builder = new UnocssBuilder(node)
+  builder.commonShapeStyles(node)
+  return builder.build(additionalAttr)
 }
