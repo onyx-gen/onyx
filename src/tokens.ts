@@ -1,6 +1,8 @@
 import { Properties } from './properties'
 
-export type DesignTokens = Record<string, string>
+export type DesignTokens = {
+  [key in Properties]?: string
+}
 
 /**
  * This function retrieves the applied design tokens from a given node.

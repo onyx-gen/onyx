@@ -1,4 +1,6 @@
 // TODO MF
+import type { DesignTokens } from '../tokens'
+
 function pxToLayoutSize(value: number): string {
   return `${value}px`
 }
@@ -33,10 +35,17 @@ function getAlignItems(node: InferredAutoLayoutResult): string {
   }
 }
 
-function getGap(node: InferredAutoLayoutResult): string {
-  return node.itemSpacing > 0 && node.primaryAxisAlignItems !== 'SPACE_BETWEEN'
-    ? `gap-${pxToLayoutSize(node.itemSpacing)}`
-    : ''
+function getGap(node: InferredAutoLayoutResult, tokens: DesignTokens): string {
+  const hasGap = node.itemSpacing > 0 && node.primaryAxisAlignItems !== 'SPACE_BETWEEN'
+
+  if (hasGap) {
+    if (tokens.spacing === undefined)
+      console.error('You\'re using the gap property, but you haven\'t set the spacing token.')
+    else
+      return `gap-${tokens.spacing}`
+  }
+
+  return ''
 }
 
 function getFlex(node: SceneNode, autoLayout: InferredAutoLayoutResult): string {
@@ -47,12 +56,16 @@ function getFlex(node: SceneNode, autoLayout: InferredAutoLayoutResult): string 
     : 'inline-flex'
 }
 
-export function getUnoCSSAutoLayoutProps(node: SceneNode, autoLayout: InferredAutoLayoutResult): string {
+export function getUnoCSSAutoLayoutProps(
+  node: SceneNode,
+  autoLayout: InferredAutoLayoutResult,
+  tokens: DesignTokens,
+): string {
   return Object.values({
     flexDirection: getFlexDirection(autoLayout),
     justifyContent: getJustifyContent(autoLayout),
     alignItems: getAlignItems(autoLayout),
-    gap: getGap(autoLayout),
+    gap: getGap(autoLayout, tokens),
     flex: getFlex(node, autoLayout),
   })
     .filter(value => value !== '')
