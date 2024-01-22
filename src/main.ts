@@ -55,15 +55,19 @@ function recursiveGeneration(node: SceneNode): UnoTree {
   return cssTree
 }
 
-function generateHTMLFromTree(tree: UnoTree): string {
-  let html = `<div class="${tree.css}">`
+function generateHTMLFromTree(tree: UnoTree, depth: number = 0): string {
+  const indent = '  '.repeat(depth)
+  const hasChildren = tree.children && tree.children.length > 0
 
-  if (tree.children && tree.children.length > 0) {
+  let html = `${indent}<div class="${tree.css}">`
+
+  if (hasChildren) {
+    html += '\n'
     tree.children.forEach((child) => {
-      html += generateHTMLFromTree(child)
+      html += generateHTMLFromTree(child, depth + 1)
     })
   }
 
-  html += '</div>'
+  html += `${indent}</div>\n`
   return html
 }
