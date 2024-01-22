@@ -7,6 +7,8 @@
 // full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
 
 // This provides the callback to generate the code.
+import {Properties} from "./properties";
+
 figma.codegen.on('generate', async (event) => {
   const node: SceneNode = event.node;
 
@@ -14,6 +16,19 @@ figma.codegen.on('generate', async (event) => {
   const raw = Object.entries(cssObj);
 
   const cssCode = raw.map(([key, value]) => `${key}: ${value.replace(/\/\*.*\*\//g, '').trim()};`).join('\n');
+
+  const tokenKeys = Object.keys(Properties);
+
+  const code = tokenKeys
+    .map((key) => {
+      const value = event.node.getSharedPluginData('tokens', key);
+
+      return value && `${key}: ${value};`;
+    })
+    .filter((x) => x)
+    .join('\n');
+
+  console.log("tokens", code);
 
   console.log(node.type)
   console.log("variables", node.boundVariables)
