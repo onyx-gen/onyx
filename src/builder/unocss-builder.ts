@@ -155,7 +155,7 @@ export class UnocssBuilder {
     }
 
     const hasBorderTop = this.borderRadius.topRight !== null
-      && this.borderRadius.topRight === this.borderRadius.topRight
+      && this.borderRadius.topRight === this.borderRadius.topLeft
 
     const hasBorderBottom = this.borderRadius.bottomLeft !== null
       && this.borderRadius.bottomLeft === this.borderRadius.bottomRight
