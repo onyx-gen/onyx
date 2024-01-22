@@ -7,8 +7,17 @@
 // full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
 
 // This provides the callback to generate the code.
-figma.codegen.on('generate', (event) => {
+figma.codegen.on('generate', async (event) => {
   const node: SceneNode = event.node;
+
+  const cssObj = await node.getCSSAsync();
+  const raw = Object.entries(cssObj);
+
+  const cssCode = raw.map(([key, value]) => `${key}: ${value.replace(/\/\*.*\*\//g, '').trim()};`).join('\n');
+
+  console.log(node.type)
+  console.log("variables", node.boundVariables)
+  console.log("cssCode", cssCode);
 
   let textStrings: string[] = [];
 
