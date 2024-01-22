@@ -1,6 +1,7 @@
 import type { DesignTokens } from '../tokens'
 import { getAppliedTokens } from '../tokens'
 import { Properties } from '../properties'
+import { getUnoCSSAutoLayoutProps } from './auto-layout'
 
 interface Padding {
   top: string | null
@@ -211,9 +212,27 @@ export class UnocssBuilder {
     this.attributes.push(`w-$${token}`)
   }
 
+  handleAutoLayout() {
+    if (!('layoutMode' in this.node))
+      return
+
+    let css = ''
+
+    if (this.node.layoutMode !== 'NONE')
+      css = getUnoCSSAutoLayoutProps(this.node, this.node, this.tokens)
+
+    // User has not explicitly set auto-layout, but Figma has inferred auto-layout
+    // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
+    else if (this.node.inferredAutoLayout !== null)
+      css = getUnoCSSAutoLayoutProps(this.node, this.node.inferredAutoLayout, this.tokens)
+
+    this.attributes.push(css)
+  }
+
   build(): string {
     this.handlePadding()
     this.handleBorderRadius()
+    this.handleAutoLayout()
 
     return this.attributes.join(' ').toLowerCase()
   }

@@ -1,5 +1,5 @@
-// TODO MF
 import type { DesignTokens } from '../tokens'
+import { Properties } from '../properties'
 
 function getFlexDirection(node: InferredAutoLayoutResult): string {
   return node.layoutMode === 'HORIZONTAL' ? '' : 'flex-col'
@@ -36,10 +36,11 @@ function getGap(node: InferredAutoLayoutResult, tokens: DesignTokens): string {
 
   if (hasGap) {
     console.log(tokens)
-    if (tokens.itemSpacing === undefined)
+    const tokenValue = tokens.get(Properties.itemSpacing)
+    if (tokenValue === undefined)
       console.error('You\'re using the gap property, but you haven\'t set the itemSpacing token.')
     else
-      return `gap-$${tokens.itemSpacing}`
+      return `gap-$${tokenValue}`
   }
 
   return ''
@@ -59,11 +60,11 @@ export function getUnoCSSAutoLayoutProps(
   tokens: DesignTokens,
 ): string {
   return Object.values({
+    flex: getFlex(node, autoLayout),
     flexDirection: getFlexDirection(autoLayout),
     justifyContent: getJustifyContent(autoLayout),
     alignItems: getAlignItems(autoLayout),
     gap: getGap(autoLayout, tokens),
-    flex: getFlex(node, autoLayout),
   })
     .filter(value => value !== '')
     .join(' ')
