@@ -10,6 +10,11 @@
 
 import { UnocssBuilder } from './builder/unocss-builder'
 
+interface UnoTree {
+  css: string
+  children: UnoTree[]
+}
+
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 figma.skipInvisibleInstanceChildren = true
 
@@ -17,14 +22,48 @@ figma.codegen.on('generate', async () => {
   const selection = figma.currentPage.selection
   const node = selection[0]
 
-  const builder = new UnocssBuilder(node)
-  const css = builder.build()
+  let html = ''
+
+  if (node.type === 'COMPONENT') {
+    const unoTree = recursiveGeneration(node)
+    html = generateHTMLFromTree(unoTree)
+  }
+
+  else { console.log('Please select a component') }
 
   return [
     {
-      language: 'PLAINTEXT',
-      code: css,
+      language: 'HTML',
+      code: html,
       title: 'UnoCSS & Tokens Studio for Figma',
     },
   ]
 })
+
+function recursiveGeneration(node: SceneNode): UnoTree {
+  const builder = new UnocssBuilder(node)
+  const css = builder.build()
+
+  const cssTree: UnoTree = { css, children: [] }
+
+  if ('children' in node && node.children.length > 0) {
+    node.children.forEach((child) => {
+      cssTree.children.push(recursiveGeneration(child))
+    })
+  }
+
+  return cssTree
+}
+
+function generateHTMLFromTree(tree: UnoTree): string {
+  let html = `<div class="${tree.css}">`
+
+  if (tree.children && tree.children.length > 0) {
+    tree.children.forEach((child) => {
+      html += generateHTMLFromTree(child)
+    })
+  }
+
+  html += '</div>'
+  return html
+}

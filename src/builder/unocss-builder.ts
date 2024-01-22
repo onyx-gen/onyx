@@ -215,6 +215,6 @@ export class UnocssBuilder {
     this.handlePadding()
     this.handleBorderRadius()
 
-    return this.attributes.join('\n')
+    return this.attributes.join(' ')
   }
 }
