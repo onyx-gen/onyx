@@ -49,9 +49,11 @@ function recursiveGeneration(node: SceneNode): UnoTree {
   const hasChildren = 'children' in node && node.children.length > 0
 
   if (hasChildren) {
-    node.children.forEach((child) => {
-      cssTree.children.push(recursiveGeneration(child))
-    })
+    node.children
+      .filter(child => child.visible)
+      .forEach((child) => {
+        cssTree.children.push(recursiveGeneration(child))
+      })
   }
 
   return cssTree
