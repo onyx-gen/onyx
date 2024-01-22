@@ -10,8 +10,10 @@
 
 import { UnocssBuilder } from './builder/unocss-builder'
 
-figma.codegen.on('generate', async (event) => {
-  const node: SceneNode = event.node
+figma.codegen.on('generate', async () => {
+  const selection = figma.currentPage.selection
+  const node = selection[0]
+
   const builder = new UnocssBuilder(node)
   const css = builder.build()
 
