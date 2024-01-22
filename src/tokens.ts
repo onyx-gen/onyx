@@ -1,8 +1,10 @@
 import { Properties } from './properties'
 
-export type DesignTokens = {
+export type DesignTokensObject = {
   [key in Properties]?: string
 }
+
+export type DesignTokens = Map<Properties, string>
 
 /**
  * This function retrieves the applied design tokens from a given node.
@@ -17,7 +19,7 @@ export type DesignTokens = {
 export function getAppliedTokens(node: SceneNode): DesignTokens {
   const tokenKeys = Object.keys(Properties)
 
-  return Object.fromEntries(
+  const tokenMap: DesignTokensObject = Object.fromEntries(
     tokenKeys
       .map((key) => {
         const value = node
@@ -28,4 +30,10 @@ export function getAppliedTokens(node: SceneNode): DesignTokens {
       .filter(([, value]) => !!value)
       .map(([key, value]) => ([key, value.slice(1, -1)])),
   )
+
+  const myMap: DesignTokens = new Map()
+  for (const [key, value] of Object.entries(tokenMap))
+    myMap.set(key as Properties, value)
+
+  return myMap
 }

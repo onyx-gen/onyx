@@ -1,81 +1,220 @@
-import { retrieveTopFill } from '../common/retrieve-fill'
 import type { DesignTokens } from '../tokens'
 import { getAppliedTokens } from '../tokens'
-import { getUnoCSSAutoLayoutProps } from './auto-layout'
+import { Properties } from '../properties'
+
+interface Padding {
+  top: string | null
+  bottom: string | null
+  left: string | null
+  right: string | null
+}
+
+interface BorderRadius {
+  topLeft: string | null
+  topRight: string | null
+  bottomLeft: string | null
+  bottomRight: string | null
+}
 
 export class UnocssBuilder {
   private attributes: string[] = []
   private readonly tokens: DesignTokens
 
-  constructor(node: SceneNode) {
+  private padding: Padding = {
+    top: null,
+    bottom: null,
+    left: null,
+    right: null,
+  }
+
+  private borderRadius: BorderRadius = {
+    topLeft: null,
+    topRight: null,
+    bottomLeft: null,
+    bottomRight: null,
+  }
+
+  constructor(private node: SceneNode) {
     this.tokens = getAppliedTokens(node)
 
-    if (node.type === 'COMPONENT') {
-      this.color(node)
-      this.autoLayout(node)
-    }
+    this.tokens.forEach((token, tokenType) => {
+      switch (tokenType) {
+        case Properties.typography:
+          this.handleTypographyToken(token)
+          break
+        case Properties.fill:
+          this.handleFillToken(token)
+          break
 
-    if (node.type === 'TEXT') {
-      this.color(node)
-      this.autoLayout(node)
-      this.typography(node)
-    }
+        case Properties.paddingLeft:
+          this.padding.left = token
+          break
+        case Properties.paddingRight:
+          this.padding.right = token
+          break
+        case Properties.paddingTop:
+          this.padding.top = token
+          break
+        case Properties.paddingBottom:
+          this.padding.bottom = token
+          break
+
+        case Properties.height:
+          this.handleHeight(token)
+          break
+        case Properties.width:
+          this.handleWidth(token)
+          break
+        case Properties.sizing:
+          this.handleHeight(token)
+          this.handleWidth(token)
+          break
+
+        case Properties.borderRadius:
+          this.borderRadius.topLeft = token
+          this.borderRadius.topRight = token
+          this.borderRadius.bottomLeft = token
+          this.borderRadius.bottomRight = token
+          break
+        case Properties.borderRadiusTopLeft:
+          this.borderRadius.topLeft = token
+          break
+        case Properties.borderRadiusTopRight:
+          this.borderRadius.topRight = token
+          break
+        case Properties.borderRadiusBottomLeft:
+          this.borderRadius.bottomLeft = token
+          break
+        case Properties.borderRadiusBottomRight:
+          this.borderRadius.bottomRight = token
+          break
+        default:
+          console.log('token is not yet supported by codegen', tokenType, token)
+          break
+      }
+    })
   }
 
-  autoLayout(node: GeometryMixin & BlendMixin & SceneNode) {
-    if (node.type !== 'COMPONENT')
-      return this
-
-    // User has explicitly set auto-layout
-    if (node.layoutMode !== 'NONE') {
-      console.log('node.layoutMode')
-      const rowColumn = getUnoCSSAutoLayoutProps(node, node, this.tokens)
-      this.attributes.push(rowColumn)
-    }
-
-    // User has not explicitly set auto-layout, but Figma has inferred auto-layout
-    // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
-    else if (node.inferredAutoLayout !== null) {
-      console.log('node.inferredAutoLayout')
-    }
-
-    // No explicitly set or automatically inferred auto-layout
-    else {
-      // Auto-layout is disabled
-      console.log('node.layoutMode NONE')
-    }
-
-    return this
+  handleTypographyToken(token: string) {
+    this.attributes.push(`font-$${token}`)
   }
 
-  typography(node: SceneNode) {
-    if (this.tokens.typography)
-      this.attributes.push(`font-$${this.tokens.typography}`)
+  handleFillToken(token: string) {
+    if (this.node.type === 'TEXT')
+      this.attributes.push(`color-$${token}`)
+    else
+      this.attributes.push(`bg-$${token}`)
   }
 
-  color(node: MinimalFillsMixin & SceneNode): this {
-    const paint: MinimalFillsMixin['fills'] = node.fills
+  handlePadding() {
+    // all sides the same padding
+    const p = this.padding.top !== null
+      && this.padding.top === this.padding.bottom
+      && this.padding.bottom === this.padding.left
+      && this.padding.left === this.padding.right
 
-    const fill = retrieveTopFill(paint)
-
-    if (!fill)
-      return this
-
-    if (fill.type === 'SOLID') {
-      console.log('solid')
-      if (node.type === 'TEXT')
-        this.attributes.push(`color-$${this.tokens.fill}`)
-      else
-        this.attributes.push(`bg-$${this.tokens.fill}`)
+    if (p) {
+      this.attributes.push(`p-$${this.padding.top}`)
+      return
     }
 
-    // TODO MF
-    else { console.error('fill is not solid', fill) }
+    // one axis the same
+    const px = this.padding.left !== null && this.padding.left === this.padding.right
+    const py = this.padding.top !== null && this.padding.top === this.padding.bottom
 
-    return this
+    if (px || py) {
+      if (px)
+        this.attributes.push(`px-$${this.padding.left}`)
+
+      if (py)
+        this.attributes.push(`py-$${this.padding.top}`)
+
+      if (px && py)
+        return
+    }
+
+    if (this.padding.top !== null && !py)
+      this.attributes.push(`pt-$${this.padding.top}`)
+    if (this.padding.right !== null && !px)
+      this.attributes.push(`pr-$${this.padding.right}`)
+    if (this.padding.bottom !== null && !py)
+      this.attributes.push(`pb-$${this.padding.bottom}`)
+    if (this.padding.left !== null && !px)
+      this.attributes.push(`pl-$${this.padding.left}`)
+  }
+
+  handleBorderRadius() {
+    const b = this.borderRadius.topLeft !== null
+      && this.borderRadius.topLeft === this.borderRadius.topRight
+      && this.borderRadius.topRight === this.borderRadius.bottomLeft
+      && this.borderRadius.bottomLeft === this.borderRadius.bottomRight
+
+    if (b) {
+      this.attributes.push(`rounded-$${this.borderRadius.topLeft}`)
+      return
+    }
+
+    const hasBorderTop = this.borderRadius.topRight !== null
+      && this.borderRadius.topRight === this.borderRadius.topRight
+
+    const hasBorderBottom = this.borderRadius.bottomLeft !== null
+      && this.borderRadius.bottomLeft === this.borderRadius.bottomRight
+
+    if (hasBorderTop || hasBorderBottom) {
+      if (hasBorderTop)
+        this.attributes.push(`rounded-t-$${this.borderRadius.topLeft}`)
+
+      if (hasBorderBottom)
+        this.attributes.push(`rounded-b-$${this.borderRadius.bottomLeft}`)
+
+      if (hasBorderTop && hasBorderBottom)
+        return
+    }
+
+    const hasBorderLeft = this.borderRadius.topLeft !== null
+      && this.borderRadius.topLeft === this.borderRadius.bottomLeft
+
+    const hasBorderRight = this.borderRadius.topRight !== null
+      && this.borderRadius.topRight === this.borderRadius.bottomRight
+
+    if (hasBorderLeft || hasBorderRight) {
+      if (hasBorderLeft)
+        this.attributes.push(`rounded-l-$${this.borderRadius.topLeft}`)
+
+      if (hasBorderRight)
+        this.attributes.push(`rounded-r-$${this.borderRadius.topRight}`)
+
+      if (hasBorderLeft && hasBorderRight)
+        return
+    }
+
+    const hasBorderTopLeft = this.borderRadius.topLeft !== null
+    const hasBorderTopRight = this.borderRadius.topRight !== null
+    const hasBorderBottomLeft = this.borderRadius.bottomLeft !== null
+    const hasBorderBottomRight = this.borderRadius.bottomRight !== null
+
+    if (hasBorderTopLeft && !hasBorderTop && !hasBorderLeft)
+      this.attributes.push(`rounded-tl-$${this.borderRadius.topLeft}`)
+    if (hasBorderTopRight && !hasBorderTop && !hasBorderRight)
+      this.attributes.push(`rounded-tr-$${this.borderRadius.topRight}`)
+    if (hasBorderBottomLeft && !hasBorderBottom && !hasBorderLeft)
+      this.attributes.push(`rounded-bl-$${this.borderRadius.bottomLeft}`)
+    if (hasBorderBottomRight && !hasBorderBottom && !hasBorderRight)
+      this.attributes.push(`rounded-br-$${this.borderRadius.bottomRight}`)
+  }
+
+  handleHeight(token: string) {
+    this.attributes.push(`h-$${token}`)
+  }
+
+  handleWidth(token: string) {
+    this.attributes.push(`w-$${token}`)
   }
 
   build(): string {
-    return this.attributes.join(' ')
+    this.handlePadding()
+    this.handleBorderRadius()
+
+    return this.attributes.join('\n')
   }
 }
