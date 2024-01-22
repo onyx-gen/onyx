@@ -7,59 +7,58 @@
 // full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
 
 // This provides the callback to generate the code.
-import {Properties} from "./properties";
+import { Properties } from './properties'
 
 figma.codegen.on('generate', async (event) => {
-  const node: SceneNode = event.node;
+  const node: SceneNode = event.node
 
-  const cssObj = await node.getCSSAsync();
-  const raw = Object.entries(cssObj);
+  const cssObj = await node.getCSSAsync()
+  const raw = Object.entries(cssObj)
 
-  const cssCode = raw.map(([key, value]) => `${key}: ${value.replace(/\/\*.*\*\//g, '').trim()};`).join('\n');
+  const cssCode = raw.map(([key, value]) => `${key}: ${value.replace(/\/\*.*\*\//g, '').trim()};`).join('\n')
 
-  const tokenKeys = Object.keys(Properties);
+  const tokenKeys = Object.keys(Properties)
 
   const code = tokenKeys
     .map((key) => {
-      const value = event.node.getSharedPluginData('tokens', key);
+      const value = event.node.getSharedPluginData('tokens', key)
 
-      return value && `${key}: ${value};`;
+      return value && `${key}: ${value};`
     })
-    .filter((x) => x)
-    .join('\n');
+    .filter(x => x)
+    .join('\n')
 
-  console.log("tokens", code);
+  console.log('tokens', code)
 
   console.log(node.type)
-  console.log("variables", node.boundVariables)
-  console.log("cssCode", cssCode);
+  console.log('variables', node.boundVariables)
+  console.log('cssCode', cssCode)
 
-  let textStrings: string[] = [];
+  let textStrings: string[] = []
 
-  if ("findAll" in node) {
-    textStrings = node.findAll((node) => node.type === "TEXT").map((node) => (node as TextNode).characters);
-  }
+  if ('findAll' in node)
+    textStrings = node.findAll(node => node.type === 'TEXT').map(node => (node as TextNode).characters)
 
-  let jsonStringDictionary: {
-    [key: string]: { string: string };
-  } = {};
+  const jsonStringDictionary: {
+    [key: string]: { string: string }
+  } = {}
 
   for (const textString of textStrings) {
-    const jsonKey = createJsonKey(textString);
+    const jsonKey = createJsonKey(textString)
 
-    jsonStringDictionary[jsonKey] = { string: textString };
+    jsonStringDictionary[jsonKey] = { string: textString }
   }
 
   return [
     {
-      language: "JSON",
+      language: 'JSON',
       code: JSON.stringify(jsonStringDictionary, null, 2),
-      title: "i18n-dict",
+      title: 'i18n-dict',
     },
-  ];
-});
+  ]
+})
 
 // Function to create a JSON key from a string
 function createJsonKey(inputString: string) {
-  return inputString.toLowerCase().replace(/\s/g, "_");
+  return inputString.toLowerCase().replace(/\s/g, '_')
 }

@@ -1,23 +1,27 @@
 {
   "name": "unocss-variables",
+  "type": "module",
   "version": "1.0.0",
   "description": "Your Figma Plugin",
+  "author": "",
+  "license": "",
   "main": "code.js",
-  "type": "module",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
-  "author": "",
-  "license": "",
   "devDependencies": {
+    "@antfu/eslint-config": "^2.6.3",
     "@figma/plugin-typings": "^1.84.0",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
+    "eslint": "^8.56.0",
     "rollup": "^4.9.6",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3"

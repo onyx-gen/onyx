@@ -2,14 +2,14 @@
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["ESNext"],
-    "strict": true,
-    "esModuleInterop": true,
     "moduleResolution": "node",
-    "forceConsistentCasingInFileNames": true,
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@figma"
-    ]
+    ],
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["./src/**/*"]
 }
