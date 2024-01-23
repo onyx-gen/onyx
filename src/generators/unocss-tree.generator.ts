@@ -1,4 +1,4 @@
-import type { UnoTreeNode } from '../interfaces'
+import type { ContainerNodeData, TextNodeData, UnoTreeNode } from '../interfaces'
 import { UnocssBuilder } from '../builder/unocss-builder'
 
 /**
@@ -34,21 +34,48 @@ export function generateUnoTree(node: SceneNode): UnoTreeNode | null {
       return null
     }
 
-    const unoTreeNode: UnoTreeNode = { data: { type: 'container', css }, children: [] }
+    const isTextNode = node.type === 'TEXT'
 
-    if (hasChildren) {
-      node.children
-        .filter(child => child.visible)
-        .forEach((child) => {
-          const childTree = generateUnoTree(child)
+    if (isTextNode) {
+      const parentNodeData: ContainerNodeData = {
+        type: 'container',
+        css,
+      }
 
-          // Only add the child if it's not null
-          if (childTree)
-            unoTreeNode.children.push(childTree)
-        })
+      const childNodeData: TextNodeData = {
+        type: 'text',
+        text: node.characters,
+      }
+
+      return {
+        data: parentNodeData,
+        children: [
+          { children: [], data: childNodeData },
+        ],
+      }
     }
+    else {
+      const data: ContainerNodeData = {
+        type: 'container',
+        css,
+      }
 
-    return unoTreeNode
+      const unoTreeNode: UnoTreeNode = { data, children: [] }
+
+      if (hasChildren) {
+        node.children
+          .filter(child => child.visible)
+          .forEach((child) => {
+            const childTree = generateUnoTree(child)
+
+            // Only add the child if it's not null
+            if (childTree)
+              unoTreeNode.children.push(childTree)
+          })
+      }
+
+      return unoTreeNode
+    }
   }
 
   console.error('This should never happen')

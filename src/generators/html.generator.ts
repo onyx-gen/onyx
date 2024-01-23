@@ -22,6 +22,9 @@ export function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0
   else if (unoTreeNode.data.type === 'icon') {
     html = `${indent}<i class="i-figma-${unoTreeNode.data.name}">`
   }
+  else if (unoTreeNode.data.type === 'text') {
+    html = `${indent}${unoTreeNode.data.text}`
+  }
 
   if (hasChildren) {
     html += '\n'
@@ -35,6 +38,8 @@ export function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0
     html += `</div>\n`
   else if (unoTreeNode.data.type === 'icon')
     html += `</i>\n`
+  else if (unoTreeNode.data.type === 'text')
+    html += `\n`
   else
     console.warn('Instance nodes are not yet supported (end tag)', unoTreeNode)
 
