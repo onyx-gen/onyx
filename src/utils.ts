@@ -11,3 +11,17 @@ export function typedObjectEntries<T extends object>(obj: T): [keyof T, T[keyof 
 export function createIndent(depth: number): string {
   return '  '.repeat(depth)
 }
+
+/**
+ * Retrieves the first selected node in the Figma document.
+ *
+ * @returns {SceneNode | null} The first selected node if any, null otherwise.
+ */
+export function getSelectedNode(): SceneNode | null {
+  const selection = figma.currentPage.selection
+
+  if (selection.length > 0)
+    return selection[0]
+
+  return null
+}

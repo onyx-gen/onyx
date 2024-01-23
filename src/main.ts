@@ -8,6 +8,7 @@
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 import TreeGenerator from './generators/tree.generator'
 import HTMLGenerator from './generators/html.generator'
+import { getSelectedNode } from './utils'
 
 figma.skipInvisibleInstanceChildren = true
 
@@ -18,8 +19,11 @@ figma.skipInvisibleInstanceChildren = true
  * inside Figma.
  */
 figma.codegen.on('generate', async () => {
-  const selection = figma.currentPage.selection
-  const node = selection[0]
+  const node = getSelectedNode()
+
+  // Early return if no node is selected
+  if (!node)
+    return []
 
   const htmlGenerator = new HTMLGenerator()
   const treeGenerator = new TreeGenerator()
