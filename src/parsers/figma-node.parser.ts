@@ -1,17 +1,18 @@
-import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, UnoTreeNode } from '../interfaces'
+import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, TreeNode } from '../interfaces'
 import { UnocssBuilder } from '../builder/unocss-builder'
 
 /**
- * Class to generate a tree structure representing UnoCSS components.
+ * Class to generate a abstract tree structure from a Figma node.
+ * The tree structure is used to generate HTML code.
  */
 class FigmaNodeParser {
   /**
    * Public method to initiate parsing of the Figma node and its subtree.
    * This method serves as the core of the tree traversal logic.
    * @param node - The Figma node to process.
-   * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
+   * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
-  public parse(node: SceneNode): UnoTreeNode | null {
+  public parse(node: SceneNode): TreeNode | null {
     if (node.type === 'INSTANCE')
       return this.parseInstanceNode(node)
     else
@@ -21,9 +22,9 @@ class FigmaNodeParser {
   /**
    * Parses nodes of type 'INSTANCE'.
    * @param node - The instance node to process.
-   * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
+   * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
-  private parseInstanceNode(node: InstanceNode): UnoTreeNode | null {
+  private parseInstanceNode(node: InstanceNode): TreeNode | null {
     const isIcon = node.name === 'icon'
     if (isIcon)
       return this.createIconNode(node)
@@ -34,9 +35,9 @@ class FigmaNodeParser {
   /**
    * Creates a tree node for icon type.
    * @param node - The icon node to process.
-   * @returns {UnoTreeNode} The generated tree node for the icon.
+   * @returns {TreeNode} The generated tree node for the icon.
    */
-  private createIconNode(node: InstanceNode): UnoTreeNode<IconNodeData> {
+  private createIconNode(node: InstanceNode): TreeNode<IconNodeData> {
     const iconName = node.mainComponent?.name
 
     if (!iconName)
@@ -48,9 +49,9 @@ class FigmaNodeParser {
   /**
    * Creates a tree node for instance type.
    * @param node - The instance node to process.
-   * @returns {UnoTreeNode} The generated tree node for the instance.
+   * @returns {TreeNode} The generated tree node for the instance.
    */
-  private createInstanceNode(node: InstanceNode): UnoTreeNode<InstanceNodeData> {
+  private createInstanceNode(node: InstanceNode): TreeNode<InstanceNodeData> {
     return {
       children: [],
       data: {
@@ -64,9 +65,9 @@ class FigmaNodeParser {
   /**
    * Parses nodes other than 'INSTANCE' type.
    * @param node - The node to process.
-   * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
+   * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
-  private parseOtherNodes(node: SceneNode): UnoTreeNode | null {
+  private parseOtherNodes(node: SceneNode): TreeNode | null {
     const builder = new UnocssBuilder(node)
     const css = builder.build()
 
@@ -85,9 +86,9 @@ class FigmaNodeParser {
    * Creates a tree node for text type.
    * @param node - The text node to process.
    * @param {string} css - CSS for the node.
-   * @returns {UnoTreeNode} The generated tree node for the text.
+   * @returns {TreeNode} The generated tree node for the text.
    */
-  private createTextNode(node: TextNode, css: string): UnoTreeNode {
+  private createTextNode(node: TextNode, css: string): TreeNode {
     const parentNodeData: ContainerNodeData = { type: 'container', css }
     const childNodeData: TextNodeData = { type: 'text', text: node.characters }
 
@@ -99,11 +100,11 @@ class FigmaNodeParser {
    * @param node - The container node to process.
    * @param {string} css - CSS for the node.
    * @param {boolean} hasChildren - Flag indicating if the node has children.
-   * @returns {UnoTreeNode} The generated tree node for the container.
+   * @returns {TreeNode} The generated tree node for the container.
    */
-  private createContainerNode(node: SceneNode, css: string, hasChildren: boolean): UnoTreeNode {
+  private createContainerNode(node: SceneNode, css: string, hasChildren: boolean): TreeNode {
     const data: ContainerNodeData = { type: 'container', css }
-    const unoTreeNode: UnoTreeNode = { data, children: [] }
+    const unoTreeNode: TreeNode = { data, children: [] }
 
     if (hasChildren)
       this.addChildrenToNode(node as SceneNode & ChildrenMixin, unoTreeNode)
@@ -114,9 +115,9 @@ class FigmaNodeParser {
   /**
    * Adds child nodes to the given tree node.
    * @param {ChildrenMixin & SceneNode} node - The parent node.
-   * @param {UnoTreeNode} unoTreeNode - The tree node to add children to.
+   * @param {TreeNode} unoTreeNode - The tree node to add children to.
    */
-  private addChildrenToNode(node: ChildrenMixin & SceneNode, unoTreeNode: UnoTreeNode): void {
+  private addChildrenToNode(node: ChildrenMixin & SceneNode, unoTreeNode: TreeNode): void {
     node.children
       .filter(child => child.visible)
       .forEach((child) => {

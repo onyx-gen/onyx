@@ -1,9 +1,9 @@
-export interface UnoTreeNode<T extends UnoTreeNodeData = UnoTreeNodeData> {
+export interface TreeNode<T extends TreeNodeData = TreeNodeData> {
   data: T
-  children: UnoTreeNode[]
+  children: TreeNode[]
 }
 
-export type UnoTreeNodeData =
+export type TreeNodeData =
   | ContainerNodeData
   | InstanceNodeData
   | IconNodeData

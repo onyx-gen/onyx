@@ -1,14 +1,14 @@
 import type {
   InstanceNodeData,
-  UnoTreeNode,
-  UnoTreeNodeData,
+  TreeNode,
+  TreeNodeData,
 } from '../interfaces'
 import { createIndent, typedObjectEntries } from '../utils'
 
 // Define a type for the attrs function
-type AttrsFunction<T extends UnoTreeNodeData> = (node: UnoTreeNode<T>) => { [key: string]: string }
+type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => { [key: string]: string }
 
-type TagFunction<T extends UnoTreeNodeData> = ((node: UnoTreeNode<T>) => string) | string
+type TagFunction<T extends TreeNodeData> = ((node: TreeNode<T>) => string) | string
 
 /**
  * Class representing the mapping from node types to their corresponding HTML tags and attributes.
@@ -39,34 +39,34 @@ class HTMLGenerator {
   }
 
   /**
-   * Generates HTML markup from a given UnoCSS tree node.
-   * @param {UnoTreeNode} unoTreeNode - The UnoCSS tree node to process.
+   * Generates HTML markup from a given tree node.
+   * @param {TreeNode} treeNode - The tree node to process.
    * @param {number} depth - The current depth in the tree, used for indentation.
    * @returns {string} The generated HTML string.
    */
-  public generate(unoTreeNode: UnoTreeNode, depth: number = 0): string {
+  public generate(treeNode: TreeNode, depth: number = 0): string {
     // Create indentation based on the current depth
     const indent = createIndent(depth)
     let html = indent
 
     // Retrieve the mapping for the current node type
-    const nodeMapping = this.nodeTypeToTag[unoTreeNode.data.type]
+    const nodeMapping = this.nodeTypeToTag[treeNode.data.type]
 
     // Early return if no mapping is found for the node type
     if (!nodeMapping) {
-      console.error(`No tag defined for node type '${unoTreeNode.data.type}'`)
+      console.error(`No tag defined for node type '${treeNode.data.type}'`)
       return ''
     }
 
     // Determine the tag and attributes for the current node
-    const tag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
-    const attrs = nodeMapping.attrs ? nodeMapping.attrs(unoTreeNode as any) : {}
+    const tag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(treeNode as any) : nodeMapping.tag
+    const attrs = nodeMapping.attrs ? nodeMapping.attrs(treeNode as any) : {}
     const hasAttrs = Object.keys(attrs).length > 0
-    const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
+    const hasChildren = treeNode.children && treeNode.children.length > 0
 
     // Handle text nodes separately
-    if (unoTreeNode.data.type === 'text') {
-      html += `${unoTreeNode.data.text}\n`
+    if (treeNode.data.type === 'text') {
+      html += `${treeNode.data.text}\n`
     }
     else if (tag) {
       // Start tag construction for non-text nodes
@@ -75,7 +75,7 @@ class HTMLGenerator {
       if (hasChildren) {
         // Add children nodes if present
         html += '>\n'
-        unoTreeNode.children.forEach((child) => {
+        treeNode.children.forEach((child) => {
           html += this.generate(child, depth + 1)
         })
         // Close the tag
@@ -94,10 +94,10 @@ class HTMLGenerator {
    * This method is used to generate a string that represents the HTML tag for an instance node.
    * It takes a treeNode with instance node data as an argument and escapes certain chars in the name
    * in order to generate a valid HTML tag.
-   * @param treeNode - The UnoTreeNode of type InstanceNodeData for which the HTML tag string is to be generated.
+   * @param treeNode - The TreeNode of type InstanceNodeData for which the HTML tag string is to be generated.
    * @returns A string representing the HTML tag for the given instance node.
    */
-  private getInstanceNodeHTMLTag(treeNode: UnoTreeNode<InstanceNodeData>): string {
+  private getInstanceNodeHTMLTag(treeNode: TreeNode<InstanceNodeData>): string {
     return treeNode.data.name
       .replaceAll('\\', '_')
       .replaceAll('/', '_')
@@ -106,10 +106,10 @@ class HTMLGenerator {
 
   /**
    * This method is used to generate an object that represents the HTML attributes for an instance node.
-   * @param treeNode - The UnoTreeNode of type InstanceNodeData for which the HTML attributes are to be generated.
+   * @param treeNode - The TreeNode of type InstanceNodeData for which the HTML attributes are to be generated.
    * @returns An object representing the HTML attributes for the given instance node.
    */
-  private getInstanceNodeHTMLAttrs(treeNode: UnoTreeNode<InstanceNodeData>): { [key: string]: string } {
+  private getInstanceNodeHTMLAttrs(treeNode: TreeNode<InstanceNodeData>): { [key: string]: string } {
     const attrs: { [key: string]: string } = {}
 
     typedObjectEntries(treeNode.data.props)
@@ -141,17 +141,17 @@ class HTMLGenerator {
   }
 }
 
-type ExtractedNodeDataType<K extends UnoTreeNodeData['type']> = Extract<UnoTreeNodeData, { type: K }>
+type ExtractedNodeDataType<K extends TreeNodeData['type']> = Extract<TreeNodeData, { type: K }>
 
 /**
- * Maps each 'type' of UnoTreeNodeData to its corresponding HTML tag configuration.
+ * Maps each 'type' of TreeNodeData to its corresponding HTML tag configuration.
  * For each type (e.g., 'container', 'text'), it defines the HTML start and end tags,
  * and a function to generate the HTML attributes appropriate for that type.
  * This mapping leverages TypeScript's conditional types and mapped types to automatically
- * associate the correct subtype of UnoTreeNodeData with its tag configuration, ensuring type safety.
+ * associate the correct subtype of TreeNodeData with its tag configuration, ensuring type safety.
  */
 export type NodeTypeToTagMap = {
-  [K in UnoTreeNodeData['type']]: {
+  [K in TreeNodeData['type']]: {
     tag?: TagFunction<ExtractedNodeDataType<K>>
     attrs?: AttrsFunction<ExtractedNodeDataType<K>>
   }
