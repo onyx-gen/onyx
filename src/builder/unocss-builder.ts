@@ -20,6 +20,25 @@ interface RectCorners {
 type TokenHandler = () => void
 type TokenHandlers = { [key in Properties]?: TokenHandler }
 
+/**
+ * UnocssBuilder is a class for building CSS classes based on design tokens and properties
+ * of a Figma node. It supports various CSS properties such as padding, border width,
+ * border radius, typography, color, dimensions, and auto-layout. The builder pattern
+ * is used to accumulate CSS classes and build a final class string that can be applied
+ * to HTML elements.
+ *
+ * @example
+ * // To use the UnocssBuilder, create an instance with a Figma node,
+ * // and then call the build method to generate the CSS class string.
+ * const node: SceneNode = { ... }; // Assume this is a Figma node object.
+ * const builder = new UnocssBuilder(node);
+ * const cssClasses = builder.build();
+ * // Now, cssClasses contains the CSS classes derived from the node's design tokens.
+ *
+ * This builder abstracts the complexity of handling different design tokens and
+ * CSS generation logic, providing a simple interface to generate UnoCSS utility classes
+ * from Figma nodes.
+ */
 export class UnocssBuilder {
   private attributes: string[] = []
   private readonly tokens: DesignTokens
@@ -27,11 +46,22 @@ export class UnocssBuilder {
   private borderWidth: RectSides = { top: null, bottom: null, left: null, right: null }
   private borderRadius: RectCorners = { topLeft: null, topRight: null, bottomLeft: null, bottomRight: null }
 
+  /**
+   * Constructs an UnoCSS builder with the specified node.
+   * It initializes design tokens for the node and sets up the builder.
+   * @param node The scene node for which to build CSS attributes.
+   */
   constructor(private node: SceneNode) {
     this.tokens = getAppliedTokens(node)
     this.tokens.forEach((token, tokenType) => this.handleToken(token, tokenType))
   }
 
+  /**
+   * Handles the given token based on its type.
+   * It maps various token types to their respective handler functions.
+   * @param token The value of the design token.
+   * @param tokenType The type of the design token.
+   */
   private handleToken(token: string, tokenType: Properties) {
     const paddingHandlers: TokenHandlers = {
       [Properties.paddingLeft]: () => this.padding.left = token,
@@ -93,10 +123,22 @@ export class UnocssBuilder {
       console.log('Token is not yet supported by codegen', tokenType, token)
   }
 
+  /**
+   * Handles the dimension attributes for height and width.
+   * It adds the appropriate CSS class for the given dimension.
+   * @param dimension The dimension type ('height' or 'width').
+   * @param token The value of the dimension token.
+   */
   private handleDimension(dimension: 'height' | 'width', token: string) {
     this.attributes.push(`${dimension[0]}-$${token}`)
   }
 
+  /**
+   * Handles attributes for rectangular sides (such as padding or border-width).
+   * It generates CSS classes based on the uniformity and equality of the rectangular sides.
+   * @param rectSides The object containing values for each side of the rectangle.
+   * @param attributePrefix The prefix to use for the CSS class.
+   */
   private handleRectSidesAttribute(rectSides: RectSides, attributePrefix: string) {
     // Check if all sides are the same
     const allSidesEqual = rectSides.top !== null
@@ -132,14 +174,28 @@ export class UnocssBuilder {
       this.attributes.push(`${attributePrefix}-l-$${rectSides.left}`)
   }
 
+  /**
+   * Handles the padding attributes.
+   * It delegates to handleRectSidesAttribute with the 'padding' prefix.
+   */
   private handlePadding() {
     this.handleRectSidesAttribute(this.padding, 'p')
   }
 
+  /**
+   * Handles the border-width attributes.
+   * It delegates to handleRectSidesAttribute with the 'border-size' prefix.
+   */
   private handleBorderWidth() {
     this.handleRectSidesAttribute(this.borderWidth, 'border-size')
   }
 
+  /**
+   * Handles attributes for rectangular corners (border-radius).
+   * It generates CSS classes based on the uniformity and equality of the rectangular corners.
+   * @param rectCorners The object containing values for each corner of the rectangle.
+   * @param attributePrefix The prefix to use for the CSS class.
+   */
   private handleRectCornersAttribute(rectCorners: RectCorners, attributePrefix: string) {
     const allCornersEqual = rectCorners.topLeft !== null
       && rectCorners.topLeft === rectCorners.topRight
@@ -182,10 +238,18 @@ export class UnocssBuilder {
       this.attributes.push(`${attributePrefix}-br-$${rectCorners.bottomRight}`)
   }
 
+  /**
+   * Handles the border-radius attributes.
+   * It delegates to handleRectCornersAttribute with the 'rounded' prefix.
+   */
   private handleBorderRadius() {
     this.handleRectCornersAttribute(this.borderRadius, 'rounded')
   }
 
+  /**
+   * Handles the auto-layout properties of the node.
+   * It adds CSS classes based on the layout properties of the node.
+   */
   private handleAutoLayout() {
     if (!('layoutMode' in this.node))
       return
@@ -203,6 +267,11 @@ export class UnocssBuilder {
     this.attributes.push(css)
   }
 
+  /**
+   * Builds and returns the final CSS class string.
+   * It combines all the handled attributes into a single CSS class string.
+   * @returns The final CSS class string.
+   */
   build(): string {
     this.handlePadding()
     this.handleBorderWidth()
