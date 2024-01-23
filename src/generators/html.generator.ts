@@ -10,7 +10,92 @@ import type {
 // Define a type for the attrs function
 type AttrsFunction<T extends UnoTreeNodeData> = (node: UnoTreeNode<T>) => { [key: string]: string }
 
-// Improve NodeTypeToTagMap to handle different node data types
+/**
+ * Class representing the mapping from node types to their corresponding HTML tags and attributes.
+ */
+class HTMLGenerator {
+  // Improve NodeTypeToTagMap to handle different node data types
+  private nodeTypeToTag: NodeTypeToTagMap = {
+    container: {
+      start: 'div',
+      end: 'div',
+      attrs: (treeNode) => {
+        // Only add 'class' property if css is not undefined
+        const attrs: { [key: string]: string } = {}
+        if (treeNode.data.css)
+          attrs.class = treeNode.data.css
+
+        return attrs
+      },
+    },
+    icon: {
+      start: 'i',
+      end: 'i',
+      attrs: treeNode => ({ class: `i-figma-${treeNode.data.name}` }),
+    },
+    text: {
+      start: '',
+      end: '',
+      attrs: () => ({}),
+    },
+    instance: {
+      start: '',
+      end: '',
+      attrs: () => ({}),
+    },
+  }
+
+  /**
+   * Generates HTML markup from a given UnoCSS tree node.
+   * @param {UnoTreeNode} unoTreeNode - The UnoCSS tree node to process.
+   * @param {number} depth - The current depth in the tree, used for indentation.
+   * @returns {string} The generated HTML string.
+   */
+  public generate(unoTreeNode: UnoTreeNode, depth: number = 0): string {
+    const indent = '  '.repeat(depth)
+    let html = ''
+    const nodeTag = this.nodeTypeToTag[unoTreeNode.data.type]
+
+    if (unoTreeNode.data.type === 'text') {
+      html = `${indent}${unoTreeNode.data.text}`
+    }
+    else if (nodeTag) {
+      if (unoTreeNode.data.type === 'instance')
+        console.warn('Instance nodes are not yet supported', unoTreeNode)
+
+      else
+        html = `${indent}<${nodeTag.start} ${this.attrsToString(nodeTag.attrs(unoTreeNode as any))}>`
+    }
+
+    const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
+    if (hasChildren) {
+      html += '\n'
+      unoTreeNode.children.forEach((child) => {
+        html += this.generate(child, depth + 1)
+      })
+      if (nodeTag && nodeTag.end)
+        html += `${indent}</${nodeTag.end}>\n`
+    }
+    else if (nodeTag && nodeTag.end) {
+      html += `</${nodeTag.end}>\n`
+    }
+
+    return html
+  }
+
+  /**
+   * Converts an attributes object into a string format.
+   * @param {object} attrs - The attributes object.
+   * @returns {string} The string representation of the attributes.
+   */
+  private attrsToString(attrs: { [key: string]: string }): string {
+    return Object.entries(attrs)
+      .map(([key, value]) => `${key}="${value}"`)
+      .join(' ')
+  }
+}
+
+// Interface for the mapping from node types to their corresponding HTML tags and attributes
 interface NodeTypeToTagMap {
   container: {
     start: string
@@ -34,89 +119,4 @@ interface NodeTypeToTagMap {
   }
 }
 
-const nodeTypeToTag: NodeTypeToTagMap = {
-  container: {
-    start: 'div',
-    end: 'div',
-    attrs: (treeNode) => {
-      // Only add 'class' property if css is not undefined
-      const attrs: { [key: string]: string } = {}
-      if (treeNode.data.css)
-        attrs.class = treeNode.data.css
-
-      return attrs
-    },
-  },
-  icon: {
-    start: 'i',
-    end: 'i',
-    attrs: treeNode => ({ class: `i-figma-${treeNode.data.name}` }),
-  },
-  text: {
-    start: '',
-    end: '',
-    attrs: () => ({}),
-  },
-  instance: {
-    start: '',
-    end: '',
-    attrs: () => ({}),
-  },
-}
-
-/**
- * Generates HTML markup from a given UnoCSS tree structure.
- * @param {UnoTreeNode} unoTreeNode - The UnoCSS tree node to process.
- * @param {number} [depth] - The current depth in the tree, used for indentation.
- * @returns {string} The generated HTML string.
- */
-export function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0): string {
-  // Create an indentation based on the current depth
-  const indent = '  '.repeat(depth)
-
-  let html = ''
-  const nodeTag = nodeTypeToTag[unoTreeNode.data.type]
-
-  // Handle different node types
-  if (unoTreeNode.data.type === 'text') {
-    // Directly use text content for text nodes
-    html = `${indent}${unoTreeNode.data.text}`
-  }
-  else if (nodeTag) {
-    if (unoTreeNode.data.type === 'instance') {
-      // Warning for unsupported instance nodes
-      console.warn('Instance nodes are not yet supported', unoTreeNode)
-    }
-    else {
-      // Construct start tag with attributes
-      html = `${indent}<${nodeTag.start} ${attrsToString(nodeTag.attrs(unoTreeNode as any))}>`
-    }
-  }
-
-  // Check if the node has children
-  const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
-
-  // Handle child nodes if present
-  if (hasChildren) {
-    html += '\n'
-    unoTreeNode.children.forEach((child) => {
-      html += generateHTMLFromTree(child, depth + 1)
-    })
-    // Add end tag for nodes with children
-    if (nodeTag && nodeTag.end)
-      html += `${indent}</${nodeTag.end}>\n`
-  }
-  else if (nodeTag && nodeTag.end) {
-    // Add end tag for nodes without children
-    html += `</${nodeTag.end}>\n`
-  }
-
-  return html
-}
-
-// Convert attributes object to string
-function attrsToString(attrs: { [key: string]: string }): string {
-  return Object.entries(attrs)
-    .map(([key, value]) => `${key}="${value}"`)
-    .join(' ')
-}
+export default HTMLGenerator

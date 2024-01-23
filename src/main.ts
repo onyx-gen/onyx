@@ -7,7 +7,7 @@
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 import { generateUnoTree } from './generators/unocss-tree.generator'
-import { generateHTMLFromTree } from './generators/html.generator'
+import HTMLGenerator from './generators/html.generator'
 
 figma.skipInvisibleInstanceChildren = true
 
@@ -21,11 +21,13 @@ figma.codegen.on('generate', async () => {
   const selection = figma.currentPage.selection
   const node = selection[0]
 
+  const htmlGenerator = new HTMLGenerator()
+
   let html = ''
 
   const unoTree = generateUnoTree(node)
   if (unoTree)
-    html = generateHTMLFromTree(unoTree)
+    html = htmlGenerator.generate(unoTree)
 
   else console.log('Please select a component')
 
