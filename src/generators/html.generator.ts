@@ -16,8 +16,7 @@ class HTMLGenerator {
   // Improve NodeTypeToTagMap to handle different node data types
   private nodeTypeToTag: NodeTypeToTagMap = {
     container: {
-      start: 'div',
-      end: 'div',
+      tag: 'div',
       attrs: (treeNode) => {
         // Only add 'class' property if css is not undefined
         const attrs: { [key: string]: string } = {}
@@ -28,19 +27,12 @@ class HTMLGenerator {
       },
     },
     icon: {
-      start: 'i',
-      end: 'i',
+      tag: 'i',
       attrs: treeNode => ({ class: `i-figma-${treeNode.data.name}` }),
     },
-    text: {
-      start: '',
-      end: '',
-      attrs: () => ({}),
-    },
+    text: {},
     instance: {
-      start: this.getInstanceNodeHTMLTag,
-      end: this.getInstanceNodeHTMLTag,
-      attrs: () => ({}),
+      tag: this.getInstanceNodeHTMLTag,
     },
   }
 
@@ -53,14 +45,24 @@ class HTMLGenerator {
   public generate(unoTreeNode: UnoTreeNode, depth: number = 0): string {
     const indent = '  '.repeat(depth)
     let html = ''
-    const nodeTag = this.nodeTypeToTag[unoTreeNode.data.type]
+    const nodeMapping = this.nodeTypeToTag[unoTreeNode.data.type]
+
+    html = indent
 
     if (unoTreeNode.data.type === 'text') {
-      html = `${indent}${unoTreeNode.data.text}`
+      html += `${unoTreeNode.data.text}\n`
     }
-    else if (nodeTag) {
-      const htmlTag = typeof nodeTag.start === 'function' ? nodeTag.start(unoTreeNode as any) : nodeTag.start
-      html = `${indent}<${htmlTag} ${this.attrsToString(nodeTag.attrs(unoTreeNode as any))}>`
+    else if (nodeMapping.tag) {
+      const htmlTag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
+      const attrs = nodeMapping.attrs?.(unoTreeNode as any)
+
+      html += `<${htmlTag}`
+
+      if (attrs)
+        html += ` ${this.attrsToString(attrs)}>`
+    }
+    else {
+      console.error(`No tag defined for node type '${unoTreeNode.data.type}'`)
     }
 
     const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
@@ -69,14 +71,22 @@ class HTMLGenerator {
       unoTreeNode.children.forEach((child) => {
         html += this.generate(child, depth + 1)
       })
-      if (nodeTag && nodeTag.end) {
-        const htmlTag = typeof nodeTag.end === 'function' ? nodeTag.end(unoTreeNode as any) : nodeTag.end
+      if (nodeMapping.tag) {
+        const htmlTag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
         html += `${indent}</${htmlTag}>\n`
       }
     }
-    else if (nodeTag && nodeTag.end) {
-      const htmlTag = typeof nodeTag.end === 'function' ? nodeTag.end(unoTreeNode as any) : nodeTag.end
-      html += `</${htmlTag}>\n`
+    else if (nodeMapping.tag) {
+      const htmlTag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
+      const attrs = nodeMapping.attrs?.(unoTreeNode as any)
+      const hasAttrs = attrs && Object.keys(attrs).length > 0
+
+      if (hasAttrs)
+        html += `></${htmlTag}>`
+      else
+        html += ` />`
+
+      html += '\n'
     }
 
     return html
@@ -111,9 +121,8 @@ type ExtractedNodeDataType<K extends UnoTreeNodeData['type']> = Extract<UnoTreeN
  */
 export type NodeTypeToTagMap = {
   [K in UnoTreeNodeData['type']]: {
-    start: TagFunction<ExtractedNodeDataType<K>>
-    end: TagFunction<ExtractedNodeDataType<K>>
-    attrs: AttrsFunction<ExtractedNodeDataType<K>>
+    tag?: TagFunction<ExtractedNodeDataType<K>>
+    attrs?: AttrsFunction<ExtractedNodeDataType<K>>
   }
 }
 
