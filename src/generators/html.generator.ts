@@ -45,54 +45,47 @@ class HTMLGenerator {
    * @returns {string} The generated HTML string.
    */
   public generate(unoTreeNode: UnoTreeNode, depth: number = 0): string {
+    // Create indentation based on the current depth
     const indent = '  '.repeat(depth)
-    let html = ''
+    let html = indent
+
+    // Retrieve the mapping for the current node type
     const nodeMapping = this.nodeTypeToTag[unoTreeNode.data.type]
 
-    html = indent
+    // Early return if no mapping is found for the node type
+    if (!nodeMapping) {
+      console.error(`No tag defined for node type '${unoTreeNode.data.type}'`)
+      return ''
+    }
 
+    // Determine the tag and attributes for the current node
+    const tag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
+    const attrs = nodeMapping.attrs ? nodeMapping.attrs(unoTreeNode as any) : {}
+    const hasAttrs = Object.keys(attrs).length > 0
+    const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
+
+    // Handle text nodes separately
     if (unoTreeNode.data.type === 'text') {
       html += `${unoTreeNode.data.text}\n`
     }
-    else if (nodeMapping.tag) {
-      const htmlTag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
-      const attrs = nodeMapping.attrs?.(unoTreeNode as any)
-      const hasAttrs = attrs && Object.keys(attrs).length > 0
+    else if (tag) {
+      // Start tag construction for non-text nodes
+      html += `<${tag}${hasAttrs ? ` ${this.attrsToString(attrs)}` : ''}`
 
-      html += `<${htmlTag}`
-
-      if (hasAttrs)
-        html += ` ${this.attrsToString(attrs)}`
-    }
-    else {
-      console.error(`No tag defined for node type '${unoTreeNode.data.type}'`)
-    }
-
-    const htmlTag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
-    const attrs = nodeMapping.attrs?.(unoTreeNode as any)
-    const hasAttrs = attrs && Object.keys(attrs).length > 0
-
-    const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
-    if (hasChildren) {
-      if (hasAttrs)
-        html += '>'
-
-      html += '\n'
-      unoTreeNode.children.forEach((child) => {
-        html += this.generate(child, depth + 1)
-      })
-      if (nodeMapping.tag) {
-        const htmlTag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
-        html += `${indent}</${htmlTag}>\n`
+      if (hasChildren) {
+        // Add children nodes if present
+        html += '>\n'
+        unoTreeNode.children.forEach((child) => {
+          html += this.generate(child, depth + 1)
+        })
+        // Close the tag
+        html += `${indent}</${tag}>\n`
       }
-    }
-    else if (nodeMapping.tag) {
-      if (hasAttrs)
-        html += `></${htmlTag}>`
-      else
-        html += ` />`
-
-      html += '\n'
+      else {
+        // Self-closing tag for nodes without children
+        html += hasAttrs ? `></${tag}>` : ' />'
+        html += '\n'
+      }
     }
 
     return html
