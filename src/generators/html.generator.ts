@@ -46,7 +46,7 @@ class HTMLGenerator {
    */
   public generate(unoTreeNode: UnoTreeNode, depth: number = 0): string {
     // Create indentation based on the current depth
-    const indent = '  '.repeat(depth)
+    const indent = this.createIndent(depth)
     let html = indent
 
     // Retrieve the mapping for the current node type
@@ -90,6 +90,23 @@ class HTMLGenerator {
     return html
   }
 
+  /**
+   * Creates an indentation string.
+   *
+   * @param {number} depth - The number of indentation levels.
+   * @returns {string} A string containing two spaces repeated 'depth' times.
+   */
+  private createIndent(depth: number): string {
+    return '  '.repeat(depth)
+  }
+
+  /**
+   * This method is used to generate a string that represents the HTML tag for an instance node.
+   * It takes a treeNode with instance node data as an argument and escapes certain chars in the name
+   * in order to generate a valid HTML tag.
+   * @param treeNode - The UnoTreeNode of type InstanceNodeData for which the HTML tag string is to be generated.
+   * @returns A string representing the HTML tag for the given instance node.
+   */
   private getInstanceNodeHTMLTag(treeNode: UnoTreeNode<InstanceNodeData>): string {
     return treeNode.data.name
       .replaceAll('\\', '_')
@@ -97,6 +114,11 @@ class HTMLGenerator {
       .replaceAll(' ', '_')
   }
 
+  /**
+   * This method is used to generate an object that represents the HTML attributes for an instance node.
+   * @param treeNode - The UnoTreeNode of type InstanceNodeData for which the HTML attributes are to be generated.
+   * @returns An object representing the HTML attributes for the given instance node.
+   */
   private getInstanceNodeHTMLAttrs(treeNode: UnoTreeNode<InstanceNodeData>): { [key: string]: string } {
     const attrs: { [key: string]: string } = {}
 
