@@ -1,90 +1,130 @@
-import type { ContainerNodeData, TextNodeData, UnoTreeNode } from '../interfaces'
+import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, UnoTreeNode } from '../interfaces'
 import { UnocssBuilder } from '../builder/unocss-builder'
 
 /**
- * Generates a tree structure representing the UnoCSS components.
- * @param {SceneNode} node - The Figma node to process.
- * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
+ * Class to generate a tree structure representing UnoCSS components.
  */
-export function generateUnoTree(node: SceneNode): UnoTreeNode | null {
-  const isInstance = node.type === 'INSTANCE'
+class TreeGenerator {
+  /**
+   * Public method to initiate the tree generation.
+   * This method serves as the core of the tree generation logic.
+   * @param node - The Figma node to process.
+   * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
+   */
+  public generate(node: SceneNode): UnoTreeNode | null {
+    if (node.type === 'INSTANCE')
+      return this.handleInstanceNode(node)
+    else
+      return this.handleOtherNodes(node)
+  }
 
-  if (isInstance) {
-    const isIcon = isInstance && node.name === 'icon'
-    if (isIcon) {
-      const mainComponent = node.mainComponent
-      if (mainComponent) {
-        const iconName = mainComponent.name
-        return { children: [], data: { type: 'icon', name: iconName } }
-      }
-    }
-    else {
-      return {
-        children: [],
-        data: {
-          type: 'instance',
-          name: node.name,
-          props: node.componentProperties,
-        },
-      }
+  /**
+   * Handles nodes of type 'INSTANCE'.
+   * @param node - The instance node to process.
+   * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
+   */
+  private handleInstanceNode(node: InstanceNode): UnoTreeNode | null {
+    const isIcon = node.name === 'icon'
+    if (isIcon)
+      return this.createIconNode(node)
+    else
+      return this.createInstanceNode(node)
+  }
+
+  /**
+   * Creates a tree node for icon type.
+   * @param node - The icon node to process.
+   * @returns {UnoTreeNode} The generated tree node for the icon.
+   */
+  private createIconNode(node: InstanceNode): UnoTreeNode<IconNodeData> {
+    const iconName = node.mainComponent?.name
+
+    if (!iconName)
+      console.warn('No icon name found for node', node)
+
+    return { children: [], data: { type: 'icon', name: iconName || '?' } }
+  }
+
+  /**
+   * Creates a tree node for instance type.
+   * @param node - The instance node to process.
+   * @returns {UnoTreeNode} The generated tree node for the instance.
+   */
+  private createInstanceNode(node: InstanceNode): UnoTreeNode<InstanceNodeData> {
+    return {
+      children: [],
+      data: {
+        type: 'instance',
+        name: node.name,
+        props: node.componentProperties,
+      },
     }
   }
-  else {
+
+  /**
+   * Handles nodes other than 'INSTANCE' type.
+   * @param node - The node to process.
+   * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
+   */
+  private handleOtherNodes(node: SceneNode): UnoTreeNode | null {
     const builder = new UnocssBuilder(node)
     const css = builder.build()
 
     const hasChildren = 'children' in node && node.children.length > 0
 
-    // If it's a leaf node with empty CSS, return null
+    // Skip leaf nodes with empty CSS
     if (!hasChildren && css === '') {
       console.log('Skipping leaf with empty CSS')
       return null
     }
 
-    const isTextNode = node.type === 'TEXT'
-
-    if (isTextNode) {
-      const parentNodeData: ContainerNodeData = {
-        type: 'container',
-        css,
-      }
-
-      const childNodeData: TextNodeData = {
-        type: 'text',
-        text: node.characters,
-      }
-
-      return {
-        data: parentNodeData,
-        children: [
-          { children: [], data: childNodeData },
-        ],
-      }
-    }
-    else {
-      const data: ContainerNodeData = {
-        type: 'container',
-        css,
-      }
-
-      const unoTreeNode: UnoTreeNode = { data, children: [] }
-
-      if (hasChildren) {
-        node.children
-          .filter(child => child.visible)
-          .forEach((child) => {
-            const childTree = generateUnoTree(child)
-
-            // Only add the child if it's not null
-            if (childTree)
-              unoTreeNode.children.push(childTree)
-          })
-      }
-
-      return unoTreeNode
-    }
+    return node.type === 'TEXT' ? this.createTextNode(node, css) : this.createContainerNode(node, css, hasChildren)
   }
 
-  console.error('This should never happen')
-  return null
+  /**
+   * Creates a tree node for text type.
+   * @param node - The text node to process.
+   * @param {string} css - CSS for the node.
+   * @returns {UnoTreeNode} The generated tree node for the text.
+   */
+  private createTextNode(node: TextNode, css: string): UnoTreeNode {
+    const parentNodeData: ContainerNodeData = { type: 'container', css }
+    const childNodeData: TextNodeData = { type: 'text', text: node.characters }
+
+    return { data: parentNodeData, children: [{ children: [], data: childNodeData }] }
+  }
+
+  /**
+   * Creates a tree node for container type.
+   * @param node - The container node to process.
+   * @param {string} css - CSS for the node.
+   * @param {boolean} hasChildren - Flag indicating if the node has children.
+   * @returns {UnoTreeNode} The generated tree node for the container.
+   */
+  private createContainerNode(node: SceneNode, css: string, hasChildren: boolean): UnoTreeNode {
+    const data: ContainerNodeData = { type: 'container', css }
+    const unoTreeNode: UnoTreeNode = { data, children: [] }
+
+    if (hasChildren)
+      this.addChildrenToNode(node as SceneNode & ChildrenMixin, unoTreeNode)
+
+    return unoTreeNode
+  }
+
+  /**
+   * Adds child nodes to the given tree node.
+   * @param {ChildrenMixin & SceneNode} node - The parent node.
+   * @param {UnoTreeNode} unoTreeNode - The tree node to add children to.
+   */
+  private addChildrenToNode(node: ChildrenMixin & SceneNode, unoTreeNode: UnoTreeNode): void {
+    node.children
+      .filter(child => child.visible)
+      .forEach((child) => {
+        const childTree = this.generate(child)
+        if (childTree)
+          unoTreeNode.children.push(childTree)
+      })
+  }
 }
+
+export default TreeGenerator
