@@ -4,26 +4,26 @@ import { UnocssBuilder } from '../builder/unocss-builder'
 /**
  * Class to generate a tree structure representing UnoCSS components.
  */
-class TreeGenerator {
+class FigmaNodeParser {
   /**
-   * Public method to initiate the tree generation.
-   * This method serves as the core of the tree generation logic.
+   * Public method to initiate parsing of the Figma node and its subtree.
+   * This method serves as the core of the tree traversal logic.
    * @param node - The Figma node to process.
    * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
    */
-  public generate(node: SceneNode): UnoTreeNode | null {
+  public parse(node: SceneNode): UnoTreeNode | null {
     if (node.type === 'INSTANCE')
-      return this.handleInstanceNode(node)
+      return this.parseInstanceNode(node)
     else
-      return this.handleOtherNodes(node)
+      return this.parseOtherNodes(node)
   }
 
   /**
-   * Handles nodes of type 'INSTANCE'.
+   * Parses nodes of type 'INSTANCE'.
    * @param node - The instance node to process.
    * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
    */
-  private handleInstanceNode(node: InstanceNode): UnoTreeNode | null {
+  private parseInstanceNode(node: InstanceNode): UnoTreeNode | null {
     const isIcon = node.name === 'icon'
     if (isIcon)
       return this.createIconNode(node)
@@ -62,11 +62,11 @@ class TreeGenerator {
   }
 
   /**
-   * Handles nodes other than 'INSTANCE' type.
+   * Parses nodes other than 'INSTANCE' type.
    * @param node - The node to process.
    * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
    */
-  private handleOtherNodes(node: SceneNode): UnoTreeNode | null {
+  private parseOtherNodes(node: SceneNode): UnoTreeNode | null {
     const builder = new UnocssBuilder(node)
     const css = builder.build()
 
@@ -120,11 +120,11 @@ class TreeGenerator {
     node.children
       .filter(child => child.visible)
       .forEach((child) => {
-        const childTree = this.generate(child)
+        const childTree = this.parse(child)
         if (childTree)
           unoTreeNode.children.push(childTree)
       })
   }
 }
 
-export default TreeGenerator
+export default FigmaNodeParser

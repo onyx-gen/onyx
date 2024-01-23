@@ -6,7 +6,7 @@
  */
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
-import TreeGenerator from './generators/tree.generator'
+import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
 import { getSelectedNode } from './utils'
 
@@ -25,15 +25,15 @@ figma.codegen.on('generate', async () => {
   if (!node)
     return []
 
-  const htmlGenerator = new HTMLGenerator()
-  const treeGenerator = new TreeGenerator()
+  const parser = new FigmaNodeParser()
+  const generator = new HTMLGenerator()
 
   let html = ''
 
-  const unoTree = treeGenerator.generate(node)
+  const unoTree = parser.parse(node)
 
   if (unoTree)
-    html = htmlGenerator.generate(unoTree)
+    html = generator.generate(unoTree)
   else
     console.error('It was not possible to generate HTML code for the selected node.')
 
