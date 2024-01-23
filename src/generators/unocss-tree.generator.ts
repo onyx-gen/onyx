@@ -19,7 +19,14 @@ export function generateUnoTree(node: SceneNode): UnoTreeNode | null {
       }
     }
     else {
-      return { children: [], data: { type: 'instance', name: node.name } }
+      return {
+        children: [],
+        data: {
+          type: 'instance',
+          name: node.name,
+          props: node.componentProperties,
+        },
+      }
     }
   }
   else {

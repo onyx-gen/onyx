@@ -26,6 +26,7 @@ export interface TextNodeData extends AbstractNodeData {
 export interface InstanceNodeData extends AbstractNodeData {
   type: 'instance'
   name: string
+  props: ComponentProperties
 }
 
 export interface IconNodeData extends AbstractNodeData {

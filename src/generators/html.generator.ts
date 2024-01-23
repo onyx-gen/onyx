@@ -3,6 +3,7 @@ import type {
   UnoTreeNode,
   UnoTreeNodeData,
 } from '../interfaces'
+import { typedObjectEntries } from '../utils'
 
 // Define a type for the attrs function
 type AttrsFunction<T extends UnoTreeNodeData> = (node: UnoTreeNode<T>) => { [key: string]: string }
@@ -33,6 +34,7 @@ class HTMLGenerator {
     text: {},
     instance: {
       tag: this.getInstanceNodeHTMLTag,
+      attrs: this.getInstanceNodeHTMLAttrs,
     },
   }
 
@@ -55,18 +57,26 @@ class HTMLGenerator {
     else if (nodeMapping.tag) {
       const htmlTag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
       const attrs = nodeMapping.attrs?.(unoTreeNode as any)
+      const hasAttrs = attrs && Object.keys(attrs).length > 0
 
       html += `<${htmlTag}`
 
-      if (attrs)
-        html += ` ${this.attrsToString(attrs)}>`
+      if (hasAttrs)
+        html += ` ${this.attrsToString(attrs)}`
     }
     else {
       console.error(`No tag defined for node type '${unoTreeNode.data.type}'`)
     }
 
+    const htmlTag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
+    const attrs = nodeMapping.attrs?.(unoTreeNode as any)
+    const hasAttrs = attrs && Object.keys(attrs).length > 0
+
     const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
     if (hasChildren) {
+      if (hasAttrs)
+        html += '>'
+
       html += '\n'
       unoTreeNode.children.forEach((child) => {
         html += this.generate(child, depth + 1)
@@ -77,10 +87,6 @@ class HTMLGenerator {
       }
     }
     else if (nodeMapping.tag) {
-      const htmlTag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(unoTreeNode as any) : nodeMapping.tag
-      const attrs = nodeMapping.attrs?.(unoTreeNode as any)
-      const hasAttrs = attrs && Object.keys(attrs).length > 0
-
       if (hasAttrs)
         html += `></${htmlTag}>`
       else
@@ -97,6 +103,18 @@ class HTMLGenerator {
       .replaceAll('\\', '_')
       .replaceAll('/', '_')
       .replaceAll(' ', '_')
+  }
+
+  private getInstanceNodeHTMLAttrs(treeNode: UnoTreeNode<InstanceNodeData>): { [key: string]: string } {
+    const attrs: { [key: string]: string } = {}
+
+    typedObjectEntries(treeNode.data.props)
+      .filter(([, prop]) => prop.type === 'VARIANT')
+      .forEach(([key, prop]) => {
+        attrs[key] = `${prop.value}`
+      })
+
+    return attrs
   }
 
   /**
