@@ -36,7 +36,7 @@ export function generateUnoTree(node: SceneNode): UnoTreeNode | null {
       return null
     }
 
-    const unoTreeNode: UnoTreeNode = { data: { type: 'div', css }, children: [] }
+    const unoTreeNode: UnoTreeNode = { data: { type: 'container', css }, children: [] }
 
     if (hasChildren) {
       node.children

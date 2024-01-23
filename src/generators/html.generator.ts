@@ -12,7 +12,7 @@ export function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0
 
   let html = ''
 
-  if (unoTreeNode.data.type === 'div') {
+  if (unoTreeNode.data.type === 'container') {
     const css = unoTreeNode.data.css ? ` class="${unoTreeNode.data.css}"` : ''
     html = `${indent}<div${css}>`
   }
@@ -31,7 +31,7 @@ export function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0
     html += indent
   }
 
-  if (unoTreeNode.data.type === 'div')
+  if (unoTreeNode.data.type === 'container')
     html += `</div>\n`
   else if (unoTreeNode.data.type === 'icon')
     html += `</i>\n`

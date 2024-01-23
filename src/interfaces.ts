@@ -3,14 +3,14 @@ export interface UnoTreeNode<T extends UnoTreeNodeData = UnoTreeNodeData> {
   children: UnoTreeNode[]
 }
 
-export type UnoTreeNodeData = DivNodeData | InstanceNodeData | IconNodeData
+export type UnoTreeNodeData = ContainerNodeData | InstanceNodeData | IconNodeData
 
 export interface AbstractNodeData {
   type: string
 }
 
-export interface DivNodeData extends AbstractNodeData {
-  type: 'div'
+export interface ContainerNodeData extends AbstractNodeData {
+  type: 'container'
   css: string
 }
 
