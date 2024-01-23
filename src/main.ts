@@ -23,13 +23,11 @@ figma.codegen.on('generate', async () => {
 
   let html = ''
 
-  if (node.type === 'COMPONENT') {
-    const unoTree = generateUnoTree(node)
-    if (unoTree)
-      html = generateHTMLFromTree(unoTree)
-  }
+  const unoTree = generateUnoTree(node)
+  if (unoTree)
+    html = generateHTMLFromTree(unoTree)
 
-  else { console.log('Please select a component') }
+  else console.log('Please select a component')
 
   return [
     {
