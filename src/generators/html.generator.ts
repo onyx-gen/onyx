@@ -3,7 +3,7 @@ import type {
   UnoTreeNode,
   UnoTreeNodeData,
 } from '../interfaces'
-import { typedObjectEntries } from '../utils'
+import { createIndent, typedObjectEntries } from '../utils'
 
 // Define a type for the attrs function
 type AttrsFunction<T extends UnoTreeNodeData> = (node: UnoTreeNode<T>) => { [key: string]: string }
@@ -46,7 +46,7 @@ class HTMLGenerator {
    */
   public generate(unoTreeNode: UnoTreeNode, depth: number = 0): string {
     // Create indentation based on the current depth
-    const indent = this.createIndent(depth)
+    const indent = createIndent(depth)
     let html = indent
 
     // Retrieve the mapping for the current node type
@@ -88,16 +88,6 @@ class HTMLGenerator {
     }
 
     return html
-  }
-
-  /**
-   * Creates an indentation string.
-   *
-   * @param {number} depth - The number of indentation levels.
-   * @returns {string} A string containing two spaces repeated 'depth' times.
-   */
-  private createIndent(depth: number): string {
-    return '  '.repeat(depth)
   }
 
   /**
