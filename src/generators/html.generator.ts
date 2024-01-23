@@ -70,7 +70,7 @@ class HTMLGenerator {
     }
     else if (tag) {
       // Start tag construction for non-text nodes
-      html += `<${tag}${hasAttrs ? ` ${this.attrsToString(attrs)}` : ''}`
+      html += `<${tag}${hasAttrs ? ` ${this.attrsToString(attrs, depth)}` : ''}`
 
       if (hasChildren) {
         // Add children nodes if present
@@ -124,12 +124,20 @@ class HTMLGenerator {
   /**
    * Converts an attributes object into a string format.
    * @param {object} attrs - The attributes object.
+   * @param {number} depth - The current depth in the tree, used for indentation.
    * @returns {string} The string representation of the attributes.
    */
-  private attrsToString(attrs: { [key: string]: string }): string {
-    return Object.entries(attrs)
-      .map(([key, value]) => `${key}="${value}"`)
-      .join(' ')
+  private attrsToString(attrs: { [key: string]: string }, depth: number): string {
+    const pairs = typedObjectEntries(attrs).map(([key, value]) => `${key}="${value}"`)
+
+    if (pairs.length === 1) {
+      return ` ${pairs[0]}`
+    }
+    else {
+      // with indent and each pair on a new line. at the beginning and at the end an additional new line
+      const indent = createIndent(depth + 1)
+      return `\n${indent}${pairs.join(`\n${indent}`)}\n${createIndent(depth)}`
+    }
   }
 }
 
