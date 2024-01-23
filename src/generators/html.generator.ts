@@ -52,16 +52,10 @@ class HTMLGenerator {
     let html = ''
     const nodeTag = this.nodeTypeToTag[unoTreeNode.data.type]
 
-    if (unoTreeNode.data.type === 'text') {
+    if (unoTreeNode.data.type === 'text')
       html = `${indent}${unoTreeNode.data.text}`
-    }
-    else if (nodeTag) {
-      if (unoTreeNode.data.type === 'instance')
-        console.warn('Instance nodes are not yet supported', unoTreeNode)
-
-      else
-        html = `${indent}<${nodeTag.start} ${this.attrsToString(nodeTag.attrs(unoTreeNode as any))}>`
-    }
+    else if (nodeTag)
+      html = `${indent}<${nodeTag.start} ${this.attrsToString(nodeTag.attrs(unoTreeNode as any))}>`
 
     const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
     if (hasChildren) {
