@@ -6,7 +6,7 @@
  */
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
-import TreeGenerator from './generators/unocss-tree.generator'
+import TreeGenerator from './generators/tree.generator'
 import HTMLGenerator from './generators/html.generator'
 
 figma.skipInvisibleInstanceChildren = true
