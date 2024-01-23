@@ -1,8 +1,4 @@
 import type {
-  ContainerNodeData,
-  IconNodeData,
-  InstanceNodeData,
-  TextNodeData,
   UnoTreeNode,
   UnoTreeNodeData,
 } from '../interfaces'
@@ -95,27 +91,18 @@ class HTMLGenerator {
   }
 }
 
-// Interface for the mapping from node types to their corresponding HTML tags and attributes
-interface NodeTypeToTagMap {
-  container: {
+/**
+ * Maps each 'type' of UnoTreeNodeData to its corresponding HTML tag configuration.
+ * For each type (e.g., 'container', 'text'), it defines the HTML start and end tags,
+ * and a function to generate the HTML attributes appropriate for that type.
+ * This mapping leverages TypeScript's conditional types and mapped types to automatically
+ * associate the correct subtype of UnoTreeNodeData with its tag configuration, ensuring type safety.
+ */
+export type NodeTypeToTagMap = {
+  [K in UnoTreeNodeData['type']]: {
     start: string
     end: string
-    attrs: AttrsFunction<ContainerNodeData>
-  }
-  icon: {
-    start: string
-    end: string
-    attrs: AttrsFunction<IconNodeData>
-  }
-  text: {
-    start: string
-    end: string
-    attrs: AttrsFunction<TextNodeData>
-  }
-  instance: {
-    start: string
-    end: string
-    attrs: AttrsFunction<InstanceNodeData>
+    attrs: AttrsFunction<Extract<UnoTreeNodeData, { type: K }>>
   }
 }
 
