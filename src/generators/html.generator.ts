@@ -1,4 +1,5 @@
 import type {
+  InstanceNodeData,
   UnoTreeNode,
   UnoTreeNodeData,
 } from '../interfaces'
@@ -37,8 +38,8 @@ class HTMLGenerator {
       attrs: () => ({}),
     },
     instance: {
-      start: node => node.data.name,
-      end: node => node.data.name,
+      start: this.getInstanceNodeHTMLTag,
+      end: this.getInstanceNodeHTMLTag,
       attrs: () => ({}),
     },
   }
@@ -79,6 +80,12 @@ class HTMLGenerator {
     }
 
     return html
+  }
+
+  private getInstanceNodeHTMLTag(treeNode: UnoTreeNode<InstanceNodeData>): string {
+    return treeNode.data.name
+      .replaceAll('\\', '_')
+      .replaceAll('/', '_')
   }
 
   /**
