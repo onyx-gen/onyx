@@ -53,7 +53,21 @@ export class UnocssBuilder {
    */
   constructor(private node: SceneNode) {
     this.tokens = getAppliedTokens(node)
-    this.tokens.forEach((token, tokenType) => this.handleToken(token, tokenType))
+    this.tokens.forEach((token, tokenType) =>
+      this.canHandleToken(tokenType) && this.handleToken(token, tokenType),
+    )
+  }
+
+  /**
+   * Checks whether the given token type can be handled via the handleToken method.
+   *
+   * Some tokenTypes are handled outside the handleToken method, such as itemSpacing.
+   * This tokenType is handled in the AutoLayoutBuilder class.
+   * @param tokenType
+   * @private
+   */
+  private canHandleToken(tokenType: Properties): boolean {
+    return tokenType !== Properties.itemSpacing
   }
 
   /**
