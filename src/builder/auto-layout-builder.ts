@@ -1,5 +1,5 @@
-import type { DesignTokens } from '../tokens'
-import { Properties } from '../properties'
+import type { DesignTokens } from '../tokens/tokens'
+import { Properties } from '../tokens/properties'
 
 /**
  * The AutoLayoutBuilder class is responsible for constructing a string of CSS class names

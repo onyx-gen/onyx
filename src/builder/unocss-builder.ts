@@ -1,6 +1,6 @@
-import type { DesignTokens } from '../tokens'
-import { getAppliedTokens } from '../tokens'
-import { Properties } from '../properties'
+import type { DesignTokens } from '../tokens/tokens'
+import { getAppliedTokens } from '../tokens/tokens'
+import { Properties } from '../tokens/properties'
 import AutoLayoutBuilder from './auto-layout-builder'
 
 interface RectSides {
