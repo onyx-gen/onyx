@@ -15,15 +15,24 @@ interface UnoTreeNode<T extends UnoTreeNodeData = UnoTreeNodeData> {
   children: UnoTreeNode[]
 }
 
-type UnoTreeNodeData = DivNodeData | InstanceNodeData
+type UnoTreeNodeData = DivNodeData | InstanceNodeData | IconNodeData
 
-interface DivNodeData {
+interface AbstractNodeData {
+  type: string
+}
+
+interface DivNodeData extends AbstractNodeData {
   type: 'div'
   css: string
 }
 
-interface InstanceNodeData {
+interface InstanceNodeData extends AbstractNodeData {
   type: 'instance'
+  name: string
+}
+
+interface IconNodeData extends AbstractNodeData {
+  type: 'icon'
   name: string
 }
 
@@ -57,8 +66,19 @@ function generateUnoTree(node: SceneNode): UnoTreeNode | null {
   const isInstance = node.type === 'INSTANCE'
 
   if (isInstance) {
+    const isIcon = isInstance && node.name === 'icon'
+    if (isIcon) {
+      const mainComponent = node.mainComponent
+      if (mainComponent) {
+        const iconName = mainComponent.name
+        return { children: [], data: { type: 'icon', name: iconName } }
+      }
+    }
+    else {
+      return { children: [], data: { type: 'instance', name: node.name } }
+    }
+
     // TODO MF: Add main component name
-    return { children: [], data: { type: 'instance', name: node.name } }
   }
   else {
     const builder = new UnocssBuilder(node)
@@ -88,6 +108,9 @@ function generateUnoTree(node: SceneNode): UnoTreeNode | null {
 
     return unoTreeNode
   }
+
+  console.error('This should never happen')
+  return null
 }
 
 function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0): string {
@@ -103,6 +126,9 @@ function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0): stri
   else if (unoTreeNode.data.type === 'instance') {
     console.warn('Instance nodes are not yet supported (before tag)', unoTreeNode)
   }
+  else if (unoTreeNode.data.type === 'icon') {
+    html = `${indent}<i class="i-figma-${unoTreeNode.data.name}">`
+  }
 
   if (hasChildren) {
     html += '\n'
@@ -114,6 +140,8 @@ function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0): stri
 
   if (unoTreeNode.data.type === 'div')
     html += `</div>\n`
+  else if (unoTreeNode.data.type === 'icon')
+    html += `</i>\n`
   else
     console.warn('Instance nodes are not yet supported (end tag)', unoTreeNode)
 
