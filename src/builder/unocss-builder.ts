@@ -130,6 +130,12 @@ export class UnocssBuilder {
       ...sizingHandlers,
     }
 
+    // Warn if there are unhandled properties
+    if (Object.keys(handlers).length !== Object.keys(Properties).length) {
+      const unhandledProperties = Object.keys(Properties).filter(property => !Object.keys(handlers).includes(property))
+      console.warn(`There are ${unhandledProperties.length} properties that do not have a handler defined in UnocssBuilder: ${unhandledProperties.join(', ')}`)
+    }
+
     const handler = handlers[tokenType]
     if (handler)
       handler()
