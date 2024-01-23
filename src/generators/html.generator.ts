@@ -83,8 +83,7 @@ class HTMLGenerator {
       }
       else {
         // Self-closing tag for nodes without children
-        html += hasAttrs ? `></${tag}>` : ' />'
-        html += '\n'
+        html += ' />\n'
       }
     }
 
