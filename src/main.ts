@@ -1,12 +1,9 @@
-// This plugin will generate a sample codegen plugin
-// that appears in the Element tab of the Inspect panel.
-
-// This file holds the main code for plugins. Code in this file has access to
-// the *figma document* via the figma global object.
-// You can access browser APIs in the <script> tag inside "ui.html" which has a
-// full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
-
-// This provides the callback to generate the code.
+/**
+ * This plugin generates HTML code that reflects the structure and styling
+ * of components in Figma. It uses the UnoCSS framework to handle styling.
+ * The plugin operates within the Figma environment and can process selected
+ * components to output corresponding HTML structure.
+ */
 
 import { UnocssBuilder } from './builder/unocss-builder'
 
@@ -39,6 +36,12 @@ interface IconNodeData extends AbstractNodeData {
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 figma.skipInvisibleInstanceChildren = true
 
+/**
+ * Event listener for the 'generate' event in Figma.
+ * Processes the selected node and generates HTML code.
+ * The generated code is displayed in the dev tools panel
+ * inside Figma.
+ */
 figma.codegen.on('generate', async () => {
   const selection = figma.currentPage.selection
   const node = selection[0]
@@ -62,6 +65,11 @@ figma.codegen.on('generate', async () => {
   ]
 })
 
+/**
+ * Generates a tree structure representing the UnoCSS components.
+ * @param {SceneNode} node - The Figma node to process.
+ * @returns {UnoTreeNode|null} The generated tree node, or null if not applicable.
+ */
 function generateUnoTree(node: SceneNode): UnoTreeNode | null {
   const isInstance = node.type === 'INSTANCE'
 
@@ -113,6 +121,12 @@ function generateUnoTree(node: SceneNode): UnoTreeNode | null {
   return null
 }
 
+/**
+ * Generates HTML markup from a given UnoCSS tree structure.
+ * @param {UnoTreeNode} unoTreeNode - The UnoCSS tree node to process.
+ * @param {number} [depth] - The current depth in the tree (used for indentation).
+ * @returns {string} The generated HTML string.
+ */
 function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0): string {
   const indent = '  '.repeat(depth)
   const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
