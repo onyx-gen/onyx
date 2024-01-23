@@ -35,13 +35,14 @@ export function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0
   }
 
   if (unoTreeNode.data.type === 'container')
-    html += `</div>\n`
+    html += `</div>`
   else if (unoTreeNode.data.type === 'icon')
-    html += `</i>\n`
-  else if (unoTreeNode.data.type === 'text')
-    html += `\n`
+    html += `</i>`
   else
     console.warn('Instance nodes are not yet supported (end tag)', unoTreeNode)
+
+  if (['container', 'icon', 'text'].includes(unoTreeNode.data.type))
+    html += '\n'
 
   return html
 }
