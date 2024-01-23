@@ -21,8 +21,6 @@ export function generateUnoTree(node: SceneNode): UnoTreeNode | null {
     else {
       return { children: [], data: { type: 'instance', name: node.name } }
     }
-
-    // TODO MF: Add main component name
   }
   else {
     const builder = new UnocssBuilder(node)
