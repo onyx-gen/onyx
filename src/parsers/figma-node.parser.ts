@@ -16,7 +16,7 @@ class FigmaNodeParser {
     if (node.type === 'INSTANCE')
       return this.parseInstanceNode(node)
     else
-      return this.parseOtherNodes(node)
+      return this.parseNode(node)
   }
 
   /**
@@ -67,7 +67,7 @@ class FigmaNodeParser {
    * @param node - The node to process.
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
-  private parseOtherNodes(node: SceneNode): TreeNode | null {
+  private parseNode(node: SceneNode): TreeNode | null {
     const builder = new UnocssBuilder(node)
     const css = builder.build()
 
