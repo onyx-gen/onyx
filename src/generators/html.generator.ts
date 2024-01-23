@@ -6,6 +6,8 @@ import type {
 // Define a type for the attrs function
 type AttrsFunction<T extends UnoTreeNodeData> = (node: UnoTreeNode<T>) => { [key: string]: string }
 
+type TagFunction<T extends UnoTreeNodeData> = ((node: UnoTreeNode<T>) => string) | string
+
 /**
  * Class representing the mapping from node types to their corresponding HTML tags and attributes.
  */
@@ -35,8 +37,8 @@ class HTMLGenerator {
       attrs: () => ({}),
     },
     instance: {
-      start: '',
-      end: '',
+      start: node => node.data.name,
+      end: node => node.data.name,
       attrs: () => ({}),
     },
   }
@@ -52,10 +54,13 @@ class HTMLGenerator {
     let html = ''
     const nodeTag = this.nodeTypeToTag[unoTreeNode.data.type]
 
-    if (unoTreeNode.data.type === 'text')
+    if (unoTreeNode.data.type === 'text') {
       html = `${indent}${unoTreeNode.data.text}`
-    else if (nodeTag)
-      html = `${indent}<${nodeTag.start} ${this.attrsToString(nodeTag.attrs(unoTreeNode as any))}>`
+    }
+    else if (nodeTag) {
+      const htmlTag = typeof nodeTag.start === 'function' ? nodeTag.start(unoTreeNode as any) : nodeTag.start
+      html = `${indent}<${htmlTag} ${this.attrsToString(nodeTag.attrs(unoTreeNode as any))}>`
+    }
 
     const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
     if (hasChildren) {
@@ -63,11 +68,14 @@ class HTMLGenerator {
       unoTreeNode.children.forEach((child) => {
         html += this.generate(child, depth + 1)
       })
-      if (nodeTag && nodeTag.end)
-        html += `${indent}</${nodeTag.end}>\n`
+      if (nodeTag && nodeTag.end) {
+        const htmlTag = typeof nodeTag.end === 'function' ? nodeTag.end(unoTreeNode as any) : nodeTag.end
+        html += `${indent}</${htmlTag}>\n`
+      }
     }
     else if (nodeTag && nodeTag.end) {
-      html += `</${nodeTag.end}>\n`
+      const htmlTag = typeof nodeTag.end === 'function' ? nodeTag.end(unoTreeNode as any) : nodeTag.end
+      html += `</${htmlTag}>\n`
     }
 
     return html
@@ -85,6 +93,8 @@ class HTMLGenerator {
   }
 }
 
+type ExtractedNodeDataType<K extends UnoTreeNodeData['type']> = Extract<UnoTreeNodeData, { type: K }>
+
 /**
  * Maps each 'type' of UnoTreeNodeData to its corresponding HTML tag configuration.
  * For each type (e.g., 'container', 'text'), it defines the HTML start and end tags,
@@ -94,9 +104,9 @@ class HTMLGenerator {
  */
 export type NodeTypeToTagMap = {
   [K in UnoTreeNodeData['type']]: {
-    start: string
-    end: string
-    attrs: AttrsFunction<Extract<UnoTreeNodeData, { type: K }>>
+    start: TagFunction<ExtractedNodeDataType<K>>
+    end: TagFunction<ExtractedNodeDataType<K>>
+    attrs: AttrsFunction<ExtractedNodeDataType<K>>
   }
 }
 
