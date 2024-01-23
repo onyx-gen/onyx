@@ -96,6 +96,7 @@ class HTMLGenerator {
     return treeNode.data.name
       .replaceAll('\\', '_')
       .replaceAll('/', '_')
+      .replaceAll(' ', '_')
   }
 
   /**
