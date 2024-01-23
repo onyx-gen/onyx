@@ -75,7 +75,6 @@ class AutoLayoutBuilder {
     const hasGap = this.autoLayout.itemSpacing > 0 && this.autoLayout.primaryAxisAlignItems !== 'SPACE_BETWEEN'
 
     if (hasGap) {
-      console.log(this.tokens)
       const tokenValue = this.tokens.get(Properties.itemSpacing)
       if (tokenValue === undefined)
         console.error('You\'re using the gap property, but you haven\'t set the itemSpacing token.')
