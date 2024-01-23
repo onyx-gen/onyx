@@ -10,9 +10,21 @@
 
 import { UnocssBuilder } from './builder/unocss-builder'
 
-interface UnoTree {
+interface UnoTreeNode<T extends UnoTreeNodeData = UnoTreeNodeData> {
+  data: T
+  children: UnoTreeNode[]
+}
+
+type UnoTreeNodeData = DivNodeData | InstanceNodeData
+
+interface DivNodeData {
+  type: 'div'
   css: string
-  children: UnoTree[]
+}
+
+interface InstanceNodeData {
+  type: 'instance'
+  name: string
 }
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
@@ -25,7 +37,7 @@ figma.codegen.on('generate', async () => {
   let html = ''
 
   if (node.type === 'COMPONENT') {
-    const unoTree = recursiveGeneration(node)
+    const unoTree = generateUnoTree(node)
     if (unoTree)
       html = generateHTMLFromTree(unoTree)
   }
@@ -41,50 +53,69 @@ figma.codegen.on('generate', async () => {
   ]
 })
 
-function recursiveGeneration(node: SceneNode): UnoTree | null {
-  const builder = new UnocssBuilder(node)
-  const css = builder.build()
+function generateUnoTree(node: SceneNode): UnoTreeNode | null {
+  const isInstance = node.type === 'INSTANCE'
 
-  const hasChildren = 'children' in node && node.children.length > 0
-
-  // If it's a leaf node with empty CSS, return null
-  if (!hasChildren && css === '') {
-    console.log('Skipping leaf with empty CSS')
-    return null
+  if (isInstance) {
+    // TODO MF: Add main component name
+    return { children: [], data: { type: 'instance', name: node.name } }
   }
+  else {
+    const builder = new UnocssBuilder(node)
+    const css = builder.build()
 
-  const cssTree: UnoTree = { css, children: [] }
+    const hasChildren = 'children' in node && node.children.length > 0
 
-  if (hasChildren) {
-    node.children
-      .filter(child => child.visible)
-      .forEach((child) => {
-        const childTree = recursiveGeneration(child)
+    // If it's a leaf node with empty CSS, return null
+    if (!hasChildren && css === '') {
+      console.log('Skipping leaf with empty CSS')
+      return null
+    }
 
-        // Only add the child if it's not null
-        if (childTree)
-          cssTree.children.push(childTree)
-      })
+    const unoTreeNode: UnoTreeNode = { data: { type: 'div', css }, children: [] }
+
+    if (hasChildren) {
+      node.children
+        .filter(child => child.visible)
+        .forEach((child) => {
+          const childTree = generateUnoTree(child)
+
+          // Only add the child if it's not null
+          if (childTree)
+            unoTreeNode.children.push(childTree)
+        })
+    }
+
+    return unoTreeNode
   }
-
-  return cssTree
 }
 
-function generateHTMLFromTree(tree: UnoTree, depth: number = 0): string {
+function generateHTMLFromTree(unoTreeNode: UnoTreeNode, depth: number = 0): string {
   const indent = '  '.repeat(depth)
-  const hasChildren = tree.children && tree.children.length > 0
+  const hasChildren = unoTreeNode.children && unoTreeNode.children.length > 0
 
-  const css = tree.css ? ` class="${tree.css}"` : ''
-  let html = `${indent}<div${css}>`
+  let html = ''
+
+  if (unoTreeNode.data.type === 'div') {
+    const css = unoTreeNode.data.css ? ` class="${unoTreeNode.data.css}"` : ''
+    html = `${indent}<div${css}>`
+  }
+  else if (unoTreeNode.data.type === 'instance') {
+    console.warn('Instance nodes are not yet supported (before tag)', unoTreeNode)
+  }
 
   if (hasChildren) {
     html += '\n'
-    tree.children.forEach((child) => {
+    unoTreeNode.children.forEach((child) => {
       html += generateHTMLFromTree(child, depth + 1)
     })
     html += indent
   }
 
-  html += `</div>\n`
+  if (unoTreeNode.data.type === 'div')
+    html += `</div>\n`
+  else
+    console.warn('Instance nodes are not yet supported (end tag)', unoTreeNode)
+
   return html
 }
