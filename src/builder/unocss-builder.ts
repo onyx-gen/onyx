@@ -17,6 +17,13 @@ interface BorderRadius {
   bottomRight: string | null
 }
 
+interface BorderWidth {
+  top: string | null
+  bottom: string | null
+  left: string | null
+  right: string | null
+}
+
 export class UnocssBuilder {
   private attributes: string[] = []
   private readonly tokens: DesignTokens
@@ -33,6 +40,13 @@ export class UnocssBuilder {
     topRight: null,
     bottomLeft: null,
     bottomRight: null,
+  }
+
+  private borderWidth: BorderWidth = {
+    top: null,
+    bottom: null,
+    left: null,
+    right: null,
   }
 
   constructor(private node: SceneNode) {
@@ -89,6 +103,30 @@ export class UnocssBuilder {
         case Properties.borderRadiusBottomRight:
           this.borderRadius.bottomRight = token
           break
+
+        case Properties.borderColor:
+          this.handleBorderColor(token)
+          break
+
+        case Properties.borderWidth:
+          this.borderWidth.top = token
+          this.borderWidth.bottom = token
+          this.borderWidth.left = token
+          this.borderWidth.right = token
+          break
+        case Properties.borderWidthBottom:
+          this.borderWidth.bottom = token
+          break
+        case Properties.borderWidthLeft:
+          this.borderWidth.left = token
+          break
+        case Properties.borderWidthRight:
+          this.borderWidth.right = token
+          break
+        case Properties.borderWidthTop:
+          this.borderWidth.top = token
+          break
+
         default:
           console.log('token is not yet supported by codegen', tokenType, token)
           break
@@ -204,6 +242,47 @@ export class UnocssBuilder {
       this.attributes.push(`rounded-br-$${this.borderRadius.bottomRight}`)
   }
 
+  handleBorderColor(token: string) {
+    this.attributes.push(`border-color-$${token}`)
+  }
+
+  handleBorderWidth() {
+    // all sides the same padding
+    const p = this.borderWidth.top !== null
+      && this.borderWidth.top === this.borderWidth.bottom
+      && this.borderWidth.bottom === this.borderWidth.left
+      && this.borderWidth.left === this.borderWidth.right
+
+    if (p) {
+      this.attributes.push(`border-size-$${this.borderWidth.top}`)
+      return
+    }
+
+    // one axis the same
+    const px = this.borderWidth.left !== null && this.borderWidth.left === this.borderWidth.right
+    const py = this.borderWidth.top !== null && this.borderWidth.top === this.borderWidth.bottom
+
+    if (px || py) {
+      if (px)
+        this.attributes.push(`border-x-size-$${this.borderWidth.left}`)
+
+      if (py)
+        this.attributes.push(`border-y-size-$${this.borderWidth.top}`)
+
+      if (px && py)
+        return
+    }
+
+    if (this.borderWidth.top !== null && !py)
+      this.attributes.push(`border-t-size-$${this.borderWidth.top}`)
+    if (this.borderWidth.right !== null && !px)
+      this.attributes.push(`border-r-size-$${this.borderWidth.right}`)
+    if (this.borderWidth.bottom !== null && !py)
+      this.attributes.push(`border-b-size-$${this.borderWidth.bottom}`)
+    if (this.borderWidth.left !== null && !px)
+      this.attributes.push(`border-l-size-$${this.borderWidth.left}`)
+  }
+
   handleHeight(token: string) {
     this.attributes.push(`h-$${token}`)
   }
@@ -232,6 +311,7 @@ export class UnocssBuilder {
   build(): string {
     this.handlePadding()
     this.handleBorderRadius()
+    this.handleBorderWidth()
     this.handleAutoLayout()
 
     return this.attributes.join(' ').toLowerCase()
