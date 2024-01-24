@@ -180,6 +180,16 @@ class ComponentSetProcessor {
     this.processVariants(variants, permutation)
   }
 
+  /**
+   * Processes the variants of a component set based on the given permutations.
+   * It generates a tree representation for each variant, merges these trees based on their states,
+   * and generates HTML for the merged tree. The HTML is then stored for later retrieval.
+   *
+   * @param variants - An object representing the variants found for a given permutation,
+   *                   where each key is a state and each value is the corresponding ComponentNode or undefined.
+   * @param permutation - An optional object representing a permutation of property values.
+   *                      Used for generating variant-specific comments in the HTML output.
+   */
   private processVariants(variants: { [key: string]: ComponentNode | undefined }, permutation?: { [key: string]: string }): void {
     const treesForPermutationByState = this.parseVariantsToTrees(variants)
     const mergedTree = this.mergeTreesBasedOnStates(treesForPermutationByState)
