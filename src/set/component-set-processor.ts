@@ -103,18 +103,6 @@ class ComponentSetProcessor {
   }
 
   /**
-   * Parses the children of a node using the FigmaNodeParser.
-   *
-   * @param node - The node whose children are to be parsed.
-   * @returns An array of parsed trees from the node's children.
-   */
-  private parseNodeChildren(node: ComponentSetNode): any[] { // Replace 'any[]' with the appropriate type for your tree structure
-    return node.children
-      .map(child => this.figmaNodeParser.parse(child as ComponentNode))
-      .filter(tree => tree !== null)
-  }
-
-  /**
    * Generates all possible permutations of properties from a given object where each key has an array of possible values.
    *
    * This method iterates over each property in the provided object, progressively building up permutations. For each key,
