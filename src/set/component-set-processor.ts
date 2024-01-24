@@ -3,7 +3,7 @@ import HTMLGenerator from '../generators/html.generator'
 import { entries } from '../utils'
 import type { TreeNode } from '../interfaces'
 import TreeMerger from '../parsers/merge'
-import type { ComponentCollection, ComponentPropsWithState, SinglePropertyObject } from './types'
+import type { ComponentCollection, ComponentPropsWithState, GroupedComponentCollection, SinglePropertyObject } from './types'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
 class ComponentSetProcessor {
@@ -140,7 +140,7 @@ class ComponentSetProcessor {
    * @returns An object representing the variants found for the given permutation,
    *          where each key is a state and each value is the corresponding ComponentNode or undefined.
    */
-  private findVariantsForPermutation(permutation: { [key: string]: string }, groupedCollection: { [key: string]: ComponentCollection<ComponentPropsWithState> }): { [key: string]: ComponentNode | undefined } {
+  private findVariantsForPermutation(permutation: { [key: string]: string }, groupedCollection: GroupedComponentCollection<ComponentPropsWithState>): { [key: string]: ComponentNode | undefined } {
     const permutationKey = Object.keys(permutation)[0]
     const permutationValue = permutation[permutationKey]
 
@@ -160,7 +160,7 @@ class ComponentSetProcessor {
    * @param permutation - An object representing a permutation of property values.
    * @param groupedCollection - A collection of components grouped by a state property.
    */
-  private processPermutation(permutation: { [key: string]: string }, groupedCollection: { [key: string]: ComponentCollection<ComponentPropsWithState> }): void {
+  private processPermutation(permutation: { [key: string]: string }, groupedCollection: GroupedComponentCollection<ComponentPropsWithState>): void {
     const variants = this.findVariantsForPermutation(permutation, groupedCollection)
     const treesForPermutationByState = this.parseVariantsToTrees(variants)
     const mergedTree = this.mergeTreesBasedOnStates(treesForPermutationByState)
