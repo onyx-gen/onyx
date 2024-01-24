@@ -39,7 +39,7 @@ class TreeMerger {
     if (!node1)
       return this.createConditionalContainerNode(node2!)
     if (!node2)
-      return this.createConditionalContainerNode(node1!)
+      return node1!
 
     // Check for type conflict
     if (node1.data.type !== node2.data.type) {
@@ -104,7 +104,7 @@ class TreeMerger {
       data: {
         type: 'container',
         css: new Set(),
-        if: ['missing-in-one'],
+        if: [this.state],
       },
       children: [node],
     }
