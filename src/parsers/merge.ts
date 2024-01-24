@@ -49,10 +49,14 @@ class TreeMerger {
 
   // Implement specific merging strategies for each TreeNodeData subtype
   private mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData): ContainerNodeData {
-    // Example: Merge CSS strings
-    return {
-      type: 'container',
-      css: `css1(${data1.css}) css2(${data2.css})`,
+    if (data1.css !== data2.css) {
+      return {
+        type: 'container',
+        css: `css1(${data1.css}) css2(${data2.css})`,
+      }
+    }
+    else {
+      return data1
     }
   }
 
