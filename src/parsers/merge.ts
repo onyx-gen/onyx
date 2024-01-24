@@ -35,20 +35,26 @@ class TreeMerger {
     return this.mergeNodes(tree1, tree2)
   }
 
-  private mergeSubtree(subTree: TreeNode, mainTree: TreeNode, showIf: boolean = false): TreeNode {
+  private mergeSubtree(
+    subTree: TreeNode,
+    mainTree: TreeNode,
+    hasSubtreeSibling: boolean = false,
+  ): TreeNode {
     // If the current node of mainTree matches the root of subTree, start the normal merging
     if (this.isSameTree(mainTree, subTree))
       return this.mergeNodes(subTree, mainTree)
 
-    const hasChildWithSubTree = mainTree.children
+    const hasSubtreeChild = mainTree.children
       .some(child => this.isSameTree(child, subTree))
-    console.log('hasChildWithSubTree', hasChildWithSubTree)
+
+    if (!hasSubtreeChild)
+      return { ...mainTree, data: { ...mainTree.data, if: [this.state] } }
 
     // If not, recursively check each child of mainTree
     for (let i = 0; i < mainTree.children.length; i++)
-      mainTree.children[i] = this.mergeSubtree(subTree, mainTree.children[i], !hasChildWithSubTree)
+      mainTree.children[i] = this.mergeSubtree(subTree, mainTree.children[i], !hasSubtreeChild)
 
-    const conditionals = showIf ? [this.state] : []
+    const conditionals = hasSubtreeSibling || !hasSubtreeChild ? [this.state] : []
 
     const mainTreeData = mainTree.data
     if ('css' in mainTreeData && mainTreeData.css.size > 0) {
