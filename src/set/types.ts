@@ -1,4 +1,4 @@
-export interface GroupedComponentCollection<T> {
+export interface GroupedComponentCollection<T extends ComponentProps> {
   [key: string]: {
     component: ComponentNode
     props: T
