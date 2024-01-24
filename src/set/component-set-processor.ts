@@ -26,10 +26,7 @@ class ComponentSetProcessor {
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
     const permutations = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
-    const onlyFirstPermutation = true
-    const devPermutations = (onlyFirstPermutation ? permutations.slice(0, 1) : permutations)
-
-    devPermutations.forEach((permutation) => {
+    permutations.forEach((permutation) => {
       const variants = this.findVariantsForPermutation(permutation, componentCollectionGroupedByState)
 
       const treesForPermutationByState = Object.fromEntries(
@@ -48,8 +45,9 @@ class ComponentSetProcessor {
         const treeMerger = new TreeMerger('hover')
         const mergedTree = treeMerger.merge(defaultTree, hoverTree)
 
-        const html = this.htmlGenerator.generate(mergedTree)
-        this.htmls.push(html)
+        let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} -->\n`
+        variantHTML += this.htmlGenerator.generate(mergedTree)
+        this.htmls.push(variantHTML)
       }
 
       /**
