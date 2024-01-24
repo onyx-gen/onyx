@@ -1,4 +1,11 @@
-import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, TreeNode, TreeNodeData } from '../interfaces'
+import type {
+  ContainerNodeData,
+  IconNodeData,
+  InstanceNodeData,
+  TextNodeData,
+  TreeNode,
+  TreeNodeData,
+} from '../interfaces'
 import { difference } from '../set/utils'
 
 /**
@@ -35,41 +42,34 @@ class TreeMerger {
     return this.mergeNodes(tree1, tree2)
   }
 
+  /**
+   * Merges a subtree into a main tree at the matching node.
+   *
+   * @param subTree - The subtree to be merged.
+   * @param mainTree - The main tree where the subtree will be merged.
+   * @param hasSubtreeSibling - Indicates if the subtree has a sibling node. Defaults to false.
+   * @returns {TreeNode} - The main tree with the subtree merged at the appropriate node.
+   */
   private mergeSubtree(
     subTree: TreeNode,
     mainTree: TreeNode,
     hasSubtreeSibling: boolean = false,
   ): TreeNode {
-    // If the current node of mainTree matches the root of subTree, start the normal merging
     if (this.isSameTree(mainTree, subTree))
       return this.mergeNodes(subTree, mainTree)
 
-    const hasSubtreeChild = mainTree.children
-      .some(child => this.isSameTree(child, subTree))
-
+    const hasSubtreeChild = mainTree.children.some(child => this.isSameTree(child, subTree))
     if (!hasSubtreeChild)
       return { ...mainTree, data: { ...mainTree.data, if: [this.state] } }
 
-    // If not, recursively check each child of mainTree
-    for (let i = 0; i < mainTree.children.length; i++)
-      mainTree.children[i] = this.mergeSubtree(subTree, mainTree.children[i], !hasSubtreeChild)
+    mainTree.children = mainTree.children.map(child =>
+      this.mergeSubtree(subTree, child, !hasSubtreeChild),
+    )
 
     const conditionals = hasSubtreeSibling || !hasSubtreeChild ? [this.state] : []
 
-    const mainTreeData = mainTree.data
-    if ('css' in mainTreeData && mainTreeData.css.size > 0) {
-      const showParentheses = mainTreeData.css.size > 1
-
-      let hoverCss = `${this.state}:`
-
-      if (showParentheses)
-        hoverCss += '('
-
-      hoverCss += [...mainTreeData.css.values()].join(' ')
-
-      if (showParentheses)
-        hoverCss += ')'
-
+    if ('css' in mainTree.data && mainTree.data.css.size > 0) {
+      const hoverCss = this.composeVariantCss(mainTree.data.css)
       return {
         ...mainTree,
         data: {
@@ -82,6 +82,17 @@ class TreeMerger {
     }
 
     return { ...mainTree, data: { ...mainTree.data, if: conditionals } }
+  }
+
+  /**
+   * Composes a variant CSS string from the given CSS set.
+   *
+   * @param cssSet - The set of CSS styles.
+   * @returns {string} - The composed hover CSS string.
+   */
+  private composeVariantCss(cssSet: Set<string>): string {
+    const showParentheses = cssSet.size > 1
+    return `${this.state}:${showParentheses ? '(' : ''}${[...cssSet.values()].join(' ')}${showParentheses ? ')' : ''}`
   }
 
   /**
