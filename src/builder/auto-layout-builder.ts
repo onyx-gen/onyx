@@ -103,16 +103,17 @@ class AutoLayoutBuilder {
    *
    * @returns A string of CSS class names.
    */
-  public build(): string {
-    return Object.values({
-      flex: this.getFlex(),
-      flexDirection: this.getFlexDirection(),
-      justifyContent: this.getJustifyContent(),
-      alignItems: this.getAlignItems(),
-      gap: this.getGap(),
-    })
-      .filter(value => value !== '')
-      .join(' ')
+  public build(): Set<string> {
+    return new Set<string>(
+      Object.values({
+        flex: this.getFlex(),
+        flexDirection: this.getFlexDirection(),
+        justifyContent: this.getJustifyContent(),
+        alignItems: this.getAlignItems(),
+        gap: this.getGap(),
+      })
+        .filter(value => value !== ''),
+    )
   }
 }
 

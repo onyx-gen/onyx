@@ -22,7 +22,7 @@ class HTMLGenerator {
         // Only add 'class' property if css is not undefined
         const attrs: { [key: string]: string } = {}
         if (treeNode.data.css)
-          attrs.class = treeNode.data.css
+          attrs.class = [...treeNode.data.css.values()].join(' ')
 
         return attrs
       },

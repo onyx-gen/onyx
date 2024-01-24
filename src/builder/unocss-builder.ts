@@ -40,7 +40,7 @@ type TokenHandlers = { [key in Properties]?: TokenHandler }
  * from Figma nodes.
  */
 export class UnocssBuilder {
-  private attributes: string[] = []
+  private attributes: Set<string> = new Set()
   private readonly tokens: DesignTokens
   private padding: RectSides = { top: null, bottom: null, left: null, right: null }
   private borderWidth: RectSides = { top: null, bottom: null, left: null, right: null }
@@ -120,9 +120,9 @@ export class UnocssBuilder {
     }
 
     const handlers: TokenHandlers = {
-      [Properties.typography]: () => this.attributes.push(`font-$${token}`),
-      [Properties.fill]: () => this.attributes.push(this.node.type === 'TEXT' ? `color-$${token}` : `bg-$${token}`),
-      [Properties.borderColor]: () => this.attributes.push(`border-color-$${token}`),
+      [Properties.typography]: () => this.attributes.add(`font-$${token}`),
+      [Properties.fill]: () => this.attributes.add(this.node.type === 'TEXT' ? `color-$${token}` : `bg-$${token}`),
+      [Properties.borderColor]: () => this.attributes.add(`border-color-$${token}`),
 
       ...paddingHandlers,
       ...borderWidthHandlers,
@@ -150,7 +150,7 @@ export class UnocssBuilder {
    * @param token The value of the dimension token.
    */
   private handleDimension(dimension: 'height' | 'width', token: string) {
-    this.attributes.push(`${dimension[0]}-$${token}`)
+    this.attributes.add(`${dimension[0]}-$${token}`)
   }
 
   /**
@@ -167,7 +167,7 @@ export class UnocssBuilder {
       && rectSides.left === rectSides.right
 
     if (allSidesEqual) {
-      this.attributes.push(`${attributePrefix}-$${rectSides.top}`)
+      this.attributes.add(`${attributePrefix}-$${rectSides.top}`)
       return
     }
 
@@ -176,22 +176,22 @@ export class UnocssBuilder {
     const axisYEqual = rectSides.top !== null && rectSides.top === rectSides.bottom
 
     if (axisXEqual)
-      this.attributes.push(`${attributePrefix}-x-$${rectSides.left}`)
+      this.attributes.add(`${attributePrefix}-x-$${rectSides.left}`)
     if (axisYEqual)
-      this.attributes.push(`${attributePrefix}-y-$${rectSides.top}`)
+      this.attributes.add(`${attributePrefix}-y-$${rectSides.top}`)
 
     if (axisXEqual && axisYEqual)
       return
 
     // Individual sides
     if (rectSides.top !== null && !axisYEqual)
-      this.attributes.push(`${attributePrefix}-t-$${rectSides.top}`)
+      this.attributes.add(`${attributePrefix}-t-$${rectSides.top}`)
     if (rectSides.right !== null && !axisXEqual)
-      this.attributes.push(`${attributePrefix}-r-$${rectSides.right}`)
+      this.attributes.add(`${attributePrefix}-r-$${rectSides.right}`)
     if (rectSides.bottom !== null && !axisYEqual)
-      this.attributes.push(`${attributePrefix}-b-$${rectSides.bottom}`)
+      this.attributes.add(`${attributePrefix}-b-$${rectSides.bottom}`)
     if (rectSides.left !== null && !axisXEqual)
-      this.attributes.push(`${attributePrefix}-l-$${rectSides.left}`)
+      this.attributes.add(`${attributePrefix}-l-$${rectSides.left}`)
   }
 
   /**
@@ -223,7 +223,7 @@ export class UnocssBuilder {
       && rectCorners.bottomLeft === rectCorners.bottomRight
 
     if (allCornersEqual) {
-      this.attributes.push(`${attributePrefix}-$${rectCorners.topLeft}`)
+      this.attributes.add(`${attributePrefix}-$${rectCorners.topLeft}`)
       return
     }
 
@@ -237,25 +237,25 @@ export class UnocssBuilder {
       && rectCorners.topRight === rectCorners.bottomRight
 
     if (hasTopCornersEqual)
-      this.attributes.push(`${attributePrefix}-t-$${rectCorners.topLeft}`)
+      this.attributes.add(`${attributePrefix}-t-$${rectCorners.topLeft}`)
     if (hasBottomCornersEqual)
-      this.attributes.push(`${attributePrefix}-b-$${rectCorners.bottomLeft}`)
+      this.attributes.add(`${attributePrefix}-b-$${rectCorners.bottomLeft}`)
     if (hasLeftCornersEqual)
-      this.attributes.push(`${attributePrefix}-l-$${rectCorners.topLeft}`)
+      this.attributes.add(`${attributePrefix}-l-$${rectCorners.topLeft}`)
     if (hasRightCornersEqual)
-      this.attributes.push(`${attributePrefix}-r-$${rectCorners.topRight}`)
+      this.attributes.add(`${attributePrefix}-r-$${rectCorners.topRight}`)
 
     if (hasTopCornersEqual && hasBottomCornersEqual && hasLeftCornersEqual && hasRightCornersEqual)
       return
 
     if (rectCorners.topLeft !== null && !hasTopCornersEqual && !hasLeftCornersEqual)
-      this.attributes.push(`${attributePrefix}-tl-$${rectCorners.topLeft}`)
+      this.attributes.add(`${attributePrefix}-tl-$${rectCorners.topLeft}`)
     if (rectCorners.topRight !== null && !hasTopCornersEqual && !hasRightCornersEqual)
-      this.attributes.push(`${attributePrefix}-tr-$${rectCorners.topRight}`)
+      this.attributes.add(`${attributePrefix}-tr-$${rectCorners.topRight}`)
     if (rectCorners.bottomLeft !== null && !hasBottomCornersEqual && !hasLeftCornersEqual)
-      this.attributes.push(`${attributePrefix}-bl-$${rectCorners.bottomLeft}`)
+      this.attributes.add(`${attributePrefix}-bl-$${rectCorners.bottomLeft}`)
     if (rectCorners.bottomRight !== null && !hasBottomCornersEqual && !hasRightCornersEqual)
-      this.attributes.push(`${attributePrefix}-br-$${rectCorners.bottomRight}`)
+      this.attributes.add(`${attributePrefix}-br-$${rectCorners.bottomRight}`)
   }
 
   /**
@@ -285,7 +285,7 @@ export class UnocssBuilder {
       autoLayoutBuilder = new AutoLayoutBuilder(this.node, this.node.inferredAutoLayout, this.tokens)
 
     if (autoLayoutBuilder)
-      this.attributes.push(autoLayoutBuilder.build())
+      autoLayoutBuilder.build().forEach(css => this.attributes.add(css))
   }
 
   /**
@@ -293,14 +293,17 @@ export class UnocssBuilder {
    * It combines all the handled attributes into a single CSS class string.
    * @returns The final CSS class string.
    */
-  build(): string {
+  build(): Set<string> {
     this.handlePadding()
     this.handleBorderWidth()
     this.handleBorderRadius()
 
     this.handleAutoLayout()
 
+    // Lowercase all attributes
+    this.attributes = new Set([...this.attributes].map(attr => attr.toLowerCase()))
+
     // Implement the logic to concatenate attributes...
-    return this.attributes.join(' ').toLowerCase()
+    return this.attributes
   }
 }

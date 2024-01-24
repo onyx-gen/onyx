@@ -15,7 +15,7 @@ export interface AbstractNodeData {
 
 export interface ContainerNodeData extends AbstractNodeData {
   type: 'container'
-  css: string
+  css: Set<string>
 }
 
 export interface TextNodeData extends AbstractNodeData {

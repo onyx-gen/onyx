@@ -51,3 +51,20 @@ export function groupComponentsByProp<T extends ComponentProps>(componentCollect
     }
   }, {} as GroupedComponentCollection<T>)
 }
+
+/**
+ * Calculates the difference between two sets of strings.
+ * The difference is a new Set containing all the elements that exist in the first set
+ * but not in the second set.
+ *
+ * @param {Set<string>} setA The first set.
+ * @param {Set<string>} setB The second set, whose items will be subtracted from the first set.
+ * @returns {Set<string>} A new Set representing the difference between setA and setB.
+ */
+export function difference(setA: Set<string>, setB: Set<string>): Set<string> {
+  const _difference = new Set(setA)
+  for (const elem of setB)
+    _difference.delete(elem)
+
+  return _difference
+}

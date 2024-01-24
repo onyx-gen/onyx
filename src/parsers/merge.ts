@@ -1,4 +1,5 @@
 import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, TreeNode, TreeNodeData } from '../interfaces'
+import { difference } from '../set/utils'
 
 class TreeMerger {
   public merge(tree1: TreeNode, tree2: TreeNode): TreeNode {
@@ -50,9 +51,13 @@ class TreeMerger {
   // Implement specific merging strategies for each TreeNodeData subtype
   private mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData): ContainerNodeData {
     if (data1.css !== data2.css) {
+      const cssDiff = difference(data1.css, data2.css)
+
+      const hoverCss = `hover:(${[...cssDiff.values()].join(' ')})`
+
       return {
         type: 'container',
-        css: `css1(${data1.css}) css2(${data2.css})`,
+        css: new Set([...data1.css, hoverCss]), // TODO MF: get difference and add hover variants
       }
     }
     else {

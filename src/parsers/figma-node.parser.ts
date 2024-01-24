@@ -74,7 +74,7 @@ class FigmaNodeParser {
     const hasChildren = 'children' in node && node.children.length > 0
 
     // Skip leaf nodes with empty CSS
-    if (!hasChildren && css === '') {
+    if (!hasChildren && css.size === 0) {
       console.log('Skipping leaf with empty CSS')
       return null
     }
@@ -88,7 +88,7 @@ class FigmaNodeParser {
    * @param {string} css - CSS for the node.
    * @returns {TreeNode} The generated tree node for the text.
    */
-  private createTextNode(node: TextNode, css: string): TreeNode {
+  private createTextNode(node: TextNode, css: Set<string>): TreeNode {
     const parentNodeData: ContainerNodeData = { type: 'container', css }
     const childNodeData: TextNodeData = { type: 'text', text: node.characters }
 
@@ -102,7 +102,7 @@ class FigmaNodeParser {
    * @param {boolean} hasChildren - Flag indicating if the node has children.
    * @returns {TreeNode} The generated tree node for the container.
    */
-  private createContainerNode(node: SceneNode, css: string, hasChildren: boolean): TreeNode {
+  private createContainerNode(node: SceneNode, css: Set<string>, hasChildren: boolean): TreeNode {
     const data: ContainerNodeData = { type: 'container', css }
     const treeNode: TreeNode = { data, children: [] }
 
