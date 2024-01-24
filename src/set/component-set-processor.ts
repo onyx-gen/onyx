@@ -301,7 +301,7 @@ class ComponentSetProcessor {
       return null
 
     Object.entries(trees).forEach(([state, tree]) => {
-      if (tree && state !== 'default') {
+      if (tree && state !== 'default' && state === 'error') {
         const treeMerger = new TreeMerger(state)
         mergedTree = treeMerger.merge(mergedTree!, tree)
       }
