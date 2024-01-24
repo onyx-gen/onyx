@@ -22,9 +22,10 @@ class ComponentSetProcessor {
     const componentCollectionWithState = this.filterComponentsWithState(componentCollection)
     const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
+    const permutations = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
-    console.log(uniquePropertiesGroupedByPropName)
-    console.log(componentCollectionGroupedByState)
+    console.log('uniquePropertiesGroupedByPropName', uniquePropertiesGroupedByPropName)
+    console.log('permutations', permutations)
 
     const trees = this.parseNodeChildren(node)
     html += this.generateHTMLFromTrees(trees)
@@ -109,6 +110,34 @@ class ComponentSetProcessor {
    */
   private generateHTMLFromTrees(trees: any[]): string { // Replace 'any[]' with the appropriate type for your tree structure
     return trees.map(tree => this.htmlGenerator.generate(tree!)).join('\n\n')
+  }
+
+  /**
+   * Generates all possible permutations of properties from a given object where each key has an array of possible values.
+   *
+   * This method iterates over each property in the provided object, progressively building up permutations. For each key,
+   * it maps through its associated array of values, combining each value with the current permutations to form new permutations.
+   * This approach ensures every combination of property values is included.
+   *
+   * @param groupedProperties - An object with property names as keys and arrays of possible values as values.
+   * @returns An array of objects, each representing a unique permutation of property values.
+   */
+  private generatePropertyPermutations(groupedProperties: { [key: string]: string[] }): { [key: string]: string }[] {
+    // Initialize an array to store the permutations
+    let permutations: { [key: string]: string }[] = [{}]
+
+    // Iterate through each property key
+    Object.keys(groupedProperties).forEach((key) => {
+      // For each property, expand the permutations array by the number of values for this key
+      permutations = permutations.flatMap(permutation =>
+        groupedProperties[key].map(value => ({
+          ...permutation,
+          [key]: value,
+        })),
+      )
+    })
+
+    return permutations
   }
 }
 
