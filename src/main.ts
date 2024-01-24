@@ -30,10 +30,10 @@ figma.codegen.on('generate', async () => {
 
   let html = ''
 
-  const unoTree = parser.parse(node)
+  const tree = parser.parse(node)
 
-  if (unoTree)
-    html = generator.generate(unoTree)
+  if (tree)
+    html = generator.generate(tree)
   else
     console.error('It was not possible to generate HTML code for the selected node.')
 

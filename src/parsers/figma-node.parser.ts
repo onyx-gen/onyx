@@ -104,26 +104,26 @@ class FigmaNodeParser {
    */
   private createContainerNode(node: SceneNode, css: string, hasChildren: boolean): TreeNode {
     const data: ContainerNodeData = { type: 'container', css }
-    const unoTreeNode: TreeNode = { data, children: [] }
+    const treeNode: TreeNode = { data, children: [] }
 
     if (hasChildren)
-      this.addChildrenToNode(node as SceneNode & ChildrenMixin, unoTreeNode)
+      this.addChildrenToNode(node as SceneNode & ChildrenMixin, treeNode)
 
-    return unoTreeNode
+    return treeNode
   }
 
   /**
    * Adds child nodes to the given tree node.
    * @param {ChildrenMixin & SceneNode} node - The parent node.
-   * @param {TreeNode} unoTreeNode - The tree node to add children to.
+   * @param {TreeNode} treeNode - The tree node to add children to.
    */
-  private addChildrenToNode(node: ChildrenMixin & SceneNode, unoTreeNode: TreeNode): void {
+  private addChildrenToNode(node: ChildrenMixin & SceneNode, treeNode: TreeNode): void {
     node.children
       .filter(child => child.visible)
       .forEach((child) => {
         const childTree = this.parse(child)
         if (childTree)
-          unoTreeNode.children.push(childTree)
+          treeNode.children.push(childTree)
       })
   }
 }
