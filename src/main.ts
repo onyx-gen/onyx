@@ -30,12 +30,22 @@ figma.codegen.on('generate', async () => {
 
   let html = ''
 
-  const tree = parser.parse(node)
+  if (node.type === 'COMPONENT_SET') {
+    const children = node.children as ComponentNode[]
+    const trees = children
+      .map(child => parser.parse(child))
+      .filter(tree => tree !== null)
 
-  if (tree)
-    html = generator.generate(tree)
-  else
-    console.error('It was not possible to generate HTML code for the selected node.')
+    html += trees.map(tree => generator.generate(tree!)).join('\n\n')
+  }
+  else {
+    const tree = parser.parse(node)
+
+    if (tree)
+      html = generator.generate(tree)
+    else
+      console.error('It was not possible to generate HTML code for the selected node.')
+  }
 
   return [
     {
