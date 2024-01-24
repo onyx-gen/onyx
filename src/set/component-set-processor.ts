@@ -24,8 +24,11 @@ class ComponentSetProcessor {
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
     const permutations = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
-    console.log('uniquePropertiesGroupedByPropName', uniquePropertiesGroupedByPropName)
-    console.log('permutations', permutations)
+    permutations.forEach((permutation) => {
+      console.log('permutation', permutation)
+      const variants = this.findVariantsForPermutation(permutation, componentCollectionGroupedByState)
+      console.log(`variants for ${JSON.stringify(permutation)}`, variants)
+    })
 
     const trees = this.parseNodeChildren(node)
     html += this.generateHTMLFromTrees(trees)
@@ -138,6 +141,28 @@ class ComponentSetProcessor {
     })
 
     return permutations
+  }
+
+  /**
+   * Finds variants for a given permutation by matching components in the grouped collection.
+   * For each permutation, this method iterates through the component collection grouped by state,
+   * and finds a component whose properties match the key-value pairs in the permutation.
+   *
+   * @param permutation - An object representing a permutation of property values.
+   * @param groupedCollection - A collection of components grouped by a state property.
+   * @returns An object representing the variants found for the given permutation,
+   *          where each key is a state and each value is the corresponding ComponentNode or undefined.
+   */
+  private findVariantsForPermutation(permutation: { [key: string]: string }, groupedCollection: { [key: string]: ComponentCollection<ComponentPropsWithState> }): { [key: string]: ComponentNode | undefined } {
+    const permutationKey = Object.keys(permutation)[0]
+    const permutationValue = permutation[permutationKey]
+
+    return Object.fromEntries(
+      Object.entries(groupedCollection).map(([state, collection]) => ([
+        state,
+        collection.find(component => permutationKey in component.props && component.props[permutationKey] === permutationValue)?.component,
+      ])),
+    )
   }
 }
 
