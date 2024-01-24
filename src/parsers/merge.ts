@@ -57,10 +57,15 @@ class TreeMerger {
   }
 
   private mergeTextData(data1: TextNodeData, data2: TextNodeData): TextNodeData {
-    // Example: Concatenate text
-    return {
-      type: 'text',
-      text: `text1(${data1.text}) text2(${data2.text})`,
+    if (data1.text !== data2.text) {
+      // Example: Concatenate text
+      return {
+        type: 'text',
+        text: `text1(${data1.text}) text2(${data2.text})`,
+      }
+    }
+    else {
+      return data1
     }
   }
 
