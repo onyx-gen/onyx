@@ -3,7 +3,7 @@ import type {
   TreeNode,
   TreeNodeData,
 } from '../interfaces'
-import { createIndent, typedObjectEntries } from '../utils'
+import { createIndent, entries } from '../utils'
 
 // Define a type for the attrs function
 type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => { [key: string]: string }
@@ -112,7 +112,7 @@ class HTMLGenerator {
   private getInstanceNodeHTMLAttrs(treeNode: TreeNode<InstanceNodeData>): { [key: string]: string } {
     const attrs: { [key: string]: string } = {}
 
-    typedObjectEntries(treeNode.data.props)
+    entries(treeNode.data.props)
       .filter(([, prop]) => prop.type === 'VARIANT')
       .forEach(([key, prop]) => {
         attrs[key] = `${prop.value}`
@@ -128,7 +128,7 @@ class HTMLGenerator {
    * @returns {string} The string representation of the attributes.
    */
   private attrsToString(attrs: { [key: string]: string }, depth: number): string {
-    const pairs = typedObjectEntries(attrs).map(([key, value]) => `${key}="${value}"`)
+    const pairs = entries(attrs).map(([key, value]) => `${key}="${value}"`)
 
     if (pairs.length === 1) {
       return ` ${pairs[0]}`
