@@ -35,16 +35,47 @@ class TreeMerger {
     return this.mergeNodes(tree1, tree2)
   }
 
-  private mergeSubtree(subTree: TreeNode, mainTree: TreeNode): TreeNode {
+  private mergeSubtree(subTree: TreeNode, mainTree: TreeNode, showIf: boolean = false): TreeNode {
     // If the current node of mainTree matches the root of subTree, start the normal merging
     if (this.isSameTree(mainTree, subTree))
       return this.mergeNodes(subTree, mainTree)
 
+    const hasChildWithSubTree = mainTree.children
+      .some(child => this.isSameTree(child, subTree))
+    console.log('hasChildWithSubTree', hasChildWithSubTree)
+
     // If not, recursively check each child of mainTree
     for (let i = 0; i < mainTree.children.length; i++)
-      mainTree.children[i] = this.mergeSubtree(subTree, mainTree.children[i])
+      mainTree.children[i] = this.mergeSubtree(subTree, mainTree.children[i], !hasChildWithSubTree)
 
-    return { ...mainTree, data: { ...mainTree.data, if: [this.state] } }
+    const conditionals = showIf ? [this.state] : []
+
+    const mainTreeData = mainTree.data
+    if ('css' in mainTreeData && mainTreeData.css.size > 0) {
+      const showParentheses = mainTreeData.css.size > 1
+
+      let hoverCss = `${this.state}:`
+
+      if (showParentheses)
+        hoverCss += '('
+
+      hoverCss += [...mainTreeData.css.values()].join(' ')
+
+      if (showParentheses)
+        hoverCss += ')'
+
+      return {
+        ...mainTree,
+        data: {
+          ...mainTree.data,
+          type: 'container',
+          css: new Set([hoverCss]),
+          if: conditionals,
+        },
+      }
+    }
+
+    return { ...mainTree, data: { ...mainTree.data, if: conditionals } }
   }
 
   /**
