@@ -44,7 +44,7 @@ class TreeMerger {
     for (let i = 0; i < mainTree.children.length; i++)
       mainTree.children[i] = this.mergeSubtree(subTree, mainTree.children[i])
 
-    return mainTree
+    return { ...mainTree, data: { ...mainTree.data, if: [this.state] } }
   }
 
   /**
