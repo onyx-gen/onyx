@@ -1,4 +1,4 @@
-import type { ComponentCollection, ComponentPropsWithState, GroupedComponentCollection } from './types'
+import type { ComponentCollection, ComponentProps, GroupedComponentCollection } from './types'
 
 /**
  * Extracts and parses properties from a component's name.
@@ -25,27 +25,29 @@ export function getComponentProperties(component: ComponentNode): { [key: string
 }
 
 /**
- * Groups a collection of components by their state property.
+ * Groups a collection of components by a specified property.
  *
  * The function iterates over a collection of component objects, each containing
- * a `props` object with a `state` property. It groups these components by their
- * state, returning an object where each key is a state value and each value is
- * an array of components that share that state.
+ * a `props` object with various properties. It groups these components by the specified
+ * property, returning an object where each key is a value of that property and each value
+ * is an array of components that share that property value.
  *
  * @param componentCollection - Array of components with properties.
- * @returns An object with keys as state values and values as arrays of components.
+ * @param propName - The property name to group by.
+ * @returns An object with keys as property values and values as arrays of components.
  */
-export function groupComponentsByState(componentCollection: ComponentCollection<ComponentPropsWithState>): GroupedComponentCollection {
-  return componentCollection.reduce<GroupedComponentCollection>((acc, component) => {
-    const state = component.props.state
+export function groupComponentsByProp<T extends ComponentProps>(componentCollection: ComponentCollection<T>, propName: keyof T): GroupedComponentCollection<T> {
+  return componentCollection.reduce<GroupedComponentCollection<T>>((acc, component) => {
+    const propValue = component.props[propName]
 
-    // Get the existing group for the state, or initialize it as an empty array.
-    const componentGroup = acc[state] || []
+    if (!propValue)
+      return acc
 
-    // Return the accumulator with the new component added to the appropriate state group.
+    const componentGroup = acc[propValue] || []
+
     return {
       ...acc,
-      [state]: [...componentGroup, component],
+      [propValue]: [...componentGroup, component],
     }
-  }, {}) // Using GroupedComponentCollection as the type for the accumulator
+  }, {} as GroupedComponentCollection<T>)
 }

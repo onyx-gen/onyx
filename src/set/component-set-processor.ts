@@ -1,7 +1,7 @@
 import FigmaNodeParser from '../parsers/figma-node.parser'
 import HTMLGenerator from '../generators/html.generator'
 import type { ComponentCollection, ComponentPropsWithState } from './types'
-import { getComponentProperties, groupComponentsByState } from './utils'
+import { getComponentProperties, groupComponentsByProp } from './utils'
 
 class ComponentSetProcessor {
   public process(node: ComponentSetNode): string {
@@ -21,7 +21,7 @@ class ComponentSetProcessor {
       .filter(component => !!component.props.state) as ComponentCollection<ComponentPropsWithState>
 
     // Group components by their 'state' property.
-    const componentCollectionGroupedByState = groupComponentsByState(componentCollectionWithState)
+    const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
     console.log(componentCollectionGroupedByState)
 
     const children = node.children as ComponentNode[]
