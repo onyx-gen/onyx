@@ -27,22 +27,45 @@ class ComponentSetProcessor {
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
     const permutations = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
+    this.processWithPermutationsOrAsIs(permutations, componentCollectionGroupedByState)
+
+    return this
+  }
+
+  /**
+   * Processes the components with permutations if available, or continues with the processing as is.
+   * This method determines whether permutations exist and accordingly processes each permutation or
+   * defaults to processing the components without permutations.
+   *
+   * @param permutations - An array of permutations of property values.
+   * @param groupedCollection - A collection of components grouped by a state property.
+   */
+  private processWithPermutationsOrAsIs(
+    permutations: { [key: string]: string }[],
+    groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
+  ): void {
     if (permutations.length === 0) {
-      const variants = Object.fromEntries(
-        entries(componentCollectionGroupedByState).map(([state, collection]) => ([
-          state,
-          collection[0].component,
-        ])),
-      )
-      this.processVariants(variants)
+      this.processAsIs(groupedCollection)
     }
     else {
       permutations.forEach((permutation) => {
-        this.processPermutation(permutation, componentCollectionGroupedByState)
+        this.processPermutation(permutation, groupedCollection)
       })
     }
+  }
 
-    return this
+  /**
+   * Processes the components using the existing variant structure without any permutations.
+   * This method is used when there are no permutations available, thereby using the components
+   * as they are originally structured.
+   *
+   * @param groupedCollection - A collection of components grouped by a state property.
+   */
+  private processAsIs(groupedCollection: GroupedComponentCollection<ComponentPropsWithState>): void {
+    const variants = Object.fromEntries(
+      entries(groupedCollection).map(([state, collection]) => ([state, collection[0].component])),
+    )
+    this.processVariants(variants)
   }
 
   /**
