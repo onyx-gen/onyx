@@ -29,18 +29,17 @@ class ComponentSetProcessor {
       console.log('permutation', permutation)
       const variants = this.findVariantsForPermutation(permutation, componentCollectionGroupedByState)
 
-      entries(variants).forEach(([state, component]) => {
-        // TODO MF: Why can the component be undefined?
-        if (component) {
-          const tree = this.figmaNodeParser.parse(component)
-          if (tree) {
-            let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} (${state}) -->\n`
-            variantHTML += this.htmlGenerator.generate(tree)
-            this.htmls.push(variantHTML)
-          }
-        }
-        else {
-          console.error(`No component found for permutation ${JSON.stringify(permutation)} and state ${state}`)
+      const treesForPermutationByState = Object.fromEntries(
+        entries(variants)
+          .filter(([, component]) => component !== undefined)
+          .map(([state, component]) => [state, this.figmaNodeParser.parse(component!)]),
+      )
+
+      entries(treesForPermutationByState).forEach(([state, tree]) => {
+        if (tree) {
+          let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} (${state}) -->\n`
+          variantHTML += this.htmlGenerator.generate(tree)
+          this.htmls.push(variantHTML)
         }
       })
     })
