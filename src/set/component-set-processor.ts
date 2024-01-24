@@ -30,7 +30,6 @@ class ComponentSetProcessor {
     const devPermutations = (onlyFirstPermutation ? permutations.slice(0, 1) : permutations)
 
     devPermutations.forEach((permutation) => {
-      console.log('permutation', permutation)
       const variants = this.findVariantsForPermutation(permutation, componentCollectionGroupedByState)
 
       const treesForPermutationByState = Object.fromEntries(
@@ -46,7 +45,7 @@ class ComponentSetProcessor {
         const defaultTree = treesForPermutationByState.default
         const hoverTree = treesForPermutationByState.hover
 
-        const treeMerger = new TreeMerger()
+        const treeMerger = new TreeMerger('hover')
         const mergedTree = treeMerger.merge(defaultTree, hoverTree)
 
         const html = this.htmlGenerator.generate(mergedTree)

@@ -6,6 +6,8 @@ import { difference } from '../set/utils'
  * The merging logic is based on the type of the nodes and their respective data.
  */
 class TreeMerger {
+  constructor(private state: string) {}
+
   /**
    * Merges two TreeNode structures into one.
    *
@@ -90,8 +92,17 @@ class TreeMerger {
   private mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData): ContainerNodeData {
     if (data1.css !== data2.css) {
       const cssDiff = difference(data1.css, data2.css)
+      const showParentheses = cssDiff.size > 1
 
-      const hoverCss = `hover:(${[...cssDiff.values()].join(' ')})`
+      let hoverCss = `${this.state}:`
+
+      if (showParentheses)
+        hoverCss += '('
+
+      hoverCss += [...cssDiff.values()].join(' ')
+
+      if (showParentheses)
+        hoverCss += ')'
 
       return {
         type: 'container',
