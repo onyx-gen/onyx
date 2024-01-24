@@ -37,9 +37,9 @@ class TreeMerger {
 
     // Handle the case where either of the nodes is missing
     if (!node1)
-      return node2!
+      return this.createConditionalContainerNode(node2!)
     if (!node2)
-      return node1!
+      return this.createConditionalContainerNode(node1!)
 
     // Check for type conflict
     if (node1.data.type !== node2.data.type) {
@@ -94,6 +94,27 @@ class TreeMerger {
         css: new Set(),
       },
       children: [parentTreeNode1, parentTreeNode2],
+    }
+  }
+
+  private createConditionalContainerNode(node: TreeNode): TreeNode {
+    console.log('Creating conditional container node', node)
+
+    const parentTreeNode: TreeNode = {
+      data: {
+        type: 'container',
+        css: new Set(),
+        if: ['missing-in-one'],
+      },
+      children: [node],
+    }
+
+    return {
+      data: {
+        type: 'container',
+        css: new Set(),
+      },
+      children: [parentTreeNode],
     }
   }
 
