@@ -5,9 +5,8 @@ import type {
 } from '../interfaces'
 import { createIndent, entries } from '../utils'
 
-// Define a type for the attrs function
 type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => { [key: string]: string }
-
+type ConditionalFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string | undefined
 type TagFunction<T extends TreeNodeData> = ((node: TreeNode<T>) => string) | string
 
 /**
@@ -26,6 +25,7 @@ class HTMLGenerator {
 
         return attrs
       },
+      if: treeNode => treeNode.data.if ? treeNode.data.if.join(' && ') : undefined,
     },
     icon: {
       tag: 'i',
@@ -64,6 +64,9 @@ class HTMLGenerator {
     const hasAttrs = Object.keys(attrs).length > 0
     const hasChildren = treeNode.children && treeNode.children.length > 0
 
+    const conditionals = nodeMapping.if ? nodeMapping.if(treeNode as any) : undefined
+    const hasConditionals = conditionals && Object.keys(conditionals).length > 0
+
     // Handle text nodes separately
     if (treeNode.data.type === 'text') {
       html += `${treeNode.data.text}\n`
@@ -71,6 +74,9 @@ class HTMLGenerator {
     else if (tag) {
       // Start tag construction for non-text nodes
       html += `<${tag}${hasAttrs ? ` ${this.attrsToString(attrs, depth)}` : ''}`
+
+      if (hasConditionals)
+        html += ` v-if="${conditionals}"`
 
       if (hasChildren) {
         // Add children nodes if present
@@ -154,6 +160,7 @@ export type NodeTypeToTagMap = {
   [K in TreeNodeData['type']]: {
     tag?: TagFunction<ExtractedNodeDataType<K>>
     attrs?: AttrsFunction<ExtractedNodeDataType<K>>
+    if?: ConditionalFunction<ExtractedNodeDataType<K>>
   }
 }
 

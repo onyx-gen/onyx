@@ -19,19 +19,22 @@ class TreeMerger {
     return this.mergeNodes(tree1, tree2)
   }
 
-  /**
-   * Merges two TreeNode objects.
-   *
-   * @param node1 The first TreeNode to merge.
-   * @param node2 The second TreeNode to merge.
-   * @returns TreeNode representing the merged result of node1 and node2.
-   */
-  private mergeNodes(node1: TreeNode, node2: TreeNode): TreeNode {
+  private mergeNodes(node1: TreeNode | undefined, node2: TreeNode | undefined): TreeNode {
+    if (!node1 && !node2)
+      throw new Error('Both nodes are undefined')
+
     // Handle the case where either of the nodes is missing
     if (!node1)
-      return node2
+      return node2!
     if (!node2)
-      return node1
+      return node1!
+
+    // Check for type conflict
+    if (node1.data.type !== node2.data.type) {
+      console.warn(`Type conflict at node: ${node1.data.type} vs ${node2.data.type}. Creating a container node.`)
+      // Create a container node with both nodes as children to visualize the conflict
+      return this.createConflictContainerNode(node1, node2)
+    }
 
     // Assuming similar structure, merge TreeNodeData
     const mergedData = this.mergeData(node1.data, node2.data)
@@ -40,6 +43,20 @@ class TreeMerger {
     const children = this.mergeChildren(node1.children, node2.children)
 
     return { data: mergedData, children }
+  }
+
+  private createConflictContainerNode(node1: TreeNode, node2: TreeNode): TreeNode {
+    // Create a new container node data (modify this according to your actual container node structure)
+    const containerData: ContainerNodeData = {
+      type: 'container',
+      css: new Set(),
+      if: ['conflict'],
+    }
+
+    return {
+      data: containerData,
+      children: [node1, node2],
+    }
   }
 
   /**
@@ -148,6 +165,7 @@ class TreeMerger {
    */
   private mergeInstanceData(data1: InstanceNodeData, data2: InstanceNodeData): InstanceNodeData {
     // TODO MF
+    console.log(data1, data2)
     return data1
   }
 
@@ -160,6 +178,7 @@ class TreeMerger {
    */
   private mergeIconData(data1: IconNodeData, data2: IconNodeData): IconNodeData {
     // TODO MF
+    console.log(data1, data2)
     return data1
   }
 }

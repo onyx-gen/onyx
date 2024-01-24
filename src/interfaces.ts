@@ -11,6 +11,7 @@ export type TreeNodeData =
 
 export interface AbstractNodeData {
   type: string
+  if?: string[]
 }
 
 export interface ContainerNodeData extends AbstractNodeData {
