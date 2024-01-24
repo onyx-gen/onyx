@@ -61,7 +61,7 @@ class HTMLGenerator {
     // Determine the tag and attributes for the current node
     const tag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(treeNode as any) : nodeMapping.tag
     const attrs = nodeMapping.attrs ? nodeMapping.attrs(treeNode as any) : {}
-    const hasAttrs = Object.keys(attrs).length > 0
+    const hasAttrs = Object.keys(attrs).length > 0 && Object.values(attrs).some(val => !!val)
     const hasChildren = treeNode.children && treeNode.children.length > 0
 
     const conditionals = nodeMapping.if ? nodeMapping.if(treeNode as any) : undefined
