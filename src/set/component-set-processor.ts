@@ -1,8 +1,8 @@
 import FigmaNodeParser from '../parsers/figma-node.parser'
 import HTMLGenerator from '../generators/html.generator'
 import { entries } from '../utils'
-import TreeMerger from '../parsers/merge'
 import type { TreeNode } from '../interfaces'
+import TreeMerger from '../parsers/merge'
 import type { ComponentCollection, ComponentPropsWithState, SinglePropertyObject } from './types'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
@@ -28,63 +28,19 @@ class ComponentSetProcessor {
     const permutations = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
     permutations.forEach((permutation) => {
-      const variants = this.findVariantsForPermutation(permutation, componentCollectionGroupedByState)
-
-      const treesForPermutationByState = Object.fromEntries(
-        entries(variants)
-          .filter(([, component]) => component !== undefined)
-          .map(([state, component]) => [state, this.figmaNodeParser.parse(component!)]),
-      )
-
-      const states: {
-        default?: TreeNode
-        hover?: TreeNode
-        active?: TreeNode
-        disabled?: TreeNode
-      } = {}
-
-      if ('default' in treesForPermutationByState && treesForPermutationByState.default)
-        states.default = treesForPermutationByState.default
-
-      if ('hover' in treesForPermutationByState && treesForPermutationByState.hover)
-        states.hover = treesForPermutationByState.hover
-
-      if ('active' in treesForPermutationByState && treesForPermutationByState.active)
-        states.active = treesForPermutationByState.active
-
-      if ('disabled' in treesForPermutationByState && treesForPermutationByState.disabled)
-        states.disabled = treesForPermutationByState.disabled
-
-      let mergedTree = states.default
-
-      if (!mergedTree) {
-        console.error('No default state found for component set')
-        return this
-      }
-
-      if (states.hover) {
-        const treeMerger = new TreeMerger('hover') // Assuming 'hover' is the variant indicator for all merges
-        mergedTree = treeMerger.merge(mergedTree, states.hover)
-      }
-
-      if (states.active) {
-        const treeMerger = new TreeMerger('focus') // Assuming 'hover' is the variant indicator for all merges
-        mergedTree = treeMerger.merge(mergedTree, states.active)
-      }
-
-      if (states.disabled) {
-        const treeMerger = new TreeMerger('disabled') // Assuming 'hover' is the variant indicator for all merges
-        mergedTree = treeMerger.merge(mergedTree, states.disabled)
-      }
-
-      let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} -->\n`
-      variantHTML += this.htmlGenerator.generate(mergedTree)
-      this.htmls.push(variantHTML)
+      this.processPermutation(permutation, componentCollectionGroupedByState)
     })
 
     return this
   }
 
+  /**
+   * Retrieves the generated HTML as a single string.
+   * This method combines the HTML strings for all processed permutations into one string.
+   * Each permutation's HTML is separated by two newline characters for clear separation.
+   *
+   * @returns A single string containing the combined HTML of all processed permutations.
+   */
   public getHTML(): string {
     return this.htmls.join('\n\n')
   }
@@ -206,6 +162,65 @@ class ComponentSetProcessor {
         collection.find(component => permutationKey in component.props && component.props[permutationKey] === permutationValue)?.component,
       ])),
     )
+  }
+
+  /**
+   * Processes a single permutation of component properties and generates HTML for that permutation.
+   * It finds variants for the permutation, parses the component nodes, merges the trees based on states,
+   * and generates the HTML.
+   *
+   * @param permutation - An object representing a permutation of property values.
+   * @param groupedCollection - A collection of components grouped by a state property.
+   */
+  private processPermutation(permutation: { [key: string]: string }, groupedCollection: { [key: string]: ComponentCollection<ComponentPropsWithState> }): void {
+    const variants = this.findVariantsForPermutation(permutation, groupedCollection)
+    const treesForPermutationByState = this.parseVariantsToTrees(variants)
+    const mergedTree = this.mergeTreesBasedOnStates(treesForPermutationByState)
+
+    if (!mergedTree) {
+      console.error('No valid merged tree found for component set')
+      return
+    }
+
+    let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} -->\n`
+    variantHTML += this.htmlGenerator.generate(mergedTree)
+    this.htmls.push(variantHTML)
+  }
+
+  /**
+   * Parses variants to trees for each state.
+   *
+   * @param variants - An object with states as keys and corresponding ComponentNodes or undefined.
+   * @returns An object with states as keys and the parsed TreeNode or undefined.
+   */
+  private parseVariantsToTrees(variants: { [key: string]: ComponentNode | undefined }): { [key: string]: TreeNode | null } {
+    return Object.fromEntries(
+      entries(variants)
+        .filter(([, component]) => component !== undefined)
+        .map(([state, component]) => [state, this.figmaNodeParser.parse(component!)]),
+    )
+  }
+
+  /**
+   * Merges trees based on their states to create a single tree representing all states.
+   *
+   * @param trees - An object with states as keys and the corresponding TreeNode or undefined.
+   * @returns The merged TreeNode representing all states, or undefined if no default state is found.
+   */
+  private mergeTreesBasedOnStates(trees: { [key: string]: TreeNode | null }): TreeNode | null {
+    let mergedTree = trees.default
+
+    if (!mergedTree)
+      return null
+
+    Object.entries(trees).forEach(([state, tree]) => {
+      if (tree && state !== 'default') {
+        const treeMerger = new TreeMerger(state)
+        mergedTree = treeMerger.merge(mergedTree!, tree)
+      }
+    })
+
+    return mergedTree
   }
 }
 
