@@ -58,15 +58,17 @@ class TreeMerger {
     if (this.isSameTree(mainTree, subTree))
       return this.mergeNodes(subTree, mainTree)
 
+    const extendedConditionals = mainTree.data.if ? [...mainTree.data.if, this.state] : [this.state]
+
     const hasSubtreeChild = mainTree.children.some(child => this.isSameTree(child, subTree))
     if (!hasSubtreeChild)
-      return { ...mainTree, data: { ...mainTree.data, if: [this.state] } }
+      return { ...mainTree, data: { ...mainTree.data, if: extendedConditionals } }
 
     mainTree.children = mainTree.children.map(child =>
       this.mergeSubtree(subTree, child, !hasSubtreeChild),
     )
 
-    const conditionals = hasSubtreeSibling || !hasSubtreeChild ? [this.state] : []
+    const conditionals = hasSubtreeSibling || !hasSubtreeChild ? extendedConditionals : []
 
     if ('css' in mainTree.data && mainTree.data.css.size > 0) {
       const hoverCss = this.composeVariantCss(mainTree.data.css)
