@@ -25,7 +25,10 @@ class ComponentSetProcessor {
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
     const permutations = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
-    permutations.forEach((permutation) => {
+    const onlyFirstPermutation = true
+    const devPermutations = (onlyFirstPermutation ? permutations.slice(0, 1) : permutations)
+
+    devPermutations.forEach((permutation) => {
       console.log('permutation', permutation)
       const variants = this.findVariantsForPermutation(permutation, componentCollectionGroupedByState)
 
