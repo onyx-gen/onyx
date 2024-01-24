@@ -1,11 +1,14 @@
 import FigmaNodeParser from '../parsers/figma-node.parser'
 import HTMLGenerator from '../generators/html.generator'
+import { entries } from '../utils'
 import type { ComponentCollection, ComponentPropsWithState, SinglePropertyObject } from './types'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
 class ComponentSetProcessor {
   private figmaNodeParser = new FigmaNodeParser()
   private htmlGenerator = new HTMLGenerator()
+
+  private htmls: string[] = []
 
   /**
    * Processes a ComponentSetNode and generates HTML code.
@@ -15,9 +18,7 @@ class ComponentSetProcessor {
    * @param node - The ComponentSetNode to process.
    * @returns The generated HTML string.
    */
-  public process(node: ComponentSetNode): string {
-    let html = ''
-
+  public process(node: ComponentSetNode): this {
     const componentCollection = this.mapComponentsToProperties(node)
     const componentCollectionWithState = this.filterComponentsWithState(componentCollection)
     const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
@@ -27,13 +28,28 @@ class ComponentSetProcessor {
     permutations.forEach((permutation) => {
       console.log('permutation', permutation)
       const variants = this.findVariantsForPermutation(permutation, componentCollectionGroupedByState)
-      console.log(`variants for ${JSON.stringify(permutation)}`, variants)
+
+      entries(variants).forEach(([state, component]) => {
+        // TODO MF: Why can the component be undefined?
+        if (component) {
+          const tree = this.figmaNodeParser.parse(component)
+          if (tree) {
+            let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} (${state}) -->\n`
+            variantHTML += this.htmlGenerator.generate(tree)
+            this.htmls.push(variantHTML)
+          }
+        }
+        else {
+          console.error(`No component found for permutation ${JSON.stringify(permutation)} and state ${state}`)
+        }
+      })
     })
 
-    const trees = this.parseNodeChildren(node)
-    html += this.generateHTMLFromTrees(trees)
+    return this
+  }
 
-    return html
+  public getHTML(): string {
+    return this.htmls.join('\n\n')
   }
 
   /**
@@ -103,16 +119,6 @@ class ComponentSetProcessor {
     return node.children
       .map(child => this.figmaNodeParser.parse(child as ComponentNode))
       .filter(tree => tree !== null)
-  }
-
-  /**
-   * Generates HTML code from an array of parsed trees.
-   *
-   * @param trees - An array of parsed trees.
-   * @returns A string of concatenated HTML code.
-   */
-  private generateHTMLFromTrees(trees: any[]): string { // Replace 'any[]' with the appropriate type for your tree structure
-    return trees.map(tree => this.htmlGenerator.generate(tree!)).join('\n\n')
   }
 
   /**

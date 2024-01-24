@@ -33,7 +33,7 @@ figma.codegen.on('generate', async () => {
 
   if (node.type === 'COMPONENT_SET') {
     const componentSetProcessor = new ComponentSetProcessor()
-    componentSetProcessor.process(node)
+    html = componentSetProcessor.process(node).getHTML()
   }
   else {
     const tree = parser.parse(node)
