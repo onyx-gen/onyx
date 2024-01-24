@@ -3,7 +3,13 @@ import HTMLGenerator from '../generators/html.generator'
 import { entries } from '../utils'
 import type { TreeNode } from '../interfaces'
 import TreeMerger from '../parsers/merge'
-import type { ComponentCollection, ComponentPropsWithState, GroupedComponentCollection, SinglePropertyObject } from './types'
+import type {
+  ComponentCollection,
+  ComponentPropsWithState,
+  GroupedComponentCollection,
+  Permutation,
+  SinglePropertyObject,
+} from './types'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
 class ComponentSetProcessor {
@@ -40,14 +46,14 @@ class ComponentSetProcessor {
    *          and the second element is the collection of components grouped by their state property.
    */
   private calculatePermutations(node: ComponentSetNode): [
-    { [p: string]: string }[],
+    Permutation[],
     GroupedComponentCollection<ComponentPropsWithState>,
   ] {
     const componentCollection = this.mapComponentsToProperties(node)
     const componentCollectionWithState = this.filterComponentsWithState(componentCollection)
     const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
-    const permutations: { [p: string]: string }[] = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
+    const permutations: Permutation[] = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
     return [permutations, componentCollectionGroupedByState]
   }
@@ -61,7 +67,7 @@ class ComponentSetProcessor {
    * @param groupedCollection - A collection of components grouped by a state property.
    */
   private processWithPermutationsOrAsIs(
-    permutations: { [key: string]: string }[],
+    permutations: Permutation[],
     groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
   ): void {
     if (permutations.length === 0) {
@@ -81,7 +87,9 @@ class ComponentSetProcessor {
    *
    * @param groupedCollection - A collection of components grouped by a state property.
    */
-  private processAsIs(groupedCollection: GroupedComponentCollection<ComponentPropsWithState>): void {
+  private processAsIs(
+    groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
+  ): void {
     const variants = Object.fromEntries(
       entries(groupedCollection).map(([state, collection]) => ([state, collection[0].component])),
     )
@@ -129,7 +137,9 @@ class ComponentSetProcessor {
    * @param groupedCollection - A collection of components grouped by their 'state' property.
    * @returns An object with property names as keys and arrays of unique property values.
    */
-  private getUniquePropertiesGroupedByPropName(groupedCollection: { [key: string]: ComponentCollection<ComponentPropsWithState> }): { [key: string]: string[] } {
+  private getUniquePropertiesGroupedByPropName(
+    groupedCollection: { [key: string]: ComponentCollection<ComponentPropsWithState> },
+  ): { [key: string]: string[] } {
     const propertyObjects = Object.values(groupedCollection).flatMap(group => group
       .flatMap(({ props }) =>
         Object.entries(props)
@@ -166,9 +176,9 @@ class ComponentSetProcessor {
    * @param groupedProperties - An object with property names as keys and arrays of possible values as values.
    * @returns An array of objects, each representing a unique permutation of property values.
    */
-  private generatePropertyPermutations(groupedProperties: { [key: string]: string[] }): { [key: string]: string }[] {
+  private generatePropertyPermutations(groupedProperties: { [key: string]: string[] }): Permutation[] {
     // Initialize an array to store the permutations
-    let permutations: { [key: string]: string }[] = [{}]
+    let permutations: Permutation[] = [{}]
 
     // Iterate through each property key
     Object.keys(groupedProperties).forEach((key) => {
@@ -198,7 +208,10 @@ class ComponentSetProcessor {
    * @returns An object representing the variants found for the given permutation,
    *          where each key is a state and each value is the corresponding ComponentNode or undefined.
    */
-  private findVariantsForPermutation(permutation: { [key: string]: string }, groupedCollection: GroupedComponentCollection<ComponentPropsWithState>): { [key: string]: ComponentNode | undefined } {
+  private findVariantsForPermutation(
+    permutation: Permutation,
+    groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
+  ): { [key: string]: ComponentNode | undefined } {
     const permutationKey = Object.keys(permutation)[0]
     const permutationValue = permutation[permutationKey]
 
@@ -218,7 +231,10 @@ class ComponentSetProcessor {
    * @param permutation - An object representing a permutation of property values.
    * @param groupedCollection - A collection of components grouped by a state property.
    */
-  private processPermutation(permutation: { [key: string]: string }, groupedCollection: GroupedComponentCollection<ComponentPropsWithState>): void {
+  private processPermutation(
+    permutation: Permutation,
+    groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
+  ): void {
     const variants: { [p: string]: ComponentNode | undefined } = this.findVariantsForPermutation(permutation, groupedCollection)
     this.processVariants(variants, permutation)
   }
@@ -233,7 +249,10 @@ class ComponentSetProcessor {
    * @param permutation - An optional object representing a permutation of property values.
    *                      Used for generating variant-specific comments in the HTML output.
    */
-  private processVariants(variants: { [key: string]: ComponentNode | undefined }, permutation?: { [key: string]: string }): void {
+  private processVariants(
+    variants: { [key: string]: ComponentNode | undefined },
+    permutation?: Permutation,
+  ): void {
     const treesForPermutationByState = this.parseVariantsToTrees(variants)
     const mergedTree = this.mergeTreesBasedOnStates(treesForPermutationByState)
 
@@ -257,7 +276,9 @@ class ComponentSetProcessor {
    * @param variants - An object with states as keys and corresponding ComponentNodes or undefined.
    * @returns An object with states as keys and the parsed TreeNode or undefined.
    */
-  private parseVariantsToTrees(variants: { [key: string]: ComponentNode | undefined }): { [key: string]: TreeNode | null } {
+  private parseVariantsToTrees(
+    variants: { [key: string]: ComponentNode | undefined },
+  ): { [key: string]: TreeNode | null } {
     return Object.fromEntries(
       entries(variants)
         .filter(([, component]) => component !== undefined)
@@ -271,7 +292,9 @@ class ComponentSetProcessor {
    * @param trees - An object with states as keys and the corresponding TreeNode or undefined.
    * @returns The merged TreeNode representing all states, or undefined if no default state is found.
    */
-  private mergeTreesBasedOnStates(trees: { [key: string]: TreeNode | null }): TreeNode | null {
+  private mergeTreesBasedOnStates(
+    trees: { [key: string]: TreeNode | null },
+  ): TreeNode | null {
     let mergedTree = trees.default
 
     if (!mergedTree)

@@ -28,3 +28,5 @@ export type SinglePropertyObject = {
     [P in K]: ExcludedStateProps[P];
   }
 }[keyof ExcludedStateProps]
+
+export interface Permutation { [key: string]: string }
