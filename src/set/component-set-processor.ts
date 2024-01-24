@@ -1,6 +1,7 @@
 import FigmaNodeParser from '../parsers/figma-node.parser'
 import HTMLGenerator from '../generators/html.generator'
 import { entries } from '../utils'
+import TreeMerger from '../parsers/merge'
 import type { ComponentCollection, ComponentPropsWithState, SinglePropertyObject } from './types'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
@@ -38,6 +39,21 @@ class ComponentSetProcessor {
           .map(([state, component]) => [state, this.figmaNodeParser.parse(component!)]),
       )
 
+      if (
+        'default' in treesForPermutationByState && treesForPermutationByState.default
+        && 'hover' in treesForPermutationByState && treesForPermutationByState.hover
+      ) {
+        const defaultTree = treesForPermutationByState.default
+        const hoverTree = treesForPermutationByState.hover
+
+        const treeMerger = new TreeMerger()
+        const mergedTree = treeMerger.merge(defaultTree, hoverTree)
+
+        const html = this.htmlGenerator.generate(mergedTree)
+        this.htmls.push(html)
+      }
+
+      /**
       entries(treesForPermutationByState).forEach(([state, tree]) => {
         if (tree) {
           let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} (${state}) -->\n`
@@ -45,6 +61,7 @@ class ComponentSetProcessor {
           this.htmls.push(variantHTML)
         }
       })
+       */
     })
 
     return this
