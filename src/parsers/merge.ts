@@ -19,6 +19,18 @@ class TreeMerger {
     return this.mergeNodes(tree1, tree2)
   }
 
+  /**
+   * Merges two TreeNode objects into a single TreeNode.
+   * If both nodes are present and of the same type, their data and children are merged.
+   * In case of a type conflict (nodes of different types), a new container node is created
+   * with both nodes as children to represent the conflict visually.
+   * If one of the nodes is missing, the other node is returned as is.
+   *
+   * @param node1 The first TreeNode to merge. Can be undefined if the node does not exist in the first tree.
+   * @param node2 The second TreeNode to merge. Can be undefined if the node does not exist in the second tree.
+   * @returns A merged TreeNode. In case of a conflict, a container node with both nodes as children is returned.
+   *          If one node is undefined, the other node is returned.
+   */
   private mergeNodes(node1: TreeNode | undefined, node2: TreeNode | undefined): TreeNode {
     if (!node1 && !node2)
       throw new Error('Both nodes are undefined')
@@ -45,6 +57,17 @@ class TreeMerger {
     return { data: mergedData, children }
   }
 
+  /**
+   * Creates a container TreeNode to handle conflicting nodes.
+   * This method is used when two nodes being merged have different types,
+   * indicating a conflict in the tree structure. A new container node
+   * is created with both conflicting nodes as its children, allowing
+   * for easy identification and resolution of these conflicts.
+   *
+   * @param node1 The first TreeNode involved in the conflict.
+   * @param node2 The second TreeNode involved in the conflict.
+   * @returns A new TreeNode of the container type, containing both node1 and node2 as children.
+   */
   private createConflictContainerNode(node1: TreeNode, node2: TreeNode): TreeNode {
     // Create a new container node data (modify this according to your actual container node structure)
     const containerData: ContainerNodeData = {
@@ -165,7 +188,7 @@ class TreeMerger {
    */
   private mergeInstanceData(data1: InstanceNodeData, data2: InstanceNodeData): InstanceNodeData {
     // TODO MF
-    console.log(data1, data2)
+    console.error('Merging Instance Data (NOT YET IMPLEMENTED)', data1, data2)
     return data1
   }
 
@@ -178,7 +201,7 @@ class TreeMerger {
    */
   private mergeIconData(data1: IconNodeData, data2: IconNodeData): IconNodeData {
     // TODO MF
-    console.log(data1, data2)
+    console.log('Merging Icon Data (NOT YET IMPLEMENTED)', data1, data2)
     return data1
   }
 }
