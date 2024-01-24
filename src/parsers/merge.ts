@@ -92,6 +92,11 @@ class TreeMerger {
   private mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData): ContainerNodeData {
     if (data1.css !== data2.css) {
       const cssDiff = difference(data2.css, data1.css)
+
+      // No difference so return data1
+      if (cssDiff.size === 0)
+        return data1
+
       const showParentheses = cssDiff.size > 1
 
       let hoverCss = `${this.state}:`
