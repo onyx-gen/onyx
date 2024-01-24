@@ -21,15 +21,35 @@ class ComponentSetProcessor {
    * @returns The generated HTML string.
    */
   public process(node: ComponentSetNode): this {
-    const componentCollection = this.mapComponentsToProperties(node)
-    const componentCollectionWithState = this.filterComponentsWithState(componentCollection)
-    const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
-    const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
-    const permutations = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
+    const [permutations, componentCollectionGroupedByState]
+      = this.calculatePermutations(node)
 
     this.processWithPermutationsOrAsIs(permutations, componentCollectionGroupedByState)
 
     return this
+  }
+
+  /**
+   * Calculates and returns all possible permutations of component properties along with the components grouped by state.
+   * This method first maps components to their properties, filters out components with a 'state' property,
+   * groups these components by their 'state', and then calculates all unique property permutations.
+   * It's useful for generating different combinations of property values to create various component states.
+   *
+   * @param node - The ComponentSetNode from which to derive permutations.
+   * @returns A tuple where the first element is an array of permutations (each permutation is an object of property-value pairs),
+   *          and the second element is the collection of components grouped by their state property.
+   */
+  private calculatePermutations(node: ComponentSetNode): [
+    { [p: string]: string }[],
+    GroupedComponentCollection<ComponentPropsWithState>,
+  ] {
+    const componentCollection = this.mapComponentsToProperties(node)
+    const componentCollectionWithState = this.filterComponentsWithState(componentCollection)
+    const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
+    const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
+    const permutations: { [p: string]: string }[] = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
+
+    return [permutations, componentCollectionGroupedByState]
   }
 
   /**
