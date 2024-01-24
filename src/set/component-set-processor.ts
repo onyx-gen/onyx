@@ -27,10 +27,14 @@ class ComponentSetProcessor {
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
     const permutations = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
-    console.log('permutations', permutations)
-
     if (permutations.length === 0) {
-      console.log('no permutations found', componentCollectionGroupedByState)
+      const variants = Object.fromEntries(
+        entries(componentCollectionGroupedByState).map(([state, collection]) => ([
+          state,
+          collection[0].component,
+        ])),
+      )
+      this.processVariants(variants)
     }
     else {
       permutations.forEach((permutation) => {
@@ -172,8 +176,11 @@ class ComponentSetProcessor {
    * @param groupedCollection - A collection of components grouped by a state property.
    */
   private processPermutation(permutation: { [key: string]: string }, groupedCollection: GroupedComponentCollection<ComponentPropsWithState>): void {
-    const variants = this.findVariantsForPermutation(permutation, groupedCollection)
-    console.log('variants', variants)
+    const variants: { [p: string]: ComponentNode | undefined } = this.findVariantsForPermutation(permutation, groupedCollection)
+    this.processVariants(variants, permutation)
+  }
+
+  private processVariants(variants: { [key: string]: ComponentNode | undefined }, permutation?: { [key: string]: string }): void {
     const treesForPermutationByState = this.parseVariantsToTrees(variants)
     const mergedTree = this.mergeTreesBasedOnStates(treesForPermutationByState)
 
@@ -182,7 +189,11 @@ class ComponentSetProcessor {
       return
     }
 
-    let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} -->\n`
+    let variantHTML = ''
+
+    if (permutation)
+      variantHTML += `<!-- Variant: ${JSON.stringify(permutation)} -->\n`
+
     variantHTML += this.htmlGenerator.generate(mergedTree)
     this.htmls.push(variantHTML)
   }
