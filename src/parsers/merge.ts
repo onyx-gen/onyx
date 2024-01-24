@@ -69,31 +69,15 @@ class TreeMerger {
    * @returns A new TreeNode of the container type, containing both node1 and node2 as children.
    */
   private createConflictContainerNode(node1: TreeNode, node2: TreeNode): TreeNode {
-    // Create a new container node data (modify this according to your actual container node structure)
-    const parentTreeNode1: TreeNode = {
-      data: {
-        type: 'container',
-        css: new Set(),
-        if: ['node1-conflict'],
-      },
-      children: [node1],
-    }
-
-    const parentTreeNode2: TreeNode = {
-      data: {
-        type: 'container',
-        css: new Set(),
-        if: ['node2-conflict'],
-      },
-      children: [node2],
-    }
-
     return {
       data: {
         type: 'container',
         css: new Set(),
       },
-      children: [parentTreeNode1, parentTreeNode2],
+      children: [
+        { ...node1, data: { ...node1.data } },
+        { ...node2, data: { ...node2.data, if: [`${this.state}-conflict`] } },
+      ],
     }
   }
 
