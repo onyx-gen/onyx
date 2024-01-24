@@ -16,7 +16,35 @@ class TreeMerger {
    * @returns TreeNode representing the merged result of tree1 and tree2.
    */
   public merge(tree1: TreeNode, tree2: TreeNode): TreeNode {
+    if (this.isSameTree(tree1, tree2)) {
+      console.log(`Both tree schemas are identical. Merging tree2 (${this.state}) intro tree1`)
+    }
+    else {
+      // Check if tree1 is a subtree of tree2
+      if (this.isSubtree(tree2, tree1)) {
+        console.log(`Tree1 is a subtree of Tree2 (${this.state}). Optimizing merge...`)
+        return this.mergeSubtree(tree1, tree2)
+      }
+
+      // Check if tree2 is a subtree of tree1
+      if (this.isSubtree(tree1, tree2))
+        console.log(`Tree2 (${this.state}) is a subtree of Tree1. Optimizing merge...`)
+      // Implement your optimized merging logic here
+    }
+
     return this.mergeNodes(tree1, tree2)
+  }
+
+  private mergeSubtree(subTree: TreeNode, mainTree: TreeNode): TreeNode {
+    // If the current node of mainTree matches the root of subTree, start the normal merging
+    if (this.isSameTree(mainTree, subTree))
+      return this.mergeNodes(subTree, mainTree)
+
+    // If not, recursively check each child of mainTree
+    for (let i = 0; i < mainTree.children.length; i++)
+      mainTree.children[i] = this.mergeSubtree(subTree, mainTree.children[i])
+
+    return mainTree
   }
 
   /**
@@ -223,6 +251,41 @@ class TreeMerger {
     // TODO MF
     console.log('Merging Icon Data (NOT YET IMPLEMENTED)', data1, data2)
     return data1
+  }
+
+  /**
+   * Determines whether one tree is a subtree of another.
+   *
+   * @param mainTree The main tree to check in.
+   * @param subTree The tree to check if it is a subtree.
+   * @returns boolean indicating if subTree is a subtree of mainTree.
+   */
+  private isSubtree(mainTree: TreeNode | undefined, subTree: TreeNode | undefined): boolean {
+    if (!subTree)
+      return true // An empty tree is a subtree of any tree
+    if (!mainTree)
+      return false // Non-empty subtree can't be found in an empty tree
+
+    if (this.isSameTree(mainTree, subTree))
+      return true
+
+    return this.isSubtree(mainTree.children[0], subTree) || this.isSubtree(mainTree.children[1], subTree)
+  }
+
+  /**
+   * Compares two trees to determine if they are identical.
+   *
+   * @param node1 The first tree to compare.
+   * @param node2 The second tree to compare.
+   * @returns boolean indicating if the two trees are identical.
+   */
+  private isSameTree(node1: TreeNode | undefined, node2: TreeNode | undefined): boolean {
+    if (!node1 && !node2)
+      return true
+    if (!node1 || !node2)
+      return false
+
+    return (node1.data.type === node2.data.type) && this.isSameTree(node1.children[0], node2.children[0]) && this.isSameTree(node1.children[1], node2.children[1])
   }
 }
 
