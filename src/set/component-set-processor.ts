@@ -27,9 +27,16 @@ class ComponentSetProcessor {
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
     const permutations = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
-    permutations.forEach((permutation) => {
-      this.processPermutation(permutation, componentCollectionGroupedByState)
-    })
+    console.log('permutations', permutations)
+
+    if (permutations.length === 0) {
+      console.log('no permutations found', componentCollectionGroupedByState)
+    }
+    else {
+      permutations.forEach((permutation) => {
+        this.processPermutation(permutation, componentCollectionGroupedByState)
+      })
+    }
 
     return this
   }
@@ -127,6 +134,10 @@ class ComponentSetProcessor {
       )
     })
 
+    // Remove empty permutations
+    if (Object.keys(permutations[0]).length === 0)
+      permutations.shift()
+
     return permutations
   }
 
@@ -162,6 +173,7 @@ class ComponentSetProcessor {
    */
   private processPermutation(permutation: { [key: string]: string }, groupedCollection: GroupedComponentCollection<ComponentPropsWithState>): void {
     const variants = this.findVariantsForPermutation(permutation, groupedCollection)
+    console.log('variants', variants)
     const treesForPermutationByState = this.parseVariantsToTrees(variants)
     const mergedTree = this.mergeTreesBasedOnStates(treesForPermutationByState)
 
