@@ -2,6 +2,7 @@ import FigmaNodeParser from '../parsers/figma-node.parser'
 import HTMLGenerator from '../generators/html.generator'
 import { entries } from '../utils'
 import TreeMerger from '../parsers/merge'
+import type { TreeNode } from '../interfaces'
 import type { ComponentCollection, ComponentPropsWithState, SinglePropertyObject } from './types'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
@@ -35,30 +36,50 @@ class ComponentSetProcessor {
           .map(([state, component]) => [state, this.figmaNodeParser.parse(component!)]),
       )
 
-      if (
-        'default' in treesForPermutationByState && treesForPermutationByState.default
-        && 'hover' in treesForPermutationByState && treesForPermutationByState.hover
-      ) {
-        const defaultTree = treesForPermutationByState.default
-        const hoverTree = treesForPermutationByState.hover
+      const states: {
+        default?: TreeNode
+        hover?: TreeNode
+        active?: TreeNode
+        disabled?: TreeNode
+      } = {}
 
-        const treeMerger = new TreeMerger('hover')
-        const mergedTree = treeMerger.merge(defaultTree, hoverTree)
+      if ('default' in treesForPermutationByState && treesForPermutationByState.default)
+        states.default = treesForPermutationByState.default
 
-        let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} -->\n`
-        variantHTML += this.htmlGenerator.generate(mergedTree)
-        this.htmls.push(variantHTML)
+      if ('hover' in treesForPermutationByState && treesForPermutationByState.hover)
+        states.hover = treesForPermutationByState.hover
+
+      if ('active' in treesForPermutationByState && treesForPermutationByState.active)
+        states.active = treesForPermutationByState.active
+
+      if ('disabled' in treesForPermutationByState && treesForPermutationByState.disabled)
+        states.disabled = treesForPermutationByState.disabled
+
+      let mergedTree = states.default
+
+      if (!mergedTree) {
+        console.error('No default state found for component set')
+        return this
       }
 
-      /**
-      entries(treesForPermutationByState).forEach(([state, tree]) => {
-        if (tree) {
-          let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} (${state}) -->\n`
-          variantHTML += this.htmlGenerator.generate(tree)
-          this.htmls.push(variantHTML)
-        }
-      })
-       */
+      if (states.hover) {
+        const treeMerger = new TreeMerger('hover') // Assuming 'hover' is the variant indicator for all merges
+        mergedTree = treeMerger.merge(mergedTree, states.hover)
+      }
+
+      if (states.active) {
+        const treeMerger = new TreeMerger('focus') // Assuming 'hover' is the variant indicator for all merges
+        mergedTree = treeMerger.merge(mergedTree, states.active)
+      }
+
+      if (states.disabled) {
+        const treeMerger = new TreeMerger('disabled') // Assuming 'hover' is the variant indicator for all merges
+        mergedTree = treeMerger.merge(mergedTree, states.disabled)
+      }
+
+      let variantHTML = `<!-- Variant: ${JSON.stringify(permutation)} -->\n`
+      variantHTML += this.htmlGenerator.generate(mergedTree)
+      this.htmls.push(variantHTML)
     })
 
     return this
