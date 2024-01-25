@@ -12,7 +12,11 @@ import { composeVariantCss, composeVariantsCss } from '../set/utils'
 class TreeMerger {
   private readonly dataMerger: DataMerger
 
-  constructor(private state: string, private previousStates: string[] = []) {
+  constructor(
+    private state: string,
+    private previousStates: string[] = [],
+    private conditionalMode = false,
+  ) {
     this.dataMerger = new DataMerger(state)
   }
 
@@ -64,13 +68,30 @@ class TreeMerger {
 
     const conditionals = []
 
-    if (!hasSubtreeChild && hasSupertreeChild)
-      conditionals.push(this.previousStates.join(' || '))
+    if (!hasSubtreeChild && hasSupertreeChild) {
+      if (this.conditionalMode) {
+        conditionals.push(this.previousStates.join(' || '))
+      }
+      else {
+        if (superTree.data.type === 'container') {
+          const hiddenCss = composeVariantCss(this.state, new Set(['hidden']))
+          superTree.data.css.add(hiddenCss)
+        }
+        else {
+          console.error('Not a container (NOT YET IMPLEMENTED)')
+        }
+      }
+    }
 
     if (superTree.data.type === 'container') {
       if (hasSubtreeChild && hasSupertreeChild) {
-        const variantCss = composeVariantsCss(this.previousStates, superTree.data.css)
-        superTree.data.css = new Set([variantCss])
+        if (this.conditionalMode) {
+          conditionals.push(`!${this.state}`)
+        }
+        else {
+          const variantCss = composeVariantsCss(this.previousStates, superTree.data.css)
+          superTree.data.css = new Set([variantCss])
+        }
       }
     }
 
