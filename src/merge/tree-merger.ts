@@ -72,13 +72,13 @@ class TreeMerger {
         // Initialize the Set with individual CSS classes
         const joinedCss = [...superTree.data.css.values()].join(' ')
 
-        // Accumulate CSS from previousStates
-        const reduced = this.previousStates.reduce(
+        // Wrap all CSS classes with variant selectors from previous states
+        const variantCss = this.previousStates.reduce(
           (acc, curr) => composeVariantCss(curr, new Set([acc])),
           joinedCss,
         )
 
-        superTree.data.css = new Set([reduced])
+        superTree.data.css = new Set([variantCss])
       }
     }
 
