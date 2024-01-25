@@ -7,6 +7,7 @@ import type {
   TreeNodeData,
 } from '../interfaces'
 import { difference } from '../set/utils'
+import { zip } from '../utils'
 
 /**
  * Class responsible for merging two tree structures.
@@ -335,7 +336,15 @@ class TreeMerger {
     if (!node1 || !node2)
       return false
 
-    return (node1.data.type === node2.data.type) && this.isSameTree(node1.children[0], node2.children[0]) && this.isSameTree(node1.children[1], node2.children[1])
+    if (node1.data.type !== node2.data.type || node1.children.length !== node2.children.length)
+      return false
+
+    for (const [child1, child2] of zip(node1.children, node2.children)) {
+      if (!this.isSameTree(child1, child2))
+        return false
+    }
+
+    return true
   }
 }
 
