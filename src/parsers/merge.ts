@@ -296,11 +296,11 @@ class TreeMerger {
       if (cssDiff.size === 0)
         return data1
 
-      const hoverCss = this.composeVariantCss(this.state, data1.css)
+      const variantCss = this.composeVariantCss(this.state, cssDiff)
 
       return {
         type: 'container',
-        css: new Set([...data1.css, hoverCss]),
+        css: new Set([...data1.css, variantCss]),
       }
     }
     else {
