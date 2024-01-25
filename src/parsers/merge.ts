@@ -24,54 +24,52 @@ class TreeMerger {
    * @returns TreeNode representing the merged result of tree1 and tree2.
    */
   public merge(tree1: TreeNode, tree2: TreeNode): TreeNode {
-    if (this.isSameTree(tree1, tree2)) {
-      console.log(`Both tree schemas are identical. Merging tree2 (${this.state}) intro tree1`)
-    }
-    else {
-      console.log('merging..')
+    if (!this.isSameTree(tree1, tree2)) {
       // Check if tree1 is a subtree of tree2
-      if (this.isSubtree(tree2, tree1)) {
-        console.log('tree1 is a subtree of tree2')
+      if (this.isSubtree(tree2, tree1))
         return this.mergeSubtree(tree1, tree2)
-      }
-      else if (this.isSubtree(tree1, tree2)) {
-        console.log('tree2 is a subtree of tree1')
+
+      // Check if tree2 is a subtree of tree1
+      else if (this.isSubtree(tree1, tree2))
         return this.mergeSupertree(tree1, tree2)
-      }
-      else {
-        console.log('tree1 and tree2 are not subtrees of each other')
-      }
     }
 
     return this.mergeNodes(tree1, tree2)
   }
 
+  /**
+   * Merges a subtree into a supertree by recursively comparing and combining their nodes.
+   *
+   * This method traverses the `superTree` and `subTree`, merging them based on node similarities.
+   *
+   * @param superTree - The primary tree node into which the `subTree` is being merged.
+   * @param subTree - The secondary tree node that is being merged into the `superTree`.
+   * @returns TreeNode - The resulting tree after merging `subTree` into `superTree`.
+   */
   private mergeSupertree(
-    tree1: TreeNode, // super tree
-    tree2: TreeNode, // sub tree
+    superTree: TreeNode,
+    subTree: TreeNode,
   ): TreeNode {
-    if (this.isSameTree(tree2, tree1))
-      return this.mergeNodes(tree1, tree2)
+    if (this.isSameTree(subTree, superTree))
+      return this.mergeNodes(superTree, subTree)
 
-    const hasSubtreeChild = tree1.children.some(child => this.isSameTree(child, tree2))
-    const hasSupertreeChild = tree1.children.some(child => !this.isSameTree(child, tree2))
+    const superChildren = superTree.children
+
+    superTree.children = superChildren.map(child =>
+      this.mergeSupertree(child, subTree),
+    )
+
+    const hasSubtreeChild = superChildren.some(child => this.isSameTree(child, subTree))
+    const hasSupertreeChild = superChildren.some(child => !this.isSameTree(child, subTree))
 
     const conditionals = []
 
-    if (hasSubtreeChild && hasSupertreeChild) {
-      console.log('case 1')
+    if (hasSubtreeChild && hasSupertreeChild)
       conditionals.push('case1')
-    }
-    else if (!hasSubtreeChild && hasSupertreeChild) {
-      console.log('case 2')
+    else if (!hasSubtreeChild && hasSupertreeChild)
       conditionals.push(`!${this.state}`)
-    }
 
-    tree1.children = tree1.children.map(child =>
-      this.mergeSupertree(child, tree2),
-    )
-
-    return { ...tree1, data: { ...tree1.data, if: conditionals } }
+    return { ...superTree, data: { ...superTree.data, if: conditionals } }
   }
 
   /**
@@ -90,11 +88,13 @@ class TreeMerger {
     if (this.isSameTree(mainTree, subTree))
       return this.mergeNodes(subTree, mainTree)
 
-    const extendedConditionals = mainTree.data.if ? [...mainTree.data.if, this.state] : [this.state]
+    const mainData = mainTree.data
+
+    const extendedConditionals = mainData.if ? [...mainData.if, this.state] : [this.state]
 
     const hasSubtreeChild = mainTree.children.some(child => this.isSameTree(child, subTree))
     if (!hasSubtreeChild)
-      return { ...mainTree, data: { ...mainTree.data, if: extendedConditionals } }
+      return { ...mainTree, data: { ...mainData, if: extendedConditionals } }
 
     mainTree.children = mainTree.children.map(child =>
       this.mergeSubtree(subTree, child, !hasSubtreeChild),
@@ -102,12 +102,12 @@ class TreeMerger {
 
     const conditionals = hasSubtreeSibling || !hasSubtreeChild ? extendedConditionals : []
 
-    if ('css' in mainTree.data && mainTree.data.css.size > 0) {
-      const hoverCss = this.composeVariantCss(this.state, mainTree.data.css)
+    if ('css' in mainData && mainData.css.size > 0) {
+      const hoverCss = this.composeVariantCss(this.state, mainData.css)
       return {
         ...mainTree,
         data: {
-          ...mainTree.data,
+          ...mainData,
           type: 'container',
           css: new Set([hoverCss]),
           if: conditionals,
@@ -115,7 +115,7 @@ class TreeMerger {
       }
     }
 
-    return { ...mainTree, data: { ...mainTree.data, if: conditionals } }
+    return { ...mainTree, data: { ...mainData, if: conditionals } }
   }
 
   /**
