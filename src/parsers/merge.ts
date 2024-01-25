@@ -14,7 +14,7 @@ import { zip } from '../utils'
  * The merging logic is based on the type of the nodes and their respective data.
  */
 class TreeMerger {
-  constructor(private state: string) {}
+  constructor(private state: string, private previousStates: string[] = []) {}
 
   /**
    * Merges two TreeNode structures into one.
@@ -64,12 +64,34 @@ class TreeMerger {
 
     const conditionals = []
 
-    if (hasSubtreeChild && hasSupertreeChild)
-      conditionals.push('case1')
-    else if (!hasSubtreeChild && hasSupertreeChild)
-      conditionals.push(`!${this.state}`)
+    if (!hasSubtreeChild && hasSupertreeChild)
+      conditionals.push(this.previousStates.join(' || '))
 
-    return { ...superTree, data: { ...superTree.data, if: conditionals } }
+    if (superTree.data.type === 'container') {
+      if (hasSubtreeChild && hasSupertreeChild) {
+        // Initialize the Set with individual CSS classes
+        const joinedCss = [...superTree.data.css.values()].join(' ')
+
+        // Accumulate CSS from previousStates
+        const reduced = this.previousStates.reduce((acc, curr) => {
+          console.log({
+            acc,
+            curr,
+          })
+          return this.composeVariantCss(curr, new Set([acc]))
+        }, joinedCss)
+
+        superTree.data.css = new Set([reduced])
+      }
+    }
+
+    return {
+      ...superTree,
+      data: {
+        ...superTree.data,
+        if: conditionals,
+      },
+    }
   }
 
   /**
@@ -119,15 +141,21 @@ class TreeMerger {
   }
 
   /**
-   * Composes a variant CSS string from the given CSS set.
+   * Composes a CSS string for a specific variant by combining CSS classes.
    *
-   * @param variant - The variant to compose the CSS string for (e.g. 'hover' or 'focus').
-   * @param cssSet - The set of CSS styles.
-   * @returns {string} - The composed hover CSS string.
+   * @param variantName - The name of the variant (e.g., 'hover', 'focus').
+   * @param cssClasses - A set of CSS class names to be combined for the variant.
+   * @returns {string} - The CSS string for the specified variant. If multiple classes are present,
+   *                      they are wrapped in parentheses. Returns an empty string if no classes are provided.
    */
-  private composeVariantCss(variant: string, cssSet: Set<string>): string {
-    const showParentheses = cssSet.size > 1
-    return `${variant}:${showParentheses ? '(' : ''}${[...cssSet.values()].join(' ')}${showParentheses ? ')' : ''}`
+  private composeVariantCss(variantName: string, cssClasses: Set<string>): string {
+    if (cssClasses.size === 0)
+      return ''
+
+    const allClasses = [...cssClasses.values()]
+    const requiresParentheses = cssClasses.size > 1 || allClasses[0].includes(' ')
+
+    return `${variantName}:${requiresParentheses ? '(' : ''}${allClasses.join(' ')}${requiresParentheses ? ')' : ''}`
   }
 
   /**

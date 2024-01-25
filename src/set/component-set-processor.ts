@@ -296,14 +296,16 @@ class ComponentSetProcessor {
     trees: { [key: string]: TreeNode | null },
   ): TreeNode | null {
     let mergedTree = trees.default
+    const previousStates = ['default']
 
     if (!mergedTree)
       return null
 
     Object.entries(trees).forEach(([state, tree]) => {
       if (tree && state !== 'default') {
-        const treeMerger = new TreeMerger(state)
+        const treeMerger = new TreeMerger(state, previousStates)
         mergedTree = treeMerger.merge(mergedTree!, tree)
+        previousStates.push(state)
       }
     })
 
