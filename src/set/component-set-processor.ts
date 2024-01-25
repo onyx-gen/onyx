@@ -16,6 +16,9 @@ class ComponentSetProcessor {
   private figmaNodeParser = new FigmaNodeParser()
   private htmlGenerator = new HTMLGenerator()
 
+  // Accumulated parsed trees for each permutation
+  private treesForPermutations: { [key: string]: TreeNode | null } = {}
+
   private htmls: string[] = []
 
   /**
@@ -77,6 +80,7 @@ class ComponentSetProcessor {
       permutations.forEach((permutation) => {
         this.processPermutation(permutation, groupedCollection)
       })
+      this.mergeAndGenerateHTMLFromPermutations()
     }
   }
 
@@ -236,7 +240,53 @@ class ComponentSetProcessor {
     groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
   ): void {
     const variants: { [p: string]: ComponentNode | undefined } = this.findVariantsForPermutation(permutation, groupedCollection)
-    this.processVariants(variants, permutation)
+    const treesForPermutationByState = this.parseVariantsToTrees(variants)
+
+    const treeKey = ComponentSetProcessor.computeTreeKeyFromPermutation(permutation)
+    this.treesForPermutations[treeKey] = this.mergeTreesBasedOnStates(treesForPermutationByState)
+  }
+
+  /**
+   * Computes a unique key for a tree based on a given permutation of properties.
+   * This method constructs the key by concatenating each property's key and value pair
+   * from the permutation, separated by a hyphen, and then joining all pairs with an underscore.
+   * This key is used to uniquely identify a tree configuration derived from a specific permutation.
+   *
+   * @param permutation - An object representing a permutation of property values.
+   * @returns A string representing the unique key for the tree derived from the permutation.
+   */
+  private static computeTreeKeyFromPermutation(permutation: Permutation): string {
+    return Object.entries(permutation).map(
+      ([key, value]) => `${key}-${value}`,
+    ).join('_')
+  }
+
+  /**
+   * Merges all the accumulated trees from different permutations and generates HTML.
+   * It iterates over all stored trees, merges them, and generates the final HTML.
+   */
+  private mergeAndGenerateHTMLFromPermutations(): void {
+    let mergedTree: TreeNode | null = null
+    const previousStates: string[] = []
+
+    Object.entries(this.treesForPermutations).forEach(([treeKey, tree]) => {
+      if (tree) {
+        // TODO MF: This might not always be correct, but it works for now
+        const simplifiedTreeKey = treeKey.replace(/-true$|-false$/, '')
+
+        const treeMerger = new TreeMerger(simplifiedTreeKey, previousStates, true)
+        mergedTree = treeMerger.merge(mergedTree || tree, tree)
+        previousStates.push(simplifiedTreeKey)
+      }
+    })
+
+    if (!mergedTree) {
+      console.error('No valid merged tree found after merging all permutations')
+      return
+    }
+
+    const mergedHTML = this.htmlGenerator.generate(mergedTree)
+    this.htmls.push(mergedHTML)
   }
 
   /**
@@ -303,7 +353,7 @@ class ComponentSetProcessor {
 
     Object.entries(trees).forEach(([state, tree]) => {
       if (tree && state !== 'default') {
-        const treeMerger = new TreeMerger(state, previousStates)
+        const treeMerger = new TreeMerger(state, previousStates, false)
         mergedTree = treeMerger.merge(mergedTree!, tree)
         previousStates.push(state)
       }
