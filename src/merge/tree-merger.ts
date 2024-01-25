@@ -73,13 +73,10 @@ class TreeMerger {
         const joinedCss = [...superTree.data.css.values()].join(' ')
 
         // Accumulate CSS from previousStates
-        const reduced = this.previousStates.reduce((acc, curr) => {
-          console.log({
-            acc,
-            curr,
-          })
-          return composeVariantCss(curr, new Set([acc]))
-        }, joinedCss)
+        const reduced = this.previousStates.reduce(
+          (acc, curr) => composeVariantCss(curr, new Set([acc])),
+          joinedCss,
+        )
 
         superTree.data.css = new Set([reduced])
       }
@@ -213,8 +210,6 @@ class TreeMerger {
    * @returns TreeNode The new conditional container node with the original node as its child.
    */
   private createConditionalContainerNode(node: TreeNode): TreeNode {
-    console.log('Creating conditional container node', node)
-
     const parentTreeNode: TreeNode = {
       data: {
         type: 'container',
