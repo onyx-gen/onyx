@@ -1,8 +1,8 @@
 import type {
   TreeNode,
 } from '../interfaces'
-import { zip } from '../utils'
 import DataMerger from '../merge/data-merger'
+import TreeComparator from '../merge/tree-comparator'
 
 /**
  * Class responsible for merging two tree structures.
@@ -23,13 +23,13 @@ class TreeMerger {
    * @returns TreeNode representing the merged result of tree1 and tree2.
    */
   public merge(tree1: TreeNode, tree2: TreeNode): TreeNode {
-    if (!this.isSameTree(tree1, tree2)) {
+    if (!TreeComparator.isSameTree(tree1, tree2)) {
       // Check if tree1 is a subtree of tree2
-      if (this.isSubtree(tree2, tree1))
+      if (TreeComparator.isSubtree(tree2, tree1))
         return this.mergeSubtree(tree1, tree2)
 
       // Check if tree2 is a subtree of tree1
-      else if (this.isSubtree(tree1, tree2))
+      else if (TreeComparator.isSubtree(tree1, tree2))
         return this.mergeSupertree(tree1, tree2)
     }
 
@@ -49,7 +49,7 @@ class TreeMerger {
     superTree: TreeNode,
     subTree: TreeNode,
   ): TreeNode {
-    if (this.isSameTree(subTree, superTree))
+    if (TreeComparator.isSameTree(subTree, superTree))
       return this.mergeNodes(superTree, subTree)
 
     const superChildren = superTree.children
@@ -58,8 +58,8 @@ class TreeMerger {
       this.mergeSupertree(child, subTree),
     )
 
-    const hasSubtreeChild = superChildren.some(child => this.isSameTree(child, subTree))
-    const hasSupertreeChild = superChildren.some(child => !this.isSameTree(child, subTree))
+    const hasSubtreeChild = superChildren.some(child => TreeComparator.isSameTree(child, subTree))
+    const hasSupertreeChild = superChildren.some(child => !TreeComparator.isSameTree(child, subTree))
 
     const conditionals = []
 
@@ -106,14 +106,14 @@ class TreeMerger {
     mainTree: TreeNode,
     hasSubtreeSibling: boolean = false,
   ): TreeNode {
-    if (this.isSameTree(mainTree, subTree))
+    if (TreeComparator.isSameTree(mainTree, subTree))
       return this.mergeNodes(subTree, mainTree)
 
     const mainData = mainTree.data
 
     const extendedConditionals = mainData.if ? [...mainData.if, this.state] : [this.state]
 
-    const hasSubtreeChild = mainTree.children.some(child => this.isSameTree(child, subTree))
+    const hasSubtreeChild = mainTree.children.some(child => TreeComparator.isSameTree(child, subTree))
     if (!hasSubtreeChild)
       return { ...mainTree, data: { ...mainData, if: extendedConditionals } }
 
@@ -255,49 +255,6 @@ class TreeMerger {
       mergedChildren.push(this.mergeNodes(children1[i], children2[i]))
 
     return mergedChildren
-  }
-
-  /**
-   * Determines whether one tree is a subtree of another.
-   *
-   * @param mainTree The main tree to check in.
-   * @param subTree The tree to check if it is a subtree.
-   * @returns boolean indicating if subTree is a subtree of mainTree.
-   */
-  private isSubtree(mainTree: TreeNode | undefined, subTree: TreeNode | undefined): boolean {
-    if (!subTree)
-      return true // An empty tree is a subtree of any tree
-    if (!mainTree)
-      return false // Non-empty subtree can't be found in an empty tree
-
-    if (this.isSameTree(mainTree, subTree))
-      return true
-
-    return this.isSubtree(mainTree.children[0], subTree) || this.isSubtree(mainTree.children[1], subTree)
-  }
-
-  /**
-   * Compares two trees to determine if they are identical.
-   *
-   * @param node1 The first tree to compare.
-   * @param node2 The second tree to compare.
-   * @returns boolean indicating if the two trees are identical.
-   */
-  private isSameTree(node1: TreeNode | undefined, node2: TreeNode | undefined): boolean {
-    if (!node1 && !node2)
-      return true
-    if (!node1 || !node2)
-      return false
-
-    if (node1.data.type !== node2.data.type || node1.children.length !== node2.children.length)
-      return false
-
-    for (const [child1, child2] of zip(node1.children, node2.children)) {
-      if (!this.isSameTree(child1, child2))
-        return false
-    }
-
-    return true
   }
 }
 
