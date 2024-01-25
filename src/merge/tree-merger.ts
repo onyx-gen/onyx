@@ -43,6 +43,21 @@ class TreeMerger {
     return this.mergeNodes(tree1, tree2)
   }
 
+  /**
+   * Diverges two TreeNode structures when they are not identical nor subtrees of each other.
+   *
+   * This method handles the scenario where two TreeNode structures need to be merged, but they
+   * neither represent the same tree nor is one a subtree of the other. It performs a conditional
+   * merge based on the state of the TreeMerger object. If the conditional mode is active, it
+   * applies conditions to the merged tree nodes based on the current state. Otherwise, it checks
+   * for container type nodes and applies CSS for visible and hidden states. This method ensures
+   * that the diverged trees are visually represented in the merged structure, preserving their
+   * unique characteristics while combining them into a single TreeNode.
+   *
+   * @param tree1 The first TreeNode to be diverged.
+   * @param tree2 The second TreeNode to be diverged.
+   * @returns TreeNode representing the diverged structure of tree1 and tree2.
+   */
   private diverge(tree1: TreeNode, tree2: TreeNode): TreeNode {
     const tree1Conditionals = [...(tree1.data.if || [])]
     const tree2Conditionals = [...(tree2.data.if || [])]
