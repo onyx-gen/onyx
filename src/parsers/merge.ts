@@ -28,13 +28,19 @@ class TreeMerger {
       console.log(`Both tree schemas are identical. Merging tree2 (${this.state}) intro tree1`)
     }
     else {
+      console.log('merging..')
       // Check if tree1 is a subtree of tree2
-      if (this.isSubtree(tree2, tree1))
+      if (this.isSubtree(tree2, tree1)) {
+        console.log('tree1 is a subtree of tree2')
         return this.mergeSubtree(tree1, tree2)
-
-      // Check if tree2 is a subtree of tree1
-      if (this.isSubtree(tree1, tree2))
+      }
+      else if (this.isSubtree(tree1, tree2)) {
+        console.log('tree2 is a subtree of tree1')
         return this.mergeSupertree(tree1, tree2)
+      }
+      else {
+        console.log('tree1 and tree2 are not subtrees of each other')
+      }
     }
 
     return this.mergeNodes(tree1, tree2)
@@ -47,12 +53,25 @@ class TreeMerger {
     if (this.isSameTree(tree2, tree1))
       return this.mergeNodes(tree1, tree2)
 
-    console.log('children', tree1.children.length)
+    const hasSubtreeChild = tree1.children.some(child => this.isSameTree(child, tree2))
+    const hasSupertreeChild = tree1.children.some(child => !this.isSameTree(child, tree2))
+
+    const conditionals = []
+
+    if (hasSubtreeChild && hasSupertreeChild) {
+      console.log('case 1')
+      conditionals.push('case1')
+    }
+    else if (!hasSubtreeChild && hasSupertreeChild) {
+      console.log('case 2')
+      conditionals.push(`!${this.state}`)
+    }
+
     tree1.children = tree1.children.map(child =>
       this.mergeSupertree(child, tree2),
     )
 
-    return tree1
+    return { ...tree1, data: { ...tree1.data, if: conditionals } }
   }
 
   /**
