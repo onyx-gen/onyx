@@ -202,6 +202,16 @@ class TreeMerger {
     }
   }
 
+  /**
+   * Creates a conditional container TreeNode. This method wraps a given TreeNode in a new
+   * container node that includes a conditional state. The conditional state is applied to
+   * the outer container, while the inner node retains its original structure. This is useful
+   * for creating nodes that should only be displayed on the state that the node to merge
+   * is currently in (i.e., `this.state`).
+   *
+   * @param node The TreeNode to be wrapped in the conditional container.
+   * @returns TreeNode The new conditional container node with the original node as its child.
+   */
   private createConditionalContainerNode(node: TreeNode): TreeNode {
     console.log('Creating conditional container node', node)
 
