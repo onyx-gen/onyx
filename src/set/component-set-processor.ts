@@ -74,7 +74,7 @@ class ComponentSetProcessor {
       this.processAsIs(groupedCollection)
     }
     else {
-      permutations.forEach((permutation) => {
+      permutations.slice(0, 1).forEach((permutation) => {
         this.processPermutation(permutation, groupedCollection)
       })
     }
