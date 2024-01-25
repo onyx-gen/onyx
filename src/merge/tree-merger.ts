@@ -51,6 +51,19 @@ class TreeMerger {
       tree1Conditionals.push(`!${this.state}`)
       tree2Conditionals.push(this.state)
     }
+    else {
+      if (tree1.data.type === 'container' && tree2.data.type === 'container') {
+        const hiddenCssTree1 = composeVariantCss(this.state, new Set(['hidden']))
+        tree1.data.css.add(hiddenCssTree1)
+
+        const hiddenCssTree2 = composeVariantsCss(this.previousStates, new Set(['hidden']))
+        tree2.data.css.add(hiddenCssTree2)
+      }
+      else {
+        // TODO MF: Implement
+        console.error('Not a container (NOT YET IMPLEMENTED)')
+      }
+    }
 
     return {
       data: {
