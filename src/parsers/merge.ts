@@ -3,6 +3,7 @@ import type {
 } from '../interfaces'
 import DataMerger from '../merge/data-merger'
 import TreeComparator from '../merge/tree-comparator'
+import { composeVariantCss } from '../set/utils'
 
 /**
  * Class responsible for merging two tree structures.
@@ -77,7 +78,7 @@ class TreeMerger {
             acc,
             curr,
           })
-          return this.composeVariantCss(curr, new Set([acc]))
+          return composeVariantCss(curr, new Set([acc]))
         }, joinedCss)
 
         superTree.data.css = new Set([reduced])
@@ -124,7 +125,7 @@ class TreeMerger {
     const conditionals = hasSubtreeSibling || !hasSubtreeChild ? extendedConditionals : []
 
     if ('css' in mainData && mainData.css.size > 0) {
-      const hoverCss = this.composeVariantCss(this.state, mainData.css)
+      const hoverCss = composeVariantCss(this.state, mainData.css)
       return {
         ...mainTree,
         data: {
@@ -137,24 +138,6 @@ class TreeMerger {
     }
 
     return { ...mainTree, data: { ...mainData, if: conditionals } }
-  }
-
-  /**
-   * Composes a CSS string for a specific variant by combining CSS classes.
-   *
-   * @param variantName - The name of the variant (e.g., 'hover', 'focus').
-   * @param cssClasses - A set of CSS class names to be combined for the variant.
-   * @returns {string} - The CSS string for the specified variant. If multiple classes are present,
-   *                      they are wrapped in parentheses. Returns an empty string if no classes are provided.
-   */
-  private composeVariantCss(variantName: string, cssClasses: Set<string>): string {
-    if (cssClasses.size === 0)
-      return ''
-
-    const allClasses = [...cssClasses.values()]
-    const requiresParentheses = cssClasses.size > 1 || allClasses[0].includes(' ')
-
-    return `${variantName}:${requiresParentheses ? '(' : ''}${allClasses.join(' ')}${requiresParentheses ? ')' : ''}`
   }
 
   /**
