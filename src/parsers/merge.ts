@@ -29,18 +29,30 @@ class TreeMerger {
     }
     else {
       // Check if tree1 is a subtree of tree2
-      if (this.isSubtree(tree2, tree1)) {
-        console.log(`Tree1 is a subtree of Tree2 (${this.state}). Optimizing merge...`)
+      if (this.isSubtree(tree2, tree1))
         return this.mergeSubtree(tree1, tree2)
-      }
 
       // Check if tree2 is a subtree of tree1
       if (this.isSubtree(tree1, tree2))
-        console.log(`Tree2 (${this.state}) is a subtree of Tree1. Optimizing merge...`)
-      // Implement your optimized merging logic here
+        return this.mergeSupertree(tree1, tree2)
     }
 
     return this.mergeNodes(tree1, tree2)
+  }
+
+  private mergeSupertree(
+    tree1: TreeNode, // super tree
+    tree2: TreeNode, // sub tree
+  ): TreeNode {
+    if (this.isSameTree(tree2, tree1))
+      return this.mergeNodes(tree1, tree2)
+
+    console.log('children', tree1.children.length)
+    tree1.children = tree1.children.map(child =>
+      this.mergeSupertree(child, tree2),
+    )
+
+    return tree1
   }
 
   /**
