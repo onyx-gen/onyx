@@ -145,6 +145,9 @@ class TreeMerger {
         }
       }
     }
+    else {
+      console.error('Not a container (NOT YET IMPLEMENTED)')
+    }
 
     return {
       ...superTree,
