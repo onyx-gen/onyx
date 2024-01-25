@@ -86,3 +86,21 @@ export function composeVariantCss(variantName: string, cssClasses: Set<string>):
 
   return `${variantName}:${requiresParentheses ? '(' : ''}${allClasses.join(' ')}${requiresParentheses ? ')' : ''}`
 }
+
+/**
+ * Composes a CSS string for multiple variants by combining CSS classes.
+ *
+ * @param {string[]} variantNames - An array of variant names (e.g., ['hover', 'focus']).
+ * @param {Set<string>} cssClasses - A set of CSS class names to be combined for the variants.
+ * @returns {string} - The CSS string for the specified variants. If multiple classes are present,
+ *                     they are wrapped in parentheses. Returns an empty string if no classes are provided.
+ */
+export function composeVariantsCss(variantNames: string[], cssClasses: Set<string>): string {
+  // Initialize the Set with individual CSS classes
+  const joinedCss = [...cssClasses.values()].join(' ')
+
+  return variantNames.reduce(
+    (acc, curr) => composeVariantCss(curr, new Set([acc])),
+    joinedCss,
+  )
+}

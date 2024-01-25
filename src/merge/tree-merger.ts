@@ -3,7 +3,7 @@ import type {
 } from '../interfaces'
 import DataMerger from '../merge/data-merger'
 import TreeComparator from '../merge/tree-comparator'
-import { composeVariantCss } from '../set/utils'
+import { composeVariantCss, composeVariantsCss } from '../set/utils'
 
 /**
  * Class responsible for merging two tree structures.
@@ -69,15 +69,7 @@ class TreeMerger {
 
     if (superTree.data.type === 'container') {
       if (hasSubtreeChild && hasSupertreeChild) {
-        // Initialize the Set with individual CSS classes
-        const joinedCss = [...superTree.data.css.values()].join(' ')
-
-        // Wrap all CSS classes with variant selectors from previous states
-        const variantCss = this.previousStates.reduce(
-          (acc, curr) => composeVariantCss(curr, new Set([acc])),
-          joinedCss,
-        )
-
+        const variantCss = composeVariantsCss(this.previousStates, superTree.data.css)
         superTree.data.css = new Set([variantCss])
       }
     }
