@@ -34,11 +34,34 @@ class TreeMerger {
         return this.mergeSubtree(tree1, tree2)
 
       // Check if tree2 is a subtree of tree1
-      else if (TreeComparator.isSubtree(tree1, tree2))
+      if (TreeComparator.isSubtree(tree1, tree2))
         return this.mergeSupertree(tree1, tree2)
+
+      return this.diverge(tree1, tree2)
     }
 
     return this.mergeNodes(tree1, tree2)
+  }
+
+  private diverge(tree1: TreeNode, tree2: TreeNode): TreeNode {
+    const tree1Conditionals = [...(tree1.data.if || [])]
+    const tree2Conditionals = [...(tree2.data.if || [])]
+
+    if (this.conditionalMode) {
+      tree1Conditionals.push(`!${this.state}`)
+      tree2Conditionals.push(this.state)
+    }
+
+    return {
+      data: {
+        type: 'container',
+        css: new Set(),
+      },
+      children: [
+        { ...tree1, data: { ...tree1.data, if: tree1Conditionals } },
+        { ...tree2, data: { ...tree2.data, if: tree2Conditionals } },
+      ],
+    }
   }
 
   /**
