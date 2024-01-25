@@ -2,7 +2,7 @@ import FigmaNodeParser from '../parsers/figma-node.parser'
 import HTMLGenerator from '../generators/html.generator'
 import { entries } from '../utils'
 import type { TreeNode } from '../interfaces'
-import TreeMerger from '../parsers/merge'
+import TreeMerger from '../merge/tree-merger'
 import type {
   ComponentCollection,
   ComponentPropsWithState,
