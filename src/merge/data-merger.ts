@@ -38,13 +38,10 @@ class DataMerger {
    * @returns ContainerNodeData representing the merged result.
    */
   private mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData): ContainerNodeData {
-    if (data1.css !== data2.css) {
-      const cssDiff = difference(data2.css, data1.css)
+    const cssDiff = difference(data2.css, data1.css)
+    const hasDifferences = cssDiff.size > 0
 
-      // No difference so return data1
-      if (cssDiff.size === 0)
-        return data1
-
+    if (hasDifferences) {
       const variantCss = this.composeVariantCss(this.state, cssDiff)
 
       return {
