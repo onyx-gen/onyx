@@ -103,7 +103,7 @@ class TreeMerger {
     const conditionals = hasSubtreeSibling || !hasSubtreeChild ? extendedConditionals : []
 
     if ('css' in mainTree.data && mainTree.data.css.size > 0) {
-      const hoverCss = this.composeVariantCss(mainTree.data.css)
+      const hoverCss = this.composeVariantCss(this.state, mainTree.data.css)
       return {
         ...mainTree,
         data: {
@@ -121,12 +121,13 @@ class TreeMerger {
   /**
    * Composes a variant CSS string from the given CSS set.
    *
+   * @param variant - The variant to compose the CSS string for (e.g. 'hover' or 'focus').
    * @param cssSet - The set of CSS styles.
    * @returns {string} - The composed hover CSS string.
    */
-  private composeVariantCss(cssSet: Set<string>): string {
+  private composeVariantCss(variant: string, cssSet: Set<string>): string {
     const showParentheses = cssSet.size > 1
-    return `${this.state}:${showParentheses ? '(' : ''}${[...cssSet.values()].join(' ')}${showParentheses ? ')' : ''}`
+    return `${variant}:${showParentheses ? '(' : ''}${[...cssSet.values()].join(' ')}${showParentheses ? ')' : ''}`
   }
 
   /**
@@ -267,17 +268,7 @@ class TreeMerger {
       if (cssDiff.size === 0)
         return data1
 
-      const showParentheses = cssDiff.size > 1
-
-      let hoverCss = `${this.state}:`
-
-      if (showParentheses)
-        hoverCss += '('
-
-      hoverCss += [...cssDiff.values()].join(' ')
-
-      if (showParentheses)
-        hoverCss += ')'
+      const hoverCss = this.composeVariantCss(this.state, data1.css)
 
       return {
         type: 'container',
