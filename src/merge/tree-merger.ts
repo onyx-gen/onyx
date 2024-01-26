@@ -2,7 +2,7 @@ import type { TreeNode } from '../interfaces'
 import DataMerger from '../merge/data-merger'
 import TreeComparator from '../merge/tree-comparator'
 import { composeVariantCss, composeVariantsCss } from '../set/utils'
-import { appendSetToVariantCSS, wrapInVariant, wrapInVariants } from '../css'
+import { appendToVariantCSS, wrapInVariant, wrapInVariants } from '../css'
 
 /**
  * Class responsible for merging two tree structures.
@@ -69,11 +69,11 @@ class TreeMerger {
       if (tree1.data.type === 'container' && tree2.data.type === 'container') {
         // TODO MF: Optimize this
         const hiddenCssTree1 = composeVariantCss(this.state, new Set(['hidden']))
-        tree1.data.css = appendSetToVariantCSS(tree1.data.css, new Set([hiddenCssTree1]))
+        tree1.data.css = appendToVariantCSS(tree1.data.css, hiddenCssTree1)
 
         // TODO MF: Optimize this
         const hiddenCssTree2 = composeVariantsCss(this.previousStates, new Set(['hidden']))
-        tree2.data.css = appendSetToVariantCSS(tree2.data.css, new Set([hiddenCssTree2]))
+        tree2.data.css = appendToVariantCSS(tree2.data.css, hiddenCssTree2)
       }
       else {
         // TODO MF: Implement
@@ -127,7 +127,7 @@ class TreeMerger {
         if (superTree.data.type === 'container') {
           // TODO MF: optimize this
           const hiddenCss = composeVariantCss(this.state, new Set(['hidden']))
-          superTree.data.css = appendSetToVariantCSS(superTree.data.css, new Set([hiddenCss]))
+          superTree.data.css = appendToVariantCSS(superTree.data.css, hiddenCss)
         }
         else {
           console.error('Not a container (NOT YET IMPLEMENTED)')
