@@ -190,29 +190,73 @@ export function wrapInVariants(variantNames: string[], variantCSS: VariantCSS | 
 export function appendSetToVariantCSS(
   variantCSS: VariantCSS | undefined,
   cssSet: Set<string>,
-  variant?: string,
+  variant?: string | string[],
 ): VariantCSS {
   if (!variantCSS) {
     if (!variant)
       return { css: [cssSet] }
-    return { variant, css: [cssSet] }
-  }
 
-  // If the variant is defined and does not match the variant of the VariantCSS object,
-  // wrap the VariantCSS object
-  if (variant && variant !== variantCSS.variant) {
-    return {
-      variant: variantCSS.variant,
-      css: [...variantCSS.css, { variant, css: [cssSet] }],
+    if (Array.isArray(variant)) {
+      return variant.reduceRight(
+        (variantCSS, variantName) => wrapInVariant(variantName, variantCSS),
+        { css: [cssSet] } as VariantCSS,
+      )
+    }
+    else {
+      return { variant, css: [cssSet] }
     }
   }
 
-  // If the variant is defined and matches the variant of the VariantCSS object,
-  // append the cssSet to the VariantCSS object
+  if (variant && Array.isArray(variant)) {
+    if (variant[0] !== variantCSS.variant) {
+      const reduced = variant.reduceRight(
+        (variantCSS, variantName) => wrapInVariant(variantName, variantCSS),
+        { css: [cssSet] } as VariantCSS,
+      )
+
+      if (variantCSS.css.some(item => isVariantCSS(item) && item.variant === variant[0])) {
+        return variantCSS
+      }
+      else {
+        return {
+          variant: variantCSS.variant,
+          css: [...variantCSS.css, reduced],
+        }
+      }
+    }
+
+    if (variant.length > 1) {
+      const index = variantCSS.css.findIndex(item => isVariantCSS(item) && item.variant === variant[1])
+      if (index !== -1)
+        variantCSS.css[index] = appendSetToVariantCSS(variantCSS.css[index] as VariantCSS, cssSet, variant.slice(1))
+    }
+
+    if (variant.length === 1) {
+      return {
+        variant: variantCSS.variant,
+        css: [...variantCSS.css, cssSet],
+      }
+    }
+
+    return appendSetToVariantCSS(variantCSS, cssSet, variant.slice(1))
+  }
   else {
-    return {
-      variant: variantCSS.variant,
-      css: [...variantCSS.css, cssSet],
+    // If the variant is defined and does not match the variant of the VariantCSS object,
+    // wrap the VariantCSS object
+    if (variant && variant !== variantCSS.variant) {
+      return {
+        variant: variantCSS.variant,
+        css: [...variantCSS.css, { variant, css: [cssSet] }],
+      }
+    }
+
+    // If the variant is defined and matches the variant of the VariantCSS object,
+    // append the cssSet to the VariantCSS object
+    else {
+      return {
+        variant: variantCSS.variant,
+        css: [...variantCSS.css, cssSet],
+      }
     }
   }
 }
@@ -227,7 +271,7 @@ export function appendSetToVariantCSS(
 export function appendToVariantCSS(
   variantCSS: VariantCSS | undefined,
   css: string,
-  variant?: string,
+  variant?: string | string[],
 ): VariantCSS {
   return appendSetToVariantCSS(variantCSS, new Set([css]), variant)
 }

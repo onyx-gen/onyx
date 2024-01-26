@@ -407,6 +407,155 @@ describe('css', () => {
     expect(appendSetToVariantCSS(map2, new Set(['px-4']), 'hover')).toEqual(map2Appended)
   })
 
+  it('appends css set to undefined variant css and set multiple variants', () => {
+    const map0Appended = {
+      variant: 'hover',
+      css: [
+        {
+          variant: 'focus',
+          css: [
+            new Set(['px-4']),
+          ],
+        },
+      ],
+    }
+    expect(
+      appendSetToVariantCSS(
+        undefined,
+        new Set(['px-4']),
+        ['hover', 'focus'],
+      ),
+    ).toEqual(map0Appended)
+  })
+
+  it('appends css set to variant css and set multiple variants', () => {
+    const map1: VariantCSS = {
+      variant: 'hover',
+      css: [
+        new Set(['bg-red']),
+      ],
+    }
+
+    const map2: VariantCSS = {
+      css: [
+        new Set(['bg-red']),
+      ],
+    }
+
+    const map3: VariantCSS = {
+      variant: 'hover',
+      css: [
+        new Set(['bg-red']),
+        {
+          variant: 'focus',
+          css: [
+            new Set(['bg-blue']),
+          ],
+        },
+      ],
+    }
+
+    const map4: VariantCSS = {
+      variant: 'hover',
+      css: [
+        new Set(['bg-red']),
+        {
+          variant: 'focus',
+          css: [
+            {
+              variant: 'disabled',
+              css: [
+                new Set(['bg-gray-300']),
+              ],
+            },
+            new Set(['bg-blue']),
+          ],
+        },
+        new Set(['my-8']),
+      ],
+    }
+
+    const map4Appended: VariantCSS = {
+      variant: 'hover',
+      css: [
+        new Set(['bg-red']),
+        {
+          variant: 'focus',
+          css: [
+            {
+              variant: 'disabled',
+              css: [
+                new Set(['bg-gray-300']),
+                new Set(['mx-4']),
+              ],
+            },
+            new Set(['bg-blue']),
+          ],
+        },
+        new Set(['my-8']),
+      ],
+    }
+
+    const map1Appended: VariantCSS = {
+      variant: 'hover',
+      css: [
+        new Set(['bg-red']),
+        {
+          variant: 'focus',
+          css: [
+            new Set(['px-4']),
+          ],
+        },
+      ],
+    }
+
+    const map2Appended: VariantCSS = {
+      css: [
+        new Set(['bg-red']),
+        {
+          variant: 'hover',
+          css: [
+            {
+              variant: 'focus',
+              css: [
+                new Set(['px-4']),
+              ],
+            },
+          ],
+        },
+      ],
+    }
+
+    const map3Appended = {
+      variant: 'hover',
+      css: [
+        new Set(['bg-red']),
+        {
+          variant: 'focus',
+          css: [
+            new Set(['bg-blue']),
+            new Set(['px-4']),
+          ],
+        },
+      ],
+    }
+
+    expect(appendSetToVariantCSS(map1, new Set(['px-4']), ['hover', 'focus'])).toEqual(map1Appended)
+    expect(appendSetToVariantCSS(map2, new Set(['px-4']), ['hover', 'focus'])).toEqual(map2Appended)
+    expect(appendSetToVariantCSS(map3, new Set(['px-4']), ['hover', 'focus'])).toEqual(map3Appended)
+
+    function toString(variantCSS: VariantCSS) {
+      return JSON.stringify(
+        variantCSS,
+        (_key, value) => (value instanceof Set ? [...value] : value),
+        0,
+      )
+    }
+
+    const transformed = appendSetToVariantCSS(map4, new Set(['mx-4']), ['hover', 'focus', 'disabled'])
+    expect(toString(transformed)).toEqual(toString(map4Appended))
+  })
+
   it('appends css string to variant set', () => {
     const map = {
       css: [
