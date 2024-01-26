@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { VariantCSS } from '../src/interfaces'
 import {
   appendSetToVariantCSS,
+  appendToVariantCSS,
   calculateVariantCSSDifference,
   calculateVariantCSSUnion,
   translateVariantCSS,
@@ -366,5 +367,22 @@ describe('css', () => {
     }
 
     expect(appendSetToVariantCSS(map, new Set(['px-4']))).toEqual(mapAppended)
+  })
+
+  it('appends css string to variant set', () => {
+    const map = {
+      css: [
+        new Set(['bg-red']),
+      ],
+    }
+
+    const mapAppended = {
+      css: [
+        new Set(['bg-red']),
+        new Set(['px-4']),
+      ],
+    }
+
+    expect(appendToVariantCSS(map, 'px-4')).toEqual(mapAppended)
   })
 })

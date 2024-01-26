@@ -186,7 +186,7 @@ export function wrapInVariants(variantNames: string[], variantCSS: VariantCSS | 
  * @param cssSet A set of strings representing CSS classes to be added to the VariantCSS object.
  * @returns A VariantCSS object with the new set of CSS classes appended.
  */
-export function appendSetToVariantCSS(variantCSS: VariantCSS | undefined, cssSet: Set<string>) {
+export function appendSetToVariantCSS(variantCSS: VariantCSS | undefined, cssSet: Set<string>): VariantCSS {
   if (!variantCSS)
     return { css: [cssSet] }
 
@@ -194,4 +194,14 @@ export function appendSetToVariantCSS(variantCSS: VariantCSS | undefined, cssSet
     variant: variantCSS.variant,
     css: [...variantCSS.css, cssSet],
   }
+}
+
+/**
+ * Appends a CSS class string to a VariantCSS object.
+ *
+ * @param variantCSS - The VariantCSS object to append the cssSet to. If undefined, a new VariantCSS object is created.
+ * @param css - A string representing a CSS class to be added to the VariantCSS object.
+ */
+export function appendToVariantCSS(variantCSS: VariantCSS | undefined, css: string): VariantCSS {
+  return appendSetToVariantCSS(variantCSS, new Set([css]))
 }
