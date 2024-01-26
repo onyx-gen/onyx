@@ -182,17 +182,38 @@ export function wrapInVariants(variantNames: string[], variantCSS: VariantCSS | 
  * The new set is appended at the end of the existing css array, preserving any existing structures within
  * the VariantCSS object.
  *
- * @param variantCSS The VariantCSS object to append the cssSet to. If undefined, a new VariantCSS object is created.
- * @param cssSet A set of strings representing CSS classes to be added to the VariantCSS object.
+ * @param variantCSS - The VariantCSS object to append the cssSet to. If undefined, a new VariantCSS object is created.
+ * @param cssSet - A set of strings representing CSS classes to be added to the VariantCSS object.
+ * @param variant - The variant name to be added to the VariantCSS object. If undefined, the variant is not added.
  * @returns A VariantCSS object with the new set of CSS classes appended.
  */
-export function appendSetToVariantCSS(variantCSS: VariantCSS | undefined, cssSet: Set<string>): VariantCSS {
-  if (!variantCSS)
-    return { css: [cssSet] }
+export function appendSetToVariantCSS(
+  variantCSS: VariantCSS | undefined,
+  cssSet: Set<string>,
+  variant?: string,
+): VariantCSS {
+  if (!variantCSS) {
+    if (!variant)
+      return { css: [cssSet] }
+    return { variant, css: [cssSet] }
+  }
 
-  return {
-    variant: variantCSS.variant,
-    css: [...variantCSS.css, cssSet],
+  // If the variant is defined and does not match the variant of the VariantCSS object,
+  // wrap the VariantCSS object
+  if (variant && variant !== variantCSS.variant) {
+    return {
+      variant: variantCSS.variant,
+      css: [...variantCSS.css, { variant, css: [cssSet] }],
+    }
+  }
+
+  // If the variant is defined and matches the variant of the VariantCSS object,
+  // append the cssSet to the VariantCSS object
+  else {
+    return {
+      variant: variantCSS.variant,
+      css: [...variantCSS.css, cssSet],
+    }
   }
 }
 
@@ -201,7 +222,12 @@ export function appendSetToVariantCSS(variantCSS: VariantCSS | undefined, cssSet
  *
  * @param variantCSS - The VariantCSS object to append the cssSet to. If undefined, a new VariantCSS object is created.
  * @param css - A string representing a CSS class to be added to the VariantCSS object.
+ * @param variant - The variant name to be added to the VariantCSS object. If undefined, the variant is not added.
  */
-export function appendToVariantCSS(variantCSS: VariantCSS | undefined, css: string): VariantCSS {
-  return appendSetToVariantCSS(variantCSS, new Set([css]))
+export function appendToVariantCSS(
+  variantCSS: VariantCSS | undefined,
+  css: string,
+  variant?: string,
+): VariantCSS {
+  return appendSetToVariantCSS(variantCSS, new Set([css]), variant)
 }
