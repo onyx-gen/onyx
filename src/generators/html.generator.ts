@@ -6,7 +6,9 @@ import type {
 import { createIndent, entries } from '../utils'
 import { translateVariantCSS } from '../css'
 
-type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => { [key: string]: string }
+interface Attributes { [key: string]: string | { [key: string]: string } }
+
+type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => Attributes
 type ConditionalFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string | undefined
 type TagFunction<T extends TreeNodeData> = ((node: TreeNode<T>) => string) | string
 
@@ -22,7 +24,7 @@ class HTMLGenerator {
         // Only add 'class' property if css is not undefined
         const attrs: { [key: string]: string } = {}
         if (treeNode.data.css)
-          attrs.class = translateVariantCSS(treeNode.data.css)
+          attrs.class = translateVariantCSS(treeNode.data.css) // TODO MF: This is a temporary solution to translate the CSS to a string. We need to find a better way to handle this.
 
         return attrs
       },
@@ -134,8 +136,14 @@ class HTMLGenerator {
    * @param {number} depth - The current depth in the tree, used for indentation.
    * @returns {string} The string representation of the attributes.
    */
-  private attrsToString(attrs: { [key: string]: string }, depth: number): string {
-    const pairs = entries(attrs).map(([key, value]) => `${key}="${value}"`)
+  private attrsToString(attrs: Attributes, depth: number): string {
+    const pairs = entries(attrs).map(([key, value]) => {
+      if (typeof value === 'string') { return `${key}="${value}"` }
+      else {
+        const attrValueString = entries(value).map(([key, value]) => `${key}: ${value}`).join(', ')
+        return `:${key}="${attrValueString}"`
+      }
+    })
 
     if (pairs.length === 1) {
       return ` ${pairs[0]}`
