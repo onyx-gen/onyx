@@ -89,7 +89,10 @@ class FigmaNodeParser {
    * @returns {TreeNode} The generated tree node for the text.
    */
   private createTextNode(node: TextNode, css: Set<string>): TreeNode {
-    const parentNodeData: ContainerNodeData = { type: 'container', css }
+    const parentNodeData: ContainerNodeData = {
+      type: 'container',
+      css: { css: [css] },
+    }
     const childNodeData: TextNodeData = { type: 'text', text: node.characters }
 
     return { data: parentNodeData, children: [{ children: [], data: childNodeData }] }
@@ -103,7 +106,10 @@ class FigmaNodeParser {
    * @returns {TreeNode} The generated tree node for the container.
    */
   private createContainerNode(node: SceneNode, css: Set<string>, hasChildren: boolean): TreeNode {
-    const data: ContainerNodeData = { type: 'container', css }
+    const data: ContainerNodeData = {
+      type: 'container',
+      css: { css: [css] },
+    }
     const treeNode: TreeNode = { data, children: [] }
 
     if (hasChildren)

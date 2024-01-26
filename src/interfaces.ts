@@ -14,9 +14,14 @@ export interface AbstractNodeData {
   if?: string[]
 }
 
+export interface VariantCSS {
+  variant?: string
+  css: (VariantCSS | Set<string>)[]
+}
+
 export interface ContainerNodeData extends AbstractNodeData {
   type: 'container'
-  css: Set<string>
+  css?: VariantCSS
 }
 
 export interface TextNodeData extends AbstractNodeData {

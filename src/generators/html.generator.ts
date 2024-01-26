@@ -4,6 +4,7 @@ import type {
   TreeNodeData,
 } from '../interfaces'
 import { createIndent, entries } from '../utils'
+import { translateVariantCSS } from '../css'
 
 type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => { [key: string]: string }
 type ConditionalFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string | undefined
@@ -21,7 +22,7 @@ class HTMLGenerator {
         // Only add 'class' property if css is not undefined
         const attrs: { [key: string]: string } = {}
         if (treeNode.data.css)
-          attrs.class = [...treeNode.data.css.values()].join(' ')
+          attrs.class = translateVariantCSS(treeNode.data.css)
 
         return attrs
       },

@@ -1,5 +1,5 @@
 import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, TreeNodeData } from '../interfaces'
-import { difference } from '../set/utils'
+import { calculateVariantCSSDifference, calculateVariantCSSUnion, wrapInVariant } from '../css'
 
 /**
  * Class responsible for merging TreeNodeData of different types.
@@ -38,15 +38,16 @@ class DataMerger {
    * @returns ContainerNodeData representing the merged result.
    */
   private mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData): ContainerNodeData {
-    const cssDiff = difference(data2.css, data1.css)
-    const hasDifferences = cssDiff.size > 0
+    const calculateVariantCSSDifference1 = calculateVariantCSSDifference(data2.css, data1.css)
+    const hasDifferences = calculateVariantCSSDifference1.css.length > 0
 
     if (hasDifferences) {
-      const variantCss = this.composeVariantCss(this.state, cssDiff)
+      const variantCSSIfState = wrapInVariant(this.state, calculateVariantCSSDifference1)
+      const newVariantCSS = calculateVariantCSSUnion(data1.css, variantCSSIfState)
 
       return {
         type: 'container',
-        css: new Set([...data1.css, variantCss]),
+        css: newVariantCSS,
       }
     }
     else {

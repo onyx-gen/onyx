@@ -12,7 +12,8 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "vitest --ui"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.3",
@@ -21,9 +22,11 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@vitest/ui": "^1.2.1",
     "eslint": "^8.56.0",
     "rollup": "^4.9.6",
     "tslib": "^2.6.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.1"
   }
 }

@@ -1,9 +1,8 @@
-import type {
-  TreeNode,
-} from '../interfaces'
+import type { TreeNode } from '../interfaces'
 import DataMerger from '../merge/data-merger'
 import TreeComparator from '../merge/tree-comparator'
 import { composeVariantCss, composeVariantsCss } from '../set/utils'
+import { appendSetToVariantCSS, wrapInVariant, wrapInVariants } from '../css'
 
 /**
  * Class responsible for merging two tree structures.
@@ -68,11 +67,13 @@ class TreeMerger {
     }
     else {
       if (tree1.data.type === 'container' && tree2.data.type === 'container') {
+        // TODO MF: Optimize this
         const hiddenCssTree1 = composeVariantCss(this.state, new Set(['hidden']))
-        tree1.data.css.add(hiddenCssTree1)
+        tree1.data.css = appendSetToVariantCSS(tree1.data.css, new Set([hiddenCssTree1]))
 
+        // TODO MF: Optimize this
         const hiddenCssTree2 = composeVariantsCss(this.previousStates, new Set(['hidden']))
-        tree2.data.css.add(hiddenCssTree2)
+        tree2.data.css = appendSetToVariantCSS(tree2.data.css, new Set([hiddenCssTree2]))
       }
       else {
         // TODO MF: Implement
@@ -83,7 +84,6 @@ class TreeMerger {
     return {
       data: {
         type: 'container',
-        css: new Set(),
       },
       children: [
         { ...tree1, data: { ...tree1.data, if: tree1Conditionals } },
@@ -125,8 +125,9 @@ class TreeMerger {
       }
       else {
         if (superTree.data.type === 'container') {
+          // TODO MF: optimize this
           const hiddenCss = composeVariantCss(this.state, new Set(['hidden']))
-          superTree.data.css.add(hiddenCss)
+          superTree.data.css = appendSetToVariantCSS(superTree.data.css, new Set([hiddenCss]))
         }
         else {
           console.error('Not a container (NOT YET IMPLEMENTED)')
@@ -136,13 +137,11 @@ class TreeMerger {
 
     if (superTree.data.type === 'container') {
       if (hasSubtreeChild && hasSupertreeChild) {
-        if (this.conditionalMode) {
+        if (this.conditionalMode)
           conditionals.push(`!${this.state}`)
-        }
-        else {
-          const variantCss = composeVariantsCss(this.previousStates, superTree.data.css)
-          superTree.data.css = new Set([variantCss])
-        }
+
+        else
+          superTree.data.css = wrapInVariants(this.previousStates, superTree.data.css)
       }
     }
     else {
@@ -188,14 +187,15 @@ class TreeMerger {
 
     const conditionals = hasSubtreeSibling || !hasSubtreeChild ? extendedConditionals : []
 
-    if ('css' in mainData && mainData.css.size > 0) {
-      const hoverCss = composeVariantCss(this.state, mainData.css)
+    // TODO MF: Optimize this and create a function that tests whether ContainerNodeData has CSS
+    if ('css' in mainData && mainData.css && mainData.css.css.length > 0) {
+      const hoverCss = wrapInVariant(this.state, mainData.css)
       return {
         ...mainTree,
         data: {
           ...mainData,
           type: 'container',
-          css: new Set([hoverCss]),
+          css: hoverCss,
           if: conditionals,
         },
       }
@@ -257,7 +257,6 @@ class TreeMerger {
     return {
       data: {
         type: 'container',
-        css: new Set(),
       },
       children: [
         { ...node1, data: { ...node1.data } },
@@ -280,7 +279,6 @@ class TreeMerger {
     const parentTreeNode: TreeNode = {
       data: {
         type: 'container',
-        css: new Set(),
         if: [this.state],
       },
       children: [node],
@@ -289,7 +287,6 @@ class TreeMerger {
     return {
       data: {
         type: 'container',
-        css: new Set(),
       },
       children: [parentTreeNode],
     }
