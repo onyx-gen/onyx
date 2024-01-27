@@ -1,4 +1,4 @@
-import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData } from '../../interfaces'
+import type { ContainerNodeData, IconNodeData, InstanceNodeData } from '../../interfaces'
 import { calculateVariantCSSDifference, calculateVariantCSSUnion, wrapInVariant } from '../../css'
 import AbstractDataMerger from '../data-merger'
 
@@ -24,19 +24,6 @@ class StateDataMerger extends AbstractDataMerger {
       return {
         type: 'container',
         css: newVariantCSS,
-      }
-    }
-    else {
-      return data1
-    }
-  }
-
-  protected mergeTextData(data1: TextNodeData, data2: TextNodeData): TextNodeData {
-    if (data1.text !== data2.text) {
-      // Example: Concatenate text
-      return {
-        type: 'text',
-        text: `text1(${data1.text}) text2(${data2.text})`,
       }
     }
     else {

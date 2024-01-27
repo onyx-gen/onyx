@@ -41,7 +41,18 @@ abstract class AbstractDataMerger implements IDataMerger {
    * @param data2 The second TextNodeData to merge.
    * @returns TextNodeData representing the merged result.
    */
-  protected abstract mergeTextData(data1: TextNodeData, data2: TextNodeData): TextNodeData
+  protected mergeTextData(data1: TextNodeData, data2: TextNodeData): TextNodeData {
+    if (data1.text !== data2.text) {
+      // Example: Concatenate text
+      return {
+        type: 'text',
+        text: `text1(${data1.text}) text2(${data2.text})`,
+      }
+    }
+    else {
+      return data1
+    }
+  }
 
   /**
    * Merges InstanceNodeData objects.

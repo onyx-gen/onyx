@@ -1,4 +1,4 @@
-import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData } from '../../interfaces'
+import type { ContainerNodeData, IconNodeData, InstanceNodeData } from '../../interfaces'
 import AbstractDataMerger from '../data-merger'
 
 class VariantDataMerger extends AbstractDataMerger {
@@ -11,11 +11,6 @@ class VariantDataMerger extends AbstractDataMerger {
 
   protected mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData): ContainerNodeData {
     console.error('[VariantDataMerger] mergeContainerData method not yet implemented.', { data1, data2 })
-    return data1
-  }
-
-  protected mergeTextData(data1: TextNodeData, data2: TextNodeData): TextNodeData {
-    console.error('[VariantDataMerger] mergeTextData method not yet implemented.', { data1, data2 })
     return data1
   }
 
