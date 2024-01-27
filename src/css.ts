@@ -11,10 +11,15 @@ import { difference } from './set/utils'
  */
 export function translateVariantCSS(variantCSS: VariantCSS): string {
   return variantCSS.css.map((css) => {
-    if (css instanceof Set)
+    if (css instanceof Set) {
       return [...css.values()].join(' ')
-    else
-      return `${css.variant}:(${translateVariantCSS(css)})`
+    }
+    else {
+      const translated = translateVariantCSS(css)
+      const requiresParentheses = translated.includes(' ')
+      console.log('requiresParentheses', requiresParentheses)
+      return `${css.variant}:${requiresParentheses ? '(' : ''}${translated}${requiresParentheses ? ')' : ''}`
+    }
   }).join(' ')
 }
 
