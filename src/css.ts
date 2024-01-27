@@ -10,17 +10,14 @@ import { difference } from './set/utils'
  * @returns A string representing the translated VariantCSS object.
  */
 export function translateVariantCSS(variantCSS: VariantCSS): string {
-  return variantCSS.css.map((css) => {
-    if (css instanceof Set) {
-      return [...css.values()].join(' ')
-    }
-    else {
-      const translated = translateVariantCSS(css)
-      const requiresParentheses = translated.includes(' ')
-      console.log('requiresParentheses', requiresParentheses)
-      return `${css.variant}:${requiresParentheses ? '(' : ''}${translated}${requiresParentheses ? ')' : ''}`
-    }
+  const translated = variantCSS.css.map((css) => {
+    return isVariantCSS(css) ? translateVariantCSS(css) : [...css.values()].join(' ')
   }).join(' ')
+
+  const variant = variantCSS.variant
+  const requiresParentheses = translated.includes(' ') && variant !== undefined
+
+  return `${variant ? `${variant}:` : ''}${requiresParentheses ? '(' : ''}${translated}${requiresParentheses ? ')' : ''}`
 }
 
 // Type predicate to check if an item is VariantCSS
