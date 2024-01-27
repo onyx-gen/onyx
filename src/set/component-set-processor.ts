@@ -2,7 +2,8 @@ import FigmaNodeParser from '../parsers/figma-node.parser'
 import HTMLGenerator from '../generators/html.generator'
 import { entries } from '../utils'
 import type { TreeNode } from '../interfaces'
-import TreeMerger from '../merge/tree-merger'
+import StateTreeMerger from '../merge/state/state-tree-merger'
+import VariantTreeMerger from '../merge/variant/variant-tree-merger'
 import type {
   ComponentCollection,
   ComponentPropsWithState,
@@ -266,26 +267,31 @@ class ComponentSetProcessor {
    * It iterates over all stored trees, merges them, and generates the final HTML.
    */
   private mergeAndGenerateHTMLFromPermutations(): void {
-    let mergedTree: TreeNode | null = null
-    const previousStates: string[] = []
+    const trees = Object.entries(this.treesForPermutations)
+    if (trees.length === 0)
+      throw new Error('No trees found for permutations')
 
-    Object.entries(this.treesForPermutations).forEach(([treeKey, tree]) => {
+    // TODO MF: Handle case where no tree is found
+    if (!trees[0][1])
+      throw new Error('No default tree found for permutations')
+
+    let mergedVariantsTree: TreeNode = trees[0][1]
+
+    // variantKey is a string representing the unique key for a variant derived from a specific permutation
+    // For example: `variant-primary`, `variant-secondary` or `selected-true`, `selected-false
+    trees.slice(1).forEach(([variantKey, tree]) => {
       if (tree) {
-        // TODO MF: This might not always be correct, but it works for now
-        const simplifiedTreeKey = treeKey.replace(/-true$|-false$/, '')
-
-        const treeMerger = new TreeMerger(simplifiedTreeKey, previousStates, true)
-        mergedTree = treeMerger.merge(mergedTree || tree, tree)
-        previousStates.push(simplifiedTreeKey)
+        const variantTreeMerger = new VariantTreeMerger(variantKey)
+        mergedVariantsTree = variantTreeMerger.merge(mergedVariantsTree, tree)
       }
     })
 
-    if (!mergedTree) {
-      console.error('No valid merged tree found after merging all permutations')
+    if (!mergedVariantsTree) {
+      console.error('No valid merged variants tree found after merging all permutations')
       return
     }
 
-    const mergedHTML = this.htmlGenerator.generate(mergedTree)
+    const mergedHTML = this.htmlGenerator.generate(mergedVariantsTree)
     this.htmls.push(mergedHTML)
   }
 
@@ -353,7 +359,7 @@ class ComponentSetProcessor {
 
     Object.entries(trees).forEach(([state, tree]) => {
       if (tree && state !== 'default') {
-        const treeMerger = new TreeMerger(state, previousStates, false)
+        const treeMerger = new StateTreeMerger(state, previousStates)
         mergedTree = treeMerger.merge(mergedTree!, tree)
         previousStates.push(state)
       }

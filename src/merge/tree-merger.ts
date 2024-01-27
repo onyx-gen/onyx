@@ -1,22 +1,11 @@
-import type { TreeNode } from '../interfaces'
-import DataMerger from '../merge/data-merger'
-import TreeComparator from '../merge/tree-comparator'
-import { appendToVariantCSS, wrapInVariant, wrapInVariants } from '../css'
+import type { ContainerNodeData, TreeNode } from '../interfaces'
+import type { IDataMerger, ITreeMerger } from './types'
+import TreeComparator from './tree-comparator'
 
-/**
- * Class responsible for merging two tree structures.
- * The merging logic is based on the type of the nodes and their respective data.
- */
-class TreeMerger {
-  private readonly dataMerger: DataMerger
-
-  constructor(
-    private state: string,
-    private previousStates: string[] = [],
-    private conditionalMode = false,
-  ) {
-    this.dataMerger = new DataMerger(state)
-  }
+abstract class AbstractTreeMerger implements ITreeMerger {
+  protected constructor(
+    private readonly dataMerger: IDataMerger,
+  ) {}
 
   /**
    * Merges two TreeNode structures into one.
@@ -56,34 +45,42 @@ class TreeMerger {
    * @param tree2 The second TreeNode to be diverged.
    * @returns TreeNode representing the diverged structure of tree1 and tree2.
    */
-  private diverge(tree1: TreeNode, tree2: TreeNode): TreeNode {
-    const tree1Conditionals = [...(tree1.data.if || [])]
-    const tree2Conditionals = [...(tree2.data.if || [])]
+  protected abstract diverge(tree1: TreeNode, tree2: TreeNode): TreeNode
 
-    if (this.conditionalMode) {
-      tree1Conditionals.push(`!${this.state}`)
-      tree2Conditionals.push(this.state)
-    }
-    else {
-      if (tree1.data.type === 'container' && tree2.data.type === 'container') {
-        tree1.data.css = appendToVariantCSS(tree1.data.css, 'hidden', this.state)
-        tree2.data.css = appendToVariantCSS(tree2.data.css, 'hidden', this.previousStates)
-      }
-      else {
-        // TODO MF: Implement
-        console.error('Not a container (NOT YET IMPLEMENTED)')
-      }
-    }
+  /**
+   * Merges a subtree into a main tree at the matching node.
+   *
+   * @param subTree - The subtree to be merged.
+   * @param mainTree - The main tree where the subtree will be merged.
+   * @param hasSubtreeSibling - Whether the main tree has a sibling that is the same as the subtree.
+   * @returns {TreeNode} - The main tree with the subtree merged at the appropriate node.
+   */
+  private mergeSubtree(
+    subTree: TreeNode,
+    mainTree: TreeNode,
+    hasSubtreeSibling: boolean = false,
+  ): TreeNode {
+    if (TreeComparator.isSameTree(mainTree, subTree))
+      return this.mergeNodes(subTree, mainTree)
 
-    return {
-      data: {
-        type: 'container',
-      },
-      children: [
-        { ...tree1, data: { ...tree1.data, if: tree1Conditionals } },
-        { ...tree2, data: { ...tree2.data, if: tree2Conditionals } },
-      ],
-    }
+    const mainData = mainTree.data
+    const extendedConditionals = this.getSubtreeConditionals(mainTree)
+
+    const hasSubtreeChild = mainTree.children.some(child => TreeComparator.isSameTree(child, subTree))
+    if (!hasSubtreeChild)
+      return { ...mainTree, data: { ...mainData, if: extendedConditionals } }
+
+    mainTree.children = mainTree.children.map(child =>
+      this.mergeSubtree(subTree, child, !hasSubtreeChild),
+    )
+
+    mainTree.data.if = hasSubtreeSibling || !hasSubtreeChild ? extendedConditionals : []
+
+    // TODO MF: Optimize this and create a function that tests whether ContainerNodeData has CSS
+    if ('css' in mainData && mainData.css && mainData.css.css.length > 0)
+      this.hookHasCss(mainTree as TreeNode<ContainerNodeData>)
+
+    return mainTree
   }
 
   /**
@@ -111,87 +108,13 @@ class TreeMerger {
     const hasSubtreeChild = superChildren.some(child => TreeComparator.isSameTree(child, subTree))
     const hasSupertreeChild = superChildren.some(child => !TreeComparator.isSameTree(child, subTree))
 
-    const conditionals = []
+    if (!hasSubtreeChild && hasSupertreeChild)
+      this.hookHasNotSubtreeChild(superTree)
 
-    if (!hasSubtreeChild && hasSupertreeChild) {
-      if (this.conditionalMode) {
-        conditionals.push(this.previousStates.join(' || '))
-      }
-      else {
-        if (superTree.data.type === 'container')
-          superTree.data.css = appendToVariantCSS(superTree.data.css, 'hidden', this.state)
-        else
-          console.error('Not a container (NOT YET IMPLEMENTED)')
-      }
-    }
+    if (hasSubtreeChild && hasSupertreeChild)
+      this.hookHasSubtreeChild(superTree)
 
-    if (superTree.data.type === 'container') {
-      if (hasSubtreeChild && hasSupertreeChild) {
-        if (this.conditionalMode)
-          conditionals.push(`!${this.state}`)
-
-        else
-          superTree.data.css = wrapInVariants(this.previousStates, superTree.data.css)
-      }
-    }
-    else {
-      console.error('Not a container (NOT YET IMPLEMENTED)')
-    }
-
-    return {
-      ...superTree,
-      data: {
-        ...superTree.data,
-        if: conditionals,
-      },
-    }
-  }
-
-  /**
-   * Merges a subtree into a main tree at the matching node.
-   *
-   * @param subTree - The subtree to be merged.
-   * @param mainTree - The main tree where the subtree will be merged.
-   * @param hasSubtreeSibling - Indicates if the subtree has a sibling node. Defaults to false.
-   * @returns {TreeNode} - The main tree with the subtree merged at the appropriate node.
-   */
-  private mergeSubtree(
-    subTree: TreeNode,
-    mainTree: TreeNode,
-    hasSubtreeSibling: boolean = false,
-  ): TreeNode {
-    if (TreeComparator.isSameTree(mainTree, subTree))
-      return this.mergeNodes(subTree, mainTree)
-
-    const mainData = mainTree.data
-
-    const extendedConditionals = mainData.if ? [...mainData.if, this.state] : [this.state]
-
-    const hasSubtreeChild = mainTree.children.some(child => TreeComparator.isSameTree(child, subTree))
-    if (!hasSubtreeChild)
-      return { ...mainTree, data: { ...mainData, if: extendedConditionals } }
-
-    mainTree.children = mainTree.children.map(child =>
-      this.mergeSubtree(subTree, child, !hasSubtreeChild),
-    )
-
-    const conditionals = hasSubtreeSibling || !hasSubtreeChild ? extendedConditionals : []
-
-    // TODO MF: Optimize this and create a function that tests whether ContainerNodeData has CSS
-    if ('css' in mainData && mainData.css && mainData.css.css.length > 0) {
-      const hoverCss = wrapInVariant(this.state, mainData.css)
-      return {
-        ...mainTree,
-        data: {
-          ...mainData,
-          type: 'container',
-          css: hoverCss,
-          if: conditionals,
-        },
-      }
-    }
-
-    return { ...mainTree, data: { ...mainData, if: conditionals } }
+    return superTree
   }
 
   /**
@@ -243,17 +166,7 @@ class TreeMerger {
    * @param node2 The second TreeNode involved in the conflict.
    * @returns A new TreeNode of the container type, containing both node1 and node2 as children.
    */
-  private createConflictContainerNode(node1: TreeNode, node2: TreeNode): TreeNode {
-    return {
-      data: {
-        type: 'container',
-      },
-      children: [
-        { ...node1, data: { ...node1.data } },
-        { ...node2, data: { ...node2.data, if: [this.state] } },
-      ],
-    }
-  }
+  protected abstract createConflictContainerNode(node1: TreeNode, node2: TreeNode): TreeNode
 
   /**
    * Creates a conditional container TreeNode. This method wraps a given TreeNode in a new
@@ -265,22 +178,7 @@ class TreeMerger {
    * @param node The TreeNode to be wrapped in the conditional container.
    * @returns TreeNode The new conditional container node with the original node as its child.
    */
-  private createConditionalContainerNode(node: TreeNode): TreeNode {
-    const parentTreeNode: TreeNode = {
-      data: {
-        type: 'container',
-        if: [this.state],
-      },
-      children: [node],
-    }
-
-    return {
-      data: {
-        type: 'container',
-      },
-      children: [parentTreeNode],
-    }
-  }
+  protected abstract createConditionalContainerNode(node: TreeNode): TreeNode
 
   /**
    * Merges the children arrays of two TreeNode objects.
@@ -298,6 +196,18 @@ class TreeMerger {
 
     return mergedChildren
   }
+
+  // TODO MF: Documentation
+  protected abstract hookHasSubtreeChild(superTree: TreeNode): void
+
+  // TODO MF: Documentation
+  protected abstract hookHasNotSubtreeChild(superTree: TreeNode): void
+
+  // TODO MF: Documentation
+  protected abstract hookHasCss(mainTree: TreeNode<ContainerNodeData>): TreeNode
+
+  // TODO MF: Documentation
+  protected abstract getSubtreeConditionals(mainTree: TreeNode): string[]
 }
 
-export default TreeMerger
+export default AbstractTreeMerger

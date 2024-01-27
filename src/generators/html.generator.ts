@@ -138,7 +138,9 @@ class HTMLGenerator {
    */
   private attrsToString(attrs: Attributes, depth: number): string {
     const pairs = entries(attrs).map(([key, value]) => {
-      if (typeof value === 'string') { return `${key}="${value}"` }
+      if (typeof value === 'string') {
+        return `${key}="${value}"`
+      }
       else {
         const attrValueString = entries(value).map(([key, value]) => `${key}: ${value}`).join(', ')
         return `:${key}="${attrValueString}"`

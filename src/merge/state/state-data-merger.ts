@@ -1,10 +1,11 @@
-import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, TreeNodeData } from '../interfaces'
-import { calculateVariantCSSDifference, calculateVariantCSSUnion, wrapInVariant } from '../css'
+import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, TreeNodeData } from '../../interfaces'
+import { calculateVariantCSSDifference, calculateVariantCSSUnion, wrapInVariant } from '../../css'
+import type { IDataMerger } from '../types'
 
 /**
  * Class responsible for merging TreeNodeData of different types.
  */
-class DataMerger {
+class StateDataMerger implements IDataMerger {
   constructor(private readonly state: string) {}
 
   /**
@@ -83,8 +84,8 @@ class DataMerger {
    * @returns InstanceNodeData representing the merged result.
    */
   private mergeInstanceData(data1: InstanceNodeData, data2: InstanceNodeData): InstanceNodeData {
-    // TODO: Implement instance data merging logic
-    console.error('Merging Instance Data (NOT YET IMPLEMENTED)', data1, data2)
+    // TODO MF
+    console.error('mergeInstanceData method not yet implemented.', { data1, data2 })
     return data1
   }
 
@@ -96,28 +97,10 @@ class DataMerger {
    * @returns IconNodeData representing the merged result.
    */
   private mergeIconData(data1: IconNodeData, data2: IconNodeData): IconNodeData {
-    // TODO: Implement icon data merging logic
-    console.log('Merging Icon Data (NOT YET IMPLEMENTED)', data1, data2)
+    // TODO MF
+    console.error('mergeIconData method not yet implemented.', { data1, data2 })
     return data1
-  }
-
-  /**
-   * Composes a CSS string for a specific variant by combining CSS classes.
-   *
-   * @param variantName - The name of the variant (e.g., 'hover', 'focus').
-   * @param cssClasses - A set of CSS class names to be combined for the variant.
-   * @returns {string} - The CSS string for the specified variant. If multiple classes are present,
-   *                      they are wrapped in parentheses. Returns an empty string if no classes are provided.
-   */
-  private composeVariantCss(variantName: string, cssClasses: Set<string>): string {
-    if (cssClasses.size === 0)
-      return ''
-
-    const allClasses = [...cssClasses.values()]
-    const requiresParentheses = cssClasses.size > 1 || allClasses[0].includes(' ')
-
-    return `${variantName}:${requiresParentheses ? '(' : ''}${allClasses.join(' ')}${requiresParentheses ? ')' : ''}`
   }
 }
 
-export default DataMerger
+export default StateDataMerger
