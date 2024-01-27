@@ -68,39 +68,3 @@ export function difference(setA: Set<string>, setB: Set<string>): Set<string> {
 
   return _difference
 }
-
-/**
- * Composes a CSS string for a specific variant by combining CSS classes.
- *
- * @param variantName - The name of the variant (e.g., 'hover', 'focus').
- * @param cssClasses - A set of CSS class names to be combined for the variant.
- * @returns {string} - The CSS string for the specified variant. If multiple classes are present,
- *                      they are wrapped in parentheses. Returns an empty string if no classes are provided.
- */
-export function composeVariantCss(variantName: string, cssClasses: Set<string>): string {
-  if (cssClasses.size === 0)
-    return ''
-
-  const allClasses = [...cssClasses.values()]
-  const requiresParentheses = cssClasses.size > 1 || allClasses[0].includes(' ')
-
-  return `${variantName}:${requiresParentheses ? '(' : ''}${allClasses.join(' ')}${requiresParentheses ? ')' : ''}`
-}
-
-/**
- * Composes a CSS string for multiple variants by combining CSS classes.
- *
- * @param {string[]} variantNames - An array of variant names (e.g., ['hover', 'focus']).
- * @param {Set<string>} cssClasses - A set of CSS class names to be combined for the variants.
- * @returns {string} - The CSS string for the specified variants. If multiple classes are present,
- *                     they are wrapped in parentheses. Returns an empty string if no classes are provided.
- */
-export function composeVariantsCss(variantNames: string[], cssClasses: Set<string>): string {
-  // Initialize the Set with individual CSS classes
-  const joinedCss = [...cssClasses.values()].join(' ')
-
-  return variantNames.reduce(
-    (acc, curr) => composeVariantCss(curr, new Set([acc])),
-    joinedCss,
-  )
-}
