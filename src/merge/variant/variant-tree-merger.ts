@@ -26,30 +26,30 @@ class VariantTreeMerger extends AbstractTreeMerger {
   }
 
   protected createConflictContainerNode(node1: TreeNode, node2: TreeNode): TreeNode {
-    console.error('createConflictContainerNode method not yet implemented.', { node1, node2 })
+    console.error('[VariantTreeMerger] createConflictContainerNode method not yet implemented.', { node1, node2 })
     return node1
   }
 
   protected createConditionalContainerNode(node: TreeNode): TreeNode {
-    console.error('createConditionalContainerNode method not yet implemented.', { node })
+    console.error('[VariantTreeMerger] createConditionalContainerNode method not yet implemented.', { node })
     return node
   }
 
   protected hookHasSubtreeChild(superTree: TreeNode): void {
-    console.error('hookHasSubtreeChild method not yet implemented.', { superTree })
+    console.error('[VariantTreeMerger] hookHasSubtreeChild method not yet implemented.', { superTree })
   }
 
   protected hookHasNotSubtreeChild(superTree: TreeNode): void {
-    console.error('hookHasNotSubtreeChild method not yet implemented.', { superTree })
+    console.error('[VariantTreeMerger] hookHasNotSubtreeChild method not yet implemented.', { superTree })
   }
 
   protected hookHasCss(mainTree: TreeNode<ContainerNodeData>): TreeNode {
-    console.error('hookHasCss method not yet implemented.', { mainTree })
+    console.error('[VariantTreeMerger] hookHasCss method not yet implemented.', { mainTree })
     return mainTree
   }
 
   protected getSubtreeConditionals(mainTree: TreeNode): string[] {
-    console.error('getSubtreeConditionals method not yet implemented.', { mainTree })
+    console.error('[VariantTreeMerger] getSubtreeConditionals method not yet implemented.', { mainTree })
     return []
   }
 }

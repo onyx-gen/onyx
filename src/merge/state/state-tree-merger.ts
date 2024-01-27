@@ -5,8 +5,8 @@ import StateDataMerger from './state-data-merger'
 
 class StateTreeMerger extends AbstractTreeMerger {
   constructor(
-    private state: string, // e.g. 'default', 'hover', 'focus' or 'active'
-    private previousStates: string[] = [],
+    private readonly state: string, // e.g. 'default', 'hover', 'focus' or 'active'
+    private readonly previousStates: string[] = [],
   ) {
     const dataMerger = new StateDataMerger(state)
     super(dataMerger)
