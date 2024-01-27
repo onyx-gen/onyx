@@ -11,70 +11,47 @@ import {
 } from '../src/css'
 
 describe('css', () => {
-  describe('translate variant css', () => {
-    it('does not use parentheses for single class', () => {
-      const variantCSS: VariantCSS = {
-        variant: 'hover',
-        css: [
-          new Set(['bg-red']),
-        ],
-      }
+  describe('translateVariantCSS', () => {
+    const singleClassVariantCSS: VariantCSS = {
+      variant: 'hover',
+      css: [new Set(['bg-red'])],
+    }
 
-      const translated = 'hover:bg-red'
+    const multiClassVariantCSS: VariantCSS = {
+      variant: 'hover',
+      css: [new Set(['bg-red', 'px-4'])],
+    }
 
-      expect(translateVariantCSS(variantCSS)).toBe(translated)
+    const complexVariantCSS: VariantCSS = {
+      css: [
+        new Set(['bg-red', 'px-4']),
+        {
+          variant: 'hover',
+          css: [new Set(['bg-blue', 'px-8'])],
+        },
+        {
+          variant: 'focus',
+          css: [
+            new Set(['bg-green', 'px-12']),
+            {
+              variant: 'disabled',
+              css: [new Set(['bg-gray-300'])],
+            },
+          ],
+        },
+      ],
+    }
+
+    it('translates single class without parentheses', () => {
+      expect(translateVariantCSS(singleClassVariantCSS)).toBe('hover:bg-red')
     })
 
-    it('uses parentheses for multiple classes', () => {
-      const variantCSS1: VariantCSS = {
-        variant: 'hover',
-        css: [
-          new Set(['bg-red', 'px-4']),
-        ],
-      }
-
-      const variantCSS2: VariantCSS = {
-        variant: 'hover',
-        css: [
-          new Set(['bg-red']),
-          new Set(['px-4']),
-        ],
-      }
-
-      const translated = 'hover:(bg-red px-4)'
-
-      expect(translateVariantCSS(variantCSS1)).toBe(translated)
-      expect(translateVariantCSS(variantCSS2)).toBe(translated)
+    it('translates multiple classes with parentheses', () => {
+      expect(translateVariantCSS(multiClassVariantCSS)).toBe('hover:(bg-red px-4)')
     })
 
-    it('translates variant css', () => {
-      const variantCSS: VariantCSS = {
-        css: [
-          new Set(['bg-red', 'px-4']),
-          {
-            variant: 'hover',
-            css: [
-              new Set(['bg-blue', 'px-8']),
-            ],
-          },
-          {
-            variant: 'focus',
-            css: [
-              new Set(['bg-green', 'px-12']),
-              {
-                variant: 'disabled',
-                css: [
-                  new Set(['bg-gray-300']),
-                ],
-              },
-            ],
-          },
-        ],
-      }
-
-      const translated = 'bg-red px-4 hover:(bg-blue px-8) focus:(bg-green px-12 disabled:bg-gray-300)'
-
-      expect(translateVariantCSS(variantCSS)).toBe(translated)
+    it('translates nested variant CSS structures', () => {
+      expect(translateVariantCSS(complexVariantCSS)).toBe('bg-red px-4 hover:(bg-blue px-8) focus:(bg-green px-12 disabled:bg-gray-300)')
     })
   })
 
