@@ -1,4 +1,5 @@
 import type { ContainerNodeData, TreeNode } from '../../interfaces'
+import { conditionalTree } from '../utils'
 import AbstractTreeMerger from './../tree-merger'
 import VariantDataMerger from './variant-data-merger'
 
@@ -13,8 +14,15 @@ class VariantTreeMerger extends AbstractTreeMerger {
   }
 
   protected diverge(tree1: TreeNode, tree2: TreeNode): TreeNode {
-    console.error('diverge method not yet implemented.', { tree1, tree2 })
-    return tree1
+    return {
+      data: {
+        type: 'container',
+      },
+      children: [
+        conditionalTree(tree1, `!${this.variant}`),
+        conditionalTree(tree2, this.variant),
+      ],
+    }
   }
 
   protected createConflictContainerNode(node1: TreeNode, node2: TreeNode): TreeNode {
