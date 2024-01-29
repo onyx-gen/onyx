@@ -1,3 +1,5 @@
+import type { TreeNode } from '../interfaces'
+
 export interface GroupedComponentCollection<T extends ComponentProps> {
   [key: string]: {
     component: ComponentNode
@@ -29,4 +31,8 @@ export type SinglePropertyObject = {
   }
 }[keyof ExcludedStateProps]
 
-export interface Permutation { [key: string]: string }
+export interface VariantPermutation { [key: string]: string }
+
+export type VariantKey = string
+
+export type VariantTrees = { permutation: VariantPermutation, tree: TreeNode | null }[]

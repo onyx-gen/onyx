@@ -1,11 +1,19 @@
 import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, TreeNode } from '../interfaces'
 import { UnocssBuilder } from '../builder/unocss-builder'
+import type { VariantKey, VariantPermutation } from '../set/types'
+import { variantKey } from '../merge/utils'
 
 /**
  * Class to generate a abstract tree structure from a Figma node.
  * The tree structure is used to generate HTML code.
  */
 class FigmaNodeParser {
+  constructor(private readonly variantPermutation: VariantPermutation = { default: 'default' }) {}
+
+  private get variant(): VariantKey {
+    return variantKey(this.variantPermutation)
+  }
+
   /**
    * Public method to initiate parsing of the Figma node and its subtree.
    * This method serves as the core of the tree traversal logic.
@@ -91,7 +99,7 @@ class FigmaNodeParser {
   private createTextNode(node: TextNode, css: Set<string>): TreeNode {
     const parentNodeData: ContainerNodeData = {
       type: 'container',
-      css: { css: [css] },
+      css: { [this.variant]: { css: [css] } },
     }
     const childNodeData: TextNodeData = { type: 'text', text: node.characters }
 
@@ -108,7 +116,7 @@ class FigmaNodeParser {
   private createContainerNode(node: SceneNode, css: Set<string>, hasChildren: boolean): TreeNode {
     const data: ContainerNodeData = {
       type: 'container',
-      css: { css: [css] },
+      css: { [this.variant]: { css: [css] } },
     }
     const treeNode: TreeNode = { data, children: [] }
 

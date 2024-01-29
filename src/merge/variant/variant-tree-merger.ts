@@ -1,16 +1,18 @@
 import type { ContainerNodeData, TreeNode } from '../../interfaces'
-import { conditionalTree } from '../utils'
+import { conditionalTree, variantKey } from '../utils'
+import type { VariantKey, VariantPermutation } from '../../set/types'
 import AbstractTreeMerger from './../tree-merger'
 import VariantDataMerger from './variant-data-merger'
 
 class VariantTreeMerger extends AbstractTreeMerger {
-  constructor(
-    // For example: `variant-primary`, `variant-secondary` or `selected-true`, `selected-false`
-    private readonly variant: string,
-  ) {
-    console.log('Constructed VariantTreeMerger', { variant })
-    const dataMerger = new VariantDataMerger(variant)
+  constructor(private readonly variantPermutation: VariantPermutation) {
+    console.log('Constructed VariantTreeMerger', { variantPermutation })
+    const dataMerger = new VariantDataMerger(variantPermutation)
     super(dataMerger)
+  }
+
+  private get variant(): VariantKey {
+    return variantKey(this.variantPermutation)
   }
 
   protected diverge(tree1: TreeNode, tree2: TreeNode): TreeNode {
@@ -43,9 +45,8 @@ class VariantTreeMerger extends AbstractTreeMerger {
     console.error('[VariantTreeMerger] hookHasNotSubtreeChild method not yet implemented.', { superTree })
   }
 
-  protected hookHasCss(mainTree: TreeNode<ContainerNodeData>): TreeNode {
+  protected hookHasCss(mainTree: TreeNode<ContainerNodeData>): void {
     console.error('[VariantTreeMerger] hookHasCss method not yet implemented.', { mainTree })
-    return mainTree
   }
 
   protected getSubtreeConditionals(mainTree: TreeNode): string[] {

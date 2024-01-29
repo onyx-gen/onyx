@@ -4,7 +4,7 @@ import type {
   TreeNodeData,
 } from '../interfaces'
 import { createIndent, entries } from '../utils'
-import { translateVariantCSS } from '../css'
+import { translateContainerNodeCSSData } from '../css'
 
 interface Attributes { [key: string]: string | { [key: string]: string } }
 
@@ -24,7 +24,7 @@ class HTMLGenerator {
         // Only add 'class' property if css is not undefined
         const attrs: { [key: string]: string } = {}
         if (treeNode.data.css)
-          attrs.class = translateVariantCSS(treeNode.data.css) // TODO MF: This is a temporary solution to translate the CSS to a string. We need to find a better way to handle this.
+          attrs[':class'] = JSON.stringify(translateContainerNodeCSSData(treeNode.data.css)).replaceAll('"', '\'')
 
         return attrs
       },

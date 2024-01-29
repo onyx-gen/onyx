@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import type { VariantCSS } from '../src/interfaces'
+import type { ContainerNodeCSSData, VariantCSS } from '../src/interfaces'
 import {
   appendSetToVariantCSS,
   appendToVariantCSS,
   calculateVariantCSSDifference,
   calculateVariantCSSUnion,
+  translateContainerNodeCSSData,
   translateVariantCSS,
   wrapInVariant,
   wrapInVariants,
@@ -52,6 +53,26 @@ describe('css', () => {
 
     it('translates nested variant CSS structures', () => {
       expect(translateVariantCSS(complexVariantCSS)).toBe('bg-red px-4 hover:(bg-blue px-8) focus:(bg-green px-12 disabled:bg-gray-300)')
+    })
+  })
+
+  describe('translateContainerNodeCSSData', () => {
+    it('translates variant CSS data', () => {
+      const data: ContainerNodeCSSData = {
+        primary: {
+          css: [new Set(['bg-red'])],
+        },
+        secondary: {
+          css: [new Set(['bg-gray-300'])],
+        },
+      }
+
+      const translated = {
+        primary: 'bg-red',
+        secondary: 'bg-gray-300',
+      }
+
+      expect(translateContainerNodeCSSData(data)).toEqual(translated)
     })
   })
 

@@ -76,8 +76,7 @@ abstract class AbstractTreeMerger implements ITreeMerger {
 
     mainTree.data.if = hasSubtreeSibling || !hasSubtreeChild ? extendedConditionals : []
 
-    // TODO MF: Optimize this and create a function that tests whether ContainerNodeData has CSS
-    if ('css' in mainData && mainData.css && mainData.css.css.length > 0)
+    if ('css' in mainData)
       this.hookHasCss(mainTree as TreeNode<ContainerNodeData>)
 
     return mainTree
@@ -204,7 +203,7 @@ abstract class AbstractTreeMerger implements ITreeMerger {
   protected abstract hookHasNotSubtreeChild(superTree: TreeNode): void
 
   // TODO MF: Documentation
-  protected abstract hookHasCss(mainTree: TreeNode<ContainerNodeData>): TreeNode
+  protected abstract hookHasCss(mainTree: TreeNode<ContainerNodeData>): void
 
   // TODO MF: Documentation
   protected abstract getSubtreeConditionals(mainTree: TreeNode): string[]

@@ -1,5 +1,7 @@
-import type { VariantCSS } from './interfaces'
+import type { ContainerNodeCSSData, VariantCSS } from './interfaces'
 import { difference } from './set/utils'
+import type { VariantKey } from './set/types'
+import { entries } from './utils'
 
 /**
  * Translates a VariantCSS object into a string representation.
@@ -18,6 +20,26 @@ export function translateVariantCSS(variantCSS: VariantCSS): string {
   const requiresParentheses = translated.includes(' ') && variant !== undefined
 
   return `${variant ? `${variant}:` : ''}${requiresParentheses ? '(' : ''}${translated}${requiresParentheses ? ')' : ''}`
+}
+
+/**
+ * Translates the CSS data of a container node into a record structure where each pair represents a variant
+ * and each value is a CSS class string representation of the corresponding VariantCSS object.
+ *
+ * @param data - The ContainerNodeCSSData to be translated. It is an object where each key is a
+ *               VariantKey and each value is a VariantCSS object. This structure represents the
+ *               CSS data associated with a container node, with support for various variants.
+ * @returns A record (object) where each key is a VariantKey and each value is a string
+ *          representation of the corresponding VariantCSS object. This record is a flat
+ *          representation of the input CSS data, with each variant's CSS stringified and
+ *          appropriately formatted.
+ */
+export function translateContainerNodeCSSData(data: ContainerNodeCSSData): Record<VariantKey, string> {
+  return Object.fromEntries(
+    entries(data).map(([variant, variantCSS]) => {
+      return [variant, translateVariantCSS(variantCSS)]
+    }),
+  )
 }
 
 // Type predicate to check if an item is VariantCSS

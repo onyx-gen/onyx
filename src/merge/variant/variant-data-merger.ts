@@ -1,11 +1,10 @@
 import type { ContainerNodeData, IconNodeData, InstanceNodeData } from '../../interfaces'
 import AbstractDataMerger from '../data-merger'
+import type { VariantPermutation } from '../../set/types'
 
 class VariantDataMerger extends AbstractDataMerger {
-  constructor(
-    // For example: `variant-primary`, `variant-secondary` or `selected-true`, `selected-false`
-    private readonly variant: string,
-  ) {
+  constructor(private readonly variantPermutation: VariantPermutation) {
+    console.log('Constructed VariantDataMerger', { variantPermutation })
     super()
   }
 

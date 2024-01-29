@@ -8,35 +8,44 @@ import type {
   ComponentCollection,
   ComponentPropsWithState,
   GroupedComponentCollection,
-  Permutation,
   SinglePropertyObject,
+  VariantKey,
+  VariantPermutation,
+  VariantTrees,
 } from './types'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
 class ComponentSetProcessor {
-  private figmaNodeParser = new FigmaNodeParser()
   private htmlGenerator = new HTMLGenerator()
 
-  // Accumulated parsed trees for each permutation
-  private treesForPermutations: { [key: string]: TreeNode | null } = {}
-
-  private htmls: string[] = []
-
-  /**
-   * Processes a ComponentSetNode and generates HTML code.
-   * This method orchestrates the parsing of Figma nodes, handling of component properties,
-   * and HTML generation.
-   *
-   * @param node - The ComponentSetNode to process.
-   * @returns The generated HTML string.
-   */
-  public process(node: ComponentSetNode): this {
+  public process(node: ComponentSetNode): string {
+    // TODO MF: componentCollectionGroupedByState should be a class property
     const [permutations, componentCollectionGroupedByState]
       = this.calculatePermutations(node)
 
-    this.processWithPermutationsOrAsIs(permutations, componentCollectionGroupedByState)
+    if (permutations.length === 0)
+      throw new Error('[ComponentSetProcessor] Handling of components without permutations not yet implemented.')
 
-    return this
+    const variantTrees: VariantTrees = permutations.map((permutation) => {
+      const stateMergedTree = this.processPermutation(permutation, componentCollectionGroupedByState)
+
+      return {
+        permutation,
+        tree: stateMergedTree,
+      }
+    })
+
+    const componentSetTree = this.mergeVariantTrees(variantTrees)
+
+    return this.generateHTML(componentSetTree)
+  }
+
+  // TODO MF: Documentation
+  private generateHTML(tree: TreeNode | null): string {
+    if (!tree)
+      return ''
+
+    return this.htmlGenerator.generate(tree)
   }
 
   /**
@@ -50,66 +59,16 @@ class ComponentSetProcessor {
    *          and the second element is the collection of components grouped by their state property.
    */
   private calculatePermutations(node: ComponentSetNode): [
-    Permutation[],
+    VariantPermutation[],
     GroupedComponentCollection<ComponentPropsWithState>,
   ] {
     const componentCollection = this.mapComponentsToProperties(node)
     const componentCollectionWithState = this.filterComponentsWithState(componentCollection)
     const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
-    const permutations: Permutation[] = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
+    const permutations: VariantPermutation[] = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
     return [permutations, componentCollectionGroupedByState]
-  }
-
-  /**
-   * Processes the components with permutations if available, or continues with the processing as is.
-   * This method determines whether permutations exist and accordingly processes each permutation or
-   * defaults to processing the components without permutations.
-   *
-   * @param permutations - An array of permutations of property values.
-   * @param groupedCollection - A collection of components grouped by a state property.
-   */
-  private processWithPermutationsOrAsIs(
-    permutations: Permutation[],
-    groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
-  ): void {
-    if (permutations.length === 0) {
-      this.processAsIs(groupedCollection)
-    }
-    else {
-      permutations.forEach((permutation) => {
-        this.processPermutation(permutation, groupedCollection)
-      })
-      this.mergeAndGenerateHTMLFromPermutations()
-    }
-  }
-
-  /**
-   * Processes the components using the existing variant structure without any permutations.
-   * This method is used when there are no permutations available, thereby using the components
-   * as they are originally structured.
-   *
-   * @param groupedCollection - A collection of components grouped by a state property.
-   */
-  private processAsIs(
-    groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
-  ): void {
-    const variants = Object.fromEntries(
-      entries(groupedCollection).map(([state, collection]) => ([state, collection[0].component])),
-    )
-    this.processVariants(variants)
-  }
-
-  /**
-   * Retrieves the generated HTML as a single string.
-   * This method combines the HTML strings for all processed permutations into one string.
-   * Each permutation's HTML is separated by two newline characters for clear separation.
-   *
-   * @returns A single string containing the combined HTML of all processed permutations.
-   */
-  public getHTML(): string {
-    return this.htmls.join('\n\n')
   }
 
   /**
@@ -181,9 +140,9 @@ class ComponentSetProcessor {
    * @param groupedProperties - An object with property names as keys and arrays of possible values as values.
    * @returns An array of objects, each representing a unique permutation of property values.
    */
-  private generatePropertyPermutations(groupedProperties: { [key: string]: string[] }): Permutation[] {
+  private generatePropertyPermutations(groupedProperties: { [key: string]: string[] }): VariantPermutation[] {
     // Initialize an array to store the permutations
-    let permutations: Permutation[] = [{}]
+    let permutations: VariantPermutation[] = [{}]
 
     // Iterate through each property key
     Object.keys(groupedProperties).forEach((key) => {
@@ -214,7 +173,7 @@ class ComponentSetProcessor {
    *          where each key is a state and each value is the corresponding ComponentNode or undefined.
    */
   private findVariantsForPermutation(
-    permutation: Permutation,
+    permutation: VariantPermutation,
     groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
   ): { [key: string]: ComponentNode | undefined } {
     const permutationKey = Object.keys(permutation)[0]
@@ -237,18 +196,16 @@ class ComponentSetProcessor {
    * @param groupedCollection - A collection of components grouped by a state property.
    */
   private processPermutation(
-    permutation: Permutation,
+    permutation: VariantPermutation,
     groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
-  ): void {
+  ): TreeNode | null {
     const variants: { [p: string]: ComponentNode | undefined } = this.findVariantsForPermutation(permutation, groupedCollection)
-    const treesForPermutationByState = this.parseVariantsToTrees(variants)
-
-    const treeKey = ComponentSetProcessor.computeTreeKeyFromPermutation(permutation)
-    this.treesForPermutations[treeKey] = this.mergeTreesBasedOnStates(treesForPermutationByState)
+    const treesForPermutationByState = this.parseVariantsToTrees(variants, permutation)
+    return this.mergeTreesBasedOnStates(treesForPermutationByState, permutation)
   }
 
   /**
-   * Computes a unique key for a tree based on a given permutation of properties.
+   * Computes a unique key for a given permutation of properties (called a `variant`).
    * This method constructs the key by concatenating each property's key and value pair
    * from the permutation, separated by a hyphen, and then joining all pairs with an underscore.
    * This key is used to uniquely identify a tree configuration derived from a specific permutation.
@@ -256,7 +213,7 @@ class ComponentSetProcessor {
    * @param permutation - An object representing a permutation of property values.
    * @returns A string representing the unique key for the tree derived from the permutation.
    */
-  private static computeTreeKeyFromPermutation(permutation: Permutation): string {
+  private static computeVariantKey(permutation: VariantPermutation): VariantKey {
     return Object.entries(permutation).map(
       ([key, value]) => `${key}-${value}`,
     ).join('_')
@@ -266,64 +223,22 @@ class ComponentSetProcessor {
    * Merges all the accumulated trees from different permutations and generates HTML.
    * It iterates over all stored trees, merges them, and generates the final HTML.
    */
-  private mergeAndGenerateHTMLFromPermutations(): void {
-    const trees = Object.entries(this.treesForPermutations)
-    if (trees.length === 0)
-      throw new Error('No trees found for permutations')
+  private mergeVariantTrees(variantTrees: VariantTrees): TreeNode | null {
+    let mergedTree: TreeNode | null = null
 
-    // TODO MF: Handle case where no tree is found
-    if (!trees[0][1])
-      throw new Error('No default tree found for permutations')
-
-    let mergedVariantsTree: TreeNode = trees[0][1]
-
-    // variantKey is a string representing the unique key for a variant derived from a specific permutation
-    // For example: `variant-primary`, `variant-secondary` or `selected-true`, `selected-false
-    trees.slice(1).forEach(([variantKey, tree]) => {
+    variantTrees.forEach(({ permutation, tree }) => {
       if (tree) {
-        const variantTreeMerger = new VariantTreeMerger(variantKey)
-        mergedVariantsTree = variantTreeMerger.merge(mergedVariantsTree, tree)
+        const variantTreeMerger = new VariantTreeMerger(permutation)
+        mergedTree = variantTreeMerger.merge(mergedTree || tree, tree)
       }
     })
 
-    if (!mergedVariantsTree) {
-      console.error('No valid merged variants tree found after merging all permutations')
-      return
-    }
-
-    const mergedHTML = this.htmlGenerator.generate(mergedVariantsTree)
-    this.htmls.push(mergedHTML)
-  }
-
-  /**
-   * Processes the variants of a component set based on the given permutations.
-   * It generates a tree representation for each variant, merges these trees based on their states,
-   * and generates HTML for the merged tree. The HTML is then stored for later retrieval.
-   *
-   * @param variants - An object representing the variants found for a given permutation,
-   *                   where each key is a state and each value is the corresponding ComponentNode or undefined.
-   * @param permutation - An optional object representing a permutation of property values.
-   *                      Used for generating variant-specific comments in the HTML output.
-   */
-  private processVariants(
-    variants: { [key: string]: ComponentNode | undefined },
-    permutation?: Permutation,
-  ): void {
-    const treesForPermutationByState = this.parseVariantsToTrees(variants)
-    const mergedTree = this.mergeTreesBasedOnStates(treesForPermutationByState)
-
     if (!mergedTree) {
-      console.error('No valid merged tree found for component set')
-      return
+      console.error('No valid merged variants tree found after merging all permutations')
+      return null
     }
 
-    let variantHTML = ''
-
-    if (permutation)
-      variantHTML += `<!-- Variant: ${JSON.stringify(permutation)} -->\n`
-
-    variantHTML += this.htmlGenerator.generate(mergedTree)
-    this.htmls.push(variantHTML)
+    return mergedTree
   }
 
   /**
@@ -334,11 +249,15 @@ class ComponentSetProcessor {
    */
   private parseVariantsToTrees(
     variants: { [key: string]: ComponentNode | undefined },
+    permutation: VariantPermutation,
   ): { [key: string]: TreeNode | null } {
     return Object.fromEntries(
       entries(variants)
         .filter(([, component]) => component !== undefined)
-        .map(([state, component]) => [state, this.figmaNodeParser.parse(component!)]),
+        .map(([state, component]) => {
+          const figmaNodeParser = new FigmaNodeParser(permutation)
+          return [state, figmaNodeParser.parse(component!)]
+        }),
     )
   }
 
@@ -346,10 +265,12 @@ class ComponentSetProcessor {
    * Merges trees based on their states to create a single tree representing all states.
    *
    * @param trees - An object with states as keys and the corresponding TreeNode or undefined.
+   * @param permutation - An object representing a permutation of property values.
    * @returns The merged TreeNode representing all states, or undefined if no default state is found.
    */
   private mergeTreesBasedOnStates(
     trees: { [key: string]: TreeNode | null },
+    permutation: VariantPermutation,
   ): TreeNode | null {
     let mergedTree = trees.default
     const previousStates = ['default']
@@ -359,7 +280,7 @@ class ComponentSetProcessor {
 
     Object.entries(trees).forEach(([state, tree]) => {
       if (tree && state !== 'default') {
-        const treeMerger = new StateTreeMerger(state, previousStates)
+        const treeMerger = new StateTreeMerger(state, permutation, previousStates)
         mergedTree = treeMerger.merge(mergedTree!, tree)
         previousStates.push(state)
       }
