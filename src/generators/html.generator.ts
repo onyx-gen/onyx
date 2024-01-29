@@ -22,9 +22,9 @@ class HTMLGenerator {
       tag: 'div',
       attrs: (treeNode) => {
         // Only add 'class' property if css is not undefined
-        const attrs: { [key: string]: string } = {}
+        const attrs: Attributes = {}
         if (treeNode.data.css)
-          attrs[':class'] = JSON.stringify(translateContainerNodeCSSData(treeNode.data.css)).replaceAll('"', '\'')
+          attrs.class = translateContainerNodeCSSData(treeNode.data.css)
 
         return attrs
       },
@@ -65,6 +65,7 @@ class HTMLGenerator {
     const tag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(treeNode as any) : nodeMapping.tag
     const attrs = nodeMapping.attrs ? nodeMapping.attrs(treeNode as any) : {}
     const hasAttrs = Object.keys(attrs).length > 0 && Object.values(attrs).some(val => !!val)
+    const hasAttrsObject = hasAttrs && Object.values(attrs).some(val => typeof val === 'object')
     const hasChildren = treeNode.children && treeNode.children.length > 0
 
     const conditionals = nodeMapping.if ? nodeMapping.if(treeNode as any) : undefined
@@ -76,7 +77,19 @@ class HTMLGenerator {
     }
     else if (tag) {
       // Start tag construction for non-text nodes
-      html += `<${tag}${hasAttrs ? ` ${this.attrsToString(attrs, depth)}` : ''}`
+      html += `<${tag}`
+
+      if (hasAttrs) {
+        if (hasAttrsObject)
+          html += `\n${createIndent(depth + 1)}`
+        else
+          html += ' '
+
+        html += this.attrsToString(attrs, depth)
+
+        if (hasAttrsObject)
+          html += `\n${indent}`
+      }
 
       if (hasConditionals)
         html += ` v-if="${conditionals}"`
@@ -142,8 +155,10 @@ class HTMLGenerator {
         return `${key}="${value}"`
       }
       else {
-        const attrValueString = entries(value).map(([key, value]) => `${key}: ${value}`).join(', ')
-        return `:${key}="${attrValueString}"`
+        const pairValue = JSON.stringify(value, null, 2)
+          .replaceAll('"', '\'')
+          .replaceAll('\n', `\n${createIndent(depth + 1)}`)
+        return `:${key}="${pairValue}"`
       }
     })
 
