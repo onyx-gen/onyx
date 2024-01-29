@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash-es'
 import type { ContainerNodeCSSData, VariantCSS } from './interfaces'
 import { difference } from './set/utils'
 import type { VariantKey } from './set/types'
@@ -64,7 +65,7 @@ export function calculateVariantCSSDifference(variantCSS1: VariantCSS | undefine
     return { css: [] }
 
   if (!variantCSS2)
-    return variantCSS1
+    return makeCopy(variantCSS1)!
 
   function diff(css1: VariantCSS['css'], css2: VariantCSS['css']): VariantCSS['css'] {
     const diffCSS: VariantCSS['css'] = []
@@ -97,7 +98,70 @@ export function calculateVariantCSSDifference(variantCSS1: VariantCSS | undefine
     return diffCSS
   }
 
-  return { css: diff(variantCSS1.css, variantCSS2.css) }
+  const copyVariantCSS1 = makeCopy(variantCSS1)!
+  const copyVariantCSS2 = makeCopy(variantCSS2)!
+  return { css: diff(copyVariantCSS1.css, copyVariantCSS2.css) }
+}
+
+function makeCopy(variantCSS: VariantCSS | undefined): VariantCSS | undefined {
+  if (!variantCSS)
+    return undefined
+
+  return cloneDeep(variantCSS)
+}
+
+/**
+ * Calculates the symmetric difference between two VariantCSS objects.
+ * The symmetric difference is a set of CSS classes that are present in either `variantCSS1` or `variantCSS2` but not in both.
+ * This method effectively combines the unique elements from both VariantCSS objects, excluding the elements that are common to both.
+ * The process is recursive for nested VariantCSS objects and CSS class sets.
+ *
+ * - If either input is undefined, the method treats it as an empty VariantCSS.
+ * - The symmetric difference is computed by combining the differences between `variantCSS1` and `variantCSS2` and vice versa.
+ *
+ * @param variantCSS1 - The first VariantCSS object or undefined.
+ * @param variantCSS2 - The second VariantCSS object or undefined.
+ * @returns A VariantCSS object representing the symmetric difference between the input VariantCSS objects.
+ */
+export function calculateVariantCSSSymmetricDifference(
+  variantCSS1: VariantCSS | undefined,
+  variantCSS2: VariantCSS | undefined,
+): VariantCSS {
+  const copyVariantCSS1: VariantCSS | undefined = makeCopy(variantCSS1)
+  const copyVariantCSS2: VariantCSS | undefined = makeCopy(variantCSS2)
+
+  // Diff(1,2) + Diff(2,1)
+  return calculateVariantCSSUnion(
+    calculateVariantCSSDifference(copyVariantCSS1, copyVariantCSS2),
+    calculateVariantCSSDifference(copyVariantCSS2, copyVariantCSS1),
+  )
+}
+
+/**
+ * Calculates the intersection of two VariantCSS objects.
+ * The intersection is a set of CSS classes that are present in both `variantCSS1` and `variantCSS2`.
+ * This method finds the common CSS classes and structure between the two VariantCSS objects.
+ * The process is recursive for nested VariantCSS objects and CSS class sets.
+ *
+ * - If either input is undefined, the method treats it as an empty VariantCSS.
+ * - The intersection is computed by first merging the CSS classes of both VariantCSS objects and then subtracting the symmetric difference.
+ *
+ * @param variantCSS1 - The first VariantCSS object or undefined.
+ * @param variantCSS2 - The second VariantCSS object or undefined.
+ * @returns A VariantCSS object representing the intersection between the input VariantCSS objects.
+ */
+export function calculateVariantCSSIntersection(variantCSS1: VariantCSS | undefined, variantCSS2: VariantCSS | undefined): VariantCSS {
+  const copyVariantCSS1: VariantCSS | undefined = makeCopy(variantCSS1)
+  const copyVariantCSS2: VariantCSS | undefined = makeCopy(variantCSS2)
+
+  const union12 = calculateVariantCSSUnion(copyVariantCSS1, copyVariantCSS2)
+  const symmetricDifference12 = calculateVariantCSSSymmetricDifference(copyVariantCSS1, copyVariantCSS2)
+
+  // Union(1,2) - SymDiff(1,2)
+  return calculateVariantCSSDifference(
+    union12,
+    symmetricDifference12,
+  )
 }
 
 /**
@@ -113,26 +177,33 @@ export function calculateVariantCSSDifference(variantCSS1: VariantCSS | undefine
  */
 export function calculateVariantCSSUnion(variantCSS1: VariantCSS | undefined, variantCSS2: VariantCSS | undefined): VariantCSS {
   if (!variantCSS1)
-    return variantCSS2!
+    return makeCopy(variantCSS2) || { css: [] }
   if (!variantCSS2)
-    return variantCSS1
+    return makeCopy(variantCSS1)!
+
+  const copyVariantCSS1 = makeCopy(variantCSS1)!
+  const copyVariantCSS2 = makeCopy(variantCSS2)!
 
   // Merge CSS sets if the variant is undefined or both variants match
-  if (variantCSS1.variant === variantCSS2.variant) {
-    return {
-      variant: variantCSS1.variant,
-      css: mergeCSSArrays(variantCSS1.css, variantCSS2.css),
+  if (copyVariantCSS1.variant === copyVariantCSS2.variant) {
+    const result: VariantCSS = {
+      css: mergeCSSArrays(copyVariantCSS1.css, copyVariantCSS2.css),
     }
+
+    if (copyVariantCSS1.variant !== undefined)
+      result.variant = copyVariantCSS1.variant
+
+    return result
   }
 
   // Handle distinct variant cases
   const result: VariantCSS = { css: [] }
-  if (variantCSS1.variant === undefined)
-    result.css = [...variantCSS1.css, variantCSS2]
-  else if (variantCSS2.variant === undefined)
-    result.css = [...variantCSS2.css, variantCSS1]
+  if (copyVariantCSS1.variant === undefined)
+    result.css = [...copyVariantCSS1.css, copyVariantCSS2]
+  else if (copyVariantCSS2.variant === undefined)
+    result.css = [...copyVariantCSS2.css, copyVariantCSS1]
   else
-    result.css = [variantCSS1, variantCSS2]
+    result.css = [copyVariantCSS1, copyVariantCSS2]
 
   return result
 }
@@ -145,10 +216,34 @@ export function calculateVariantCSSUnion(variantCSS1: VariantCSS | undefined, va
  * @returns A merged array of CSS sets.
  */
 function mergeCSSArrays(cssArray1: (VariantCSS | Set<string>)[], cssArray2: (VariantCSS | Set<string>)[]): (VariantCSS | Set<string>)[] {
-  // This implementation needs to handle merging of Set<string> elements and recursive merging of VariantCSS objects
-  // For simplicity, this example focuses on merging Set<string> elements only
-  // TODO MF: Implement recursive merging of VariantCSS objects
-  return [...cssArray1, ...cssArray2]
+  const merged: (VariantCSS | Set<string>)[] = [...cssArray1]
+
+  // TODO MF: Do some refactoring work here
+  cssArray2.forEach((css2) => {
+    if (isVariantCSS(css2)) {
+      const matchingVariant = merged.find(css1 =>
+        (css1 as VariantCSS).variant === css2.variant) as VariantCSS | undefined
+
+      if (matchingVariant)
+        matchingVariant.css = mergeCSSArrays(matchingVariant.css, css2.css)
+      else
+        merged.push(css2)
+    }
+    else {
+      const set1Index = merged.findIndex(css1 => !isVariantCSS(css1))
+      if (set1Index !== -1) {
+        merged[set1Index] = new Set([
+          ...(merged[set1Index] as Set<string>),
+          ...(css2 as Set<string>),
+        ])
+      }
+      else {
+        merged.push(css2)
+      }
+    }
+  })
+
+  return merged
 }
 
 /**
@@ -162,21 +257,23 @@ function mergeCSSArrays(cssArray1: (VariantCSS | Set<string>)[], cssArray2: (Var
  * @returns A new VariantCSS object wrapped with the given variant name.
  */
 export function wrapInVariant(variantName: string, variantCSS: VariantCSS | undefined): VariantCSS {
-  if (!variantCSS)
-    variantCSS = { css: [] }
+  let copyVariantCSS = makeCopy(variantCSS)
+
+  if (!copyVariantCSS)
+    copyVariantCSS = { css: [] }
 
   // If the variantCSS already has a variant, wrap it inside the new variant.
-  if (variantCSS.variant) {
+  if (copyVariantCSS.variant) {
     return {
       variant: variantName,
-      css: [variantCSS],
+      css: [copyVariantCSS],
     }
   }
 
   // If variantCSS does not have a variant, directly add the variant to it.
   return {
     variant: variantName,
-    css: variantCSS.css,
+    css: copyVariantCSS.css,
   }
 }
 

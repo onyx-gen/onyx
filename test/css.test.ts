@@ -4,6 +4,8 @@ import {
   appendSetToVariantCSS,
   appendToVariantCSS,
   calculateVariantCSSDifference,
+  calculateVariantCSSIntersection,
+  calculateVariantCSSSymmetricDifference,
   calculateVariantCSSUnion,
   translateContainerNodeCSSData,
   translateVariantCSS,
@@ -229,6 +231,60 @@ describe('css', () => {
       expect(calculateVariantCSSDifference(map1, undefined)).toEqual(map1)
     })
 
+    describe('calculateVariantCSSUnion', () => {
+      it('can optimize', () => {
+        const variantCSS1: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4', 'py-6']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8']),
+              ],
+            },
+          ],
+        }
+
+        const variantCSS2: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4', 'py-6']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8', 'py-2']),
+              ],
+            },
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-green', 'px-12']),
+              ],
+            },
+          ],
+        }
+
+        const expectedUnion: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4', 'py-6']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8', 'py-2']),
+              ],
+            },
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-green', 'px-12']),
+              ],
+            },
+          ],
+        }
+
+        expect(calculateVariantCSSUnion(variantCSS1, variantCSS2)).toEqual(expectedUnion)
+      })
+    })
+
     it('calculates the union of the variant css maps', () => {
       const map1: VariantCSS = {
         css: [
@@ -287,8 +343,7 @@ describe('css', () => {
 
       const unionMap1Map2: VariantCSS = {
         css: [
-          new Set(['bg-red']), // directly from map1
-          new Set(['px-4']), // directly from map2
+          new Set(['bg-red', 'px-4']),
         ],
       }
 
@@ -309,10 +364,6 @@ describe('css', () => {
 
       const unionMap1Map4: VariantCSS = {
         css: [
-          // directly from map1
-          new Set(['bg-red']),
-
-          // next two directly from map4
           new Set(['bg-red', 'px-6']),
           {
             variant: 'hover',
@@ -327,6 +378,127 @@ describe('css', () => {
       expect(calculateVariantCSSUnion(map1, map3)).toEqual(unionMap1Map3)
       expect(calculateVariantCSSUnion(map1, map4)).toEqual(unionMap1Map4)
       expect(calculateVariantCSSUnion(map3, map5)).toEqual(unionMap3Map5)
+    })
+
+    describe('calculateVariantCSSSymmetricDifference', () => {
+      it('calculates symmetric difference between two variant CSS objects', () => {
+        const variantCSS1: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8']),
+              ],
+            },
+          ],
+        }
+
+        const variantCSS2: VariantCSS = {
+          css: [
+            new Set(['bg-yellow', 'px-4']),
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-green', 'px-12']),
+              ],
+            },
+          ],
+        }
+
+        const expectedSymmetricDifference: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'bg-yellow']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8']),
+              ],
+            },
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-green', 'px-12']),
+              ],
+            },
+          ],
+        }
+
+        expect(calculateVariantCSSSymmetricDifference(variantCSS1, variantCSS2)).toEqual(expectedSymmetricDifference)
+      })
+
+      it('handles undefined inputs correctly', () => {
+        const variantCSS: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4']),
+          ],
+        }
+
+        expect(calculateVariantCSSSymmetricDifference(variantCSS, undefined)).toEqual(variantCSS)
+        expect(calculateVariantCSSSymmetricDifference(undefined, variantCSS)).toEqual(variantCSS)
+        expect(calculateVariantCSSSymmetricDifference(undefined, undefined)).toEqual({ css: [] })
+      })
+    })
+
+    describe('calculateVariantCSSIntersection', () => {
+      it('calculates intersection between two variant CSS objects', () => {
+        const variantCSS1: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4', 'py-4']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8']),
+              ],
+            },
+          ],
+        }
+
+        const variantCSS2: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4', 'py-6']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8', 'py-2']),
+              ],
+            },
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-green', 'px-12']),
+              ],
+            },
+          ],
+        }
+
+        const expectedIntersection: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8']),
+              ],
+            },
+          ],
+        }
+
+        const intersection = calculateVariantCSSIntersection(variantCSS1, variantCSS2)
+        expect(intersection).toEqual(expectedIntersection)
+      })
+
+      it('handles undefined inputs correctly', () => {
+        const variantCSS: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4']),
+          ],
+        }
+
+        expect(calculateVariantCSSIntersection(variantCSS, undefined)).toEqual({ css: [] })
+        expect(calculateVariantCSSIntersection(undefined, variantCSS)).toEqual({ css: [] })
+        expect(calculateVariantCSSIntersection(undefined, undefined)).toEqual({ css: [] })
+      })
     })
   })
 
