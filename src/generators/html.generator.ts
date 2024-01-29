@@ -4,7 +4,7 @@ import type {
   TreeNodeData,
 } from '../interfaces'
 import { createIndent, entries } from '../utils'
-import { translateContainerNodeCSSData } from '../css'
+import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 
 interface Attributes { [key: string]: string | { [key: string]: string } }
 
@@ -21,10 +21,18 @@ class HTMLGenerator {
     container: {
       tag: 'div',
       attrs: (treeNode) => {
-        // Only add 'class' property if css is not undefined
         const attrs: Attributes = {}
-        if (treeNode.data.css)
-          attrs.class = translateContainerNodeCSSData(treeNode.data.css)
+
+        if (treeNode.data.css) {
+          const length = Object.keys(treeNode.data.css).length
+          if (length === 1) {
+            const variantCSS = Object.values(treeNode.data.css)[0]
+            attrs.class = translateVariantCSS(variantCSS)
+          }
+          else if (length > 1) {
+            attrs.class = translateContainerNodeCSSData(treeNode.data.css)
+          }
+        }
 
         return attrs
       },
