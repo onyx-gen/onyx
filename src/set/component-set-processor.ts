@@ -210,7 +210,7 @@ class ComponentSetProcessor {
   private mergeVariantTrees(variantTrees: VariantTrees): TreeNode | null {
     let mergedTree: TreeNode | null = null
 
-    variantTrees.forEach(({ permutation, tree }) => {
+    variantTrees.reverse().forEach(({ permutation, tree }) => {
       if (tree) {
         const variantTreeMerger = new VariantTreeMerger(permutation)
         mergedTree = variantTreeMerger.merge(mergedTree || tree, tree)
