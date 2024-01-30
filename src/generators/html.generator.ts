@@ -7,7 +7,8 @@ import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import { simplifyConditionalString } from './utils'
 
-interface Attributes { [key: string]: string | { [key: string]: string } }
+type AttributeValue = string | { [key: string]: string }
+interface Attributes { [key: string]: AttributeValue }
 
 type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => Attributes
 type ConditionalFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string | undefined
