@@ -33,7 +33,13 @@ figma.codegen.on('generate', async () => {
 
   if (node.type === 'COMPONENT_SET') {
     const componentSetProcessor = new ComponentSetProcessor()
-    html = componentSetProcessor.process(node)
+
+    try {
+      html = componentSetProcessor.process(node)
+    }
+    catch (error) {
+      console.error(`[UnoCSS-Variables Plugin] Error during component set processing`, error)
+    }
   }
   else {
     const tree = parser.parse(node)
