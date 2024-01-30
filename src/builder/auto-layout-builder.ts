@@ -87,6 +87,46 @@ class AutoLayoutBuilder {
   }
 
   /**
+   * Determines the horizontal padding of the layout, using the design tokens if available.
+   * @private
+   * @returns A string representing the CSS class for horizontal padding.
+   */
+  private getHorizontalPadding(): string {
+    const hasHorizontalPadding = this.autoLayout.horizontalPadding > 0
+
+    if (hasHorizontalPadding) {
+      const tokenValue = this.tokens.get(Properties.horizontalPadding)
+      if (tokenValue === undefined) {
+        console.error('You\'re using the horizontalPadding property, but you haven\'t set the horizontalPadding token.')
+        return `px-[${this.autoLayout.horizontalPadding}px]`
+      }
+      else { return `px-$${tokenValue}` }
+    }
+
+    return ''
+  }
+
+  /**
+   * Determines the horizontal padding of the layout, using the design tokens if available.
+   * @private
+   * @returns A string representing the CSS class for horizontal padding.
+   */
+  private getVerticalPadding(): string {
+    const hasVerticalPadding = this.autoLayout.verticalPadding > 0
+
+    if (hasVerticalPadding) {
+      const tokenValue = this.tokens.get(Properties.verticalPadding)
+      if (tokenValue === undefined) {
+        console.error('You\'re using the verticalPadding property, but you haven\'t set the verticalPadding token.')
+        return `py-[${this.autoLayout.verticalPadding}px]`
+      }
+      else { return `py-$${tokenValue}` }
+    }
+
+    return ''
+  }
+
+  /**
    * Determines the flex property based on the node's relationship to its parent.
    *
    * @returns A string representing the CSS class for flex.
@@ -112,6 +152,8 @@ class AutoLayoutBuilder {
         justifyContent: this.getJustifyContent(),
         alignItems: this.getAlignItems(),
         gap: this.getGap(),
+        horizontalPadding: this.getHorizontalPadding(),
+        verticalPadding: this.getVerticalPadding(),
       })
         .filter(value => value !== ''),
     )
