@@ -96,19 +96,23 @@ class HTMLGenerator {
       html += `<${tag}`
 
       if (hasAttrs) {
-        if (hasAttrsObject)
-          html += `\n${createIndent(depth + 1)}`
-        else
+        if (!hasAttrsObject)
           html += ' '
 
         html += this.attrsToString(attrs, depth)
+      }
+
+      if (hasConditionals) {
+        if (hasAttrsObject)
+          html += `${indent}`
+        else
+          html += ` `
+
+        html += ` v-if="${conditionals}"`
 
         if (hasAttrsObject)
           html += `\n${indent}`
       }
-
-      if (hasConditionals)
-        html += ` v-if="${conditionals}"`
 
       if (hasChildren) {
         // Add children nodes if present
