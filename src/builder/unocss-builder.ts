@@ -112,11 +112,18 @@ export class UnocssBuilder {
 
     const sizingHandlers: TokenHandlers = {
       [Properties.sizing]: () => {
-        this.handleDimension('height', token)
-        this.handleDimension('width', token)
+        this.handleDimension('h', token)
+        this.handleDimension('w', token)
       },
-      [Properties.height]: () => this.handleDimension('height', token),
-      [Properties.width]: () => this.handleDimension('width', token),
+
+      [Properties.height]: () => this.handleDimension('h', token),
+      [Properties.width]: () => this.handleDimension('w', token),
+
+      [Properties.minWidth]: () => this.handleDimension('min-w', token),
+      [Properties.minHeight]: () => this.handleDimension('min-h', token),
+
+      [Properties.maxWidth]: () => this.handleDimension('max-w', token),
+      [Properties.maxHeight]: () => this.handleDimension('max-h', token),
     }
 
     const handlers: TokenHandlers = {
@@ -146,10 +153,10 @@ export class UnocssBuilder {
   /**
    * Handles the dimension attributes for height and width.
    * It adds the appropriate CSS class for the given dimension.
-   * @param dimension The dimension type ('height' or 'width').
+   * @param dimension The dimension type (e.g. 'h' for 'height').
    * @param token The value of the dimension token.
    */
-  private handleDimension(dimension: 'height' | 'width', token: string) {
+  private handleDimension(dimension: 'h' | 'w' | 'min-w' | 'min-h' | 'max-w' | 'max-h', token: string) {
     this.attributes.add(`${dimension[0]}-$${token}`)
   }
 
