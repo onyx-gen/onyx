@@ -76,10 +76,11 @@ class AutoLayoutBuilder {
 
     if (hasGap) {
       const tokenValue = this.tokens.get(Properties.itemSpacing)
-      if (tokenValue === undefined)
+      if (tokenValue === undefined) {
         console.error('You\'re using the gap property, but you haven\'t set the itemSpacing token.')
-      else
-        return `gap-$${tokenValue}`
+        return `gap-[${this.autoLayout.itemSpacing}px]`
+      }
+      else { return `gap-$${tokenValue}` }
     }
 
     return ''
