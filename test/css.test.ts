@@ -76,6 +76,23 @@ describe('css', () => {
 
       expect(translateContainerNodeCSSData(data)).toEqual(translated)
     })
+
+    it('ignores empty variant CSS data', () => {
+      const data: ContainerNodeCSSData = {
+        primary: {
+          css: [new Set(['bg-red'])],
+        },
+        secondary: {
+          css: [],
+        },
+      }
+
+      const translated = {
+        primary: 'bg-red',
+      }
+
+      expect(translateContainerNodeCSSData(data)).toStrictEqual(translated)
+    })
   })
 
   describe('set composition', () => {

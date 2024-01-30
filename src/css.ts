@@ -37,9 +37,11 @@ export function translateVariantCSS(variantCSS: VariantCSS): string {
  */
 export function translateContainerNodeCSSData(data: ContainerNodeCSSData): Record<VariantKey, string> {
   return Object.fromEntries(
-    entries(data).map(([variant, variantCSS]) => {
-      return [variant, translateVariantCSS(variantCSS)]
-    }),
+    entries(data)
+      .filter(([, variantCSS]) => variantCSS.css.length > 0)
+      .map(([variant, variantCSS]) => {
+        return [variant, translateVariantCSS(variantCSS)]
+      }),
   )
 }
 
