@@ -5,6 +5,7 @@ import type {
 } from '../interfaces'
 import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
+import { simplifyConditionalString } from './utils'
 
 interface Attributes { [key: string]: string | { [key: string]: string } }
 
@@ -36,7 +37,10 @@ class HTMLGenerator {
 
         return attrs
       },
-      if: treeNode => treeNode.data.if ? treeNode.data.if.join(' && ') : undefined,
+      if: (treeNode) => {
+        const conditionalString = treeNode.data.if ? treeNode.data.if.join(' && ') : undefined
+        return conditionalString ? simplifyConditionalString(conditionalString) : undefined
+      },
     },
     icon: {
       tag: 'i',
