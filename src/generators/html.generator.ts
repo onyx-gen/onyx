@@ -3,6 +3,7 @@ import type {
   InstanceNodeData,
   TreeNode,
   TreeNodeData,
+  VariantCSS,
 } from '../interfaces'
 import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
@@ -27,12 +28,16 @@ class HTMLGenerator {
         const attrs: Attributes = {}
 
         if (treeNode.data.css) {
-          const defaultVariantCSS = Object.values(treeNode.data.css)[0]
-          attrs.class = translateVariantCSS(defaultVariantCSS)
+          const defaultVariantCSS: VariantCSS | undefined = Object.values(treeNode.data.css)[0]
+
+          if (defaultVariantCSS)
+            attrs.class = translateVariantCSS(defaultVariantCSS)
 
           // Remove empty variant CSS entries
           const filteredEntries = Object.fromEntries(
-            entries(treeNode.data.css).filter(([, value]) => value.css.length > 0),
+            entries(treeNode.data.css)
+              .filter(([, value]) => !!value)
+              .filter(([, value]) => value.css.length > 0),
           )
 
           const length = Object.keys(filteredEntries).length
