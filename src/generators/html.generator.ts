@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash-es'
 import type {
   InstanceNodeData,
   TreeNode,
@@ -27,12 +28,14 @@ class HTMLGenerator {
 
         if (treeNode.data.css) {
           const length = Object.keys(treeNode.data.css).length
-          if (length === 1) {
-            const variantCSS = Object.values(treeNode.data.css)[0]
-            attrs.class = translateVariantCSS(variantCSS)
-          }
-          else if (length > 1) {
-            attrs.class = translateContainerNodeCSSData(treeNode.data.css)
+
+          const defaultVariantCSS = Object.values(treeNode.data.css)[0]
+          attrs.class = translateVariantCSS(defaultVariantCSS)
+
+          if (length > 1) {
+            const clonedCSS = cloneDeep(treeNode.data.css)
+            delete clonedCSS.default
+            attrs[':class'] = translateContainerNodeCSSData(clonedCSS)
           }
         }
 
@@ -171,7 +174,7 @@ class HTMLGenerator {
         const pairValue = JSON.stringify(value, null, 2)
           .replaceAll('"', '\'')
           .replaceAll('\n', `\n${createIndent(depth + 1)}`)
-        return `:${key}="${pairValue}"`
+        return `${key}="${pairValue}"`
       }
     })
 
