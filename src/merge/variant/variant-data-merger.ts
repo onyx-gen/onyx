@@ -104,10 +104,12 @@ class VariantDataMerger extends AbstractDataMerger {
     }
 
     this.getOtherVariantKeys(data1.css).forEach((otherVariantKey, index) => {
-      containerNodeCSSData[otherVariantKey] = variantsCSS[index]
+      if (variantsCSS[index].css.length !== 0)
+        containerNodeCSSData[otherVariantKey] = variantsCSS[index]
     })
 
-    containerNodeCSSData[this.variant] = currentVariantCSS
+    if (currentVariantCSS.css.length !== 0)
+      containerNodeCSSData[this.variant] = currentVariantCSS
 
     return { type: 'container', css: containerNodeCSSData }
   }
