@@ -27,10 +27,15 @@ class HTMLGenerator {
         const attrs: Attributes = {}
 
         if (treeNode.data.css) {
-          const length = Object.keys(treeNode.data.css).length
-
           const defaultVariantCSS = Object.values(treeNode.data.css)[0]
           attrs.class = translateVariantCSS(defaultVariantCSS)
+
+          // Remove empty variant CSS entries
+          const filteredEntries = Object.fromEntries(
+            entries(treeNode.data.css).filter(([, value]) => value.css.length > 0),
+          )
+
+          const length = Object.keys(filteredEntries).length
 
           if (length > 1) {
             const clonedCSS = cloneDeep(treeNode.data.css)
