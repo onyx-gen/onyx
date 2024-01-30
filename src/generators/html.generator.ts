@@ -109,7 +109,7 @@ class HTMLGenerator {
 
       if (hasConditionals) {
         if (hasAttrsObject)
-          html += `${indent}`
+          html += indent
         else
           html += ` `
 
