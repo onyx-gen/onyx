@@ -27,7 +27,7 @@ export function simplifyConditionalString(conditionalStr: string): string {
       // Remove the "-false" suffix and store the base condition name
       const baseCondition = part.substring(conditionStartIndex, part.length - 6)
       // Construct the new condition part by adding "!" to the existing prefix and appending the base condition name
-      return `!${prefix}${baseCondition}`
+      return `!${prefix}${baseCondition}`.replaceAll('!!', '')
     }
     else {
       // If the part does not end with "-true" or "-false", return it unchanged
