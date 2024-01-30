@@ -90,7 +90,9 @@ class HTMLGenerator {
     const hasChildren = treeNode.children && treeNode.children.length > 0
 
     const conditionals = nodeMapping.if ? nodeMapping.if(treeNode as any) : undefined
-    const hasConditionals = conditionals && Object.keys(conditionals).length > 0
+    const hasConditionals = !!(conditionals && Object.keys(conditionals).length > 0)
+
+    const hasMultipleAttrs = (hasAttrs && hasConditionals)
 
     // Handle text nodes separately
     if (treeNode.data.type === 'text') {
@@ -101,21 +103,21 @@ class HTMLGenerator {
       html += `<${tag}`
 
       if (hasAttrs) {
-        if (!hasAttrsObject)
+        if (!hasAttrsObject && !hasMultipleAttrs)
           html += ' '
 
-        html += this.attrsToString(attrs, depth)
+        html += this.attrsToString(attrs, depth, hasConditionals)
       }
 
       if (hasConditionals) {
-        if (hasAttrsObject)
+        if (hasAttrsObject || hasMultipleAttrs)
           html += indent
         else
           html += ` `
 
         html += ` v-if="${conditionals}"`
 
-        if (hasAttrsObject)
+        if (hasAttrsObject || hasMultipleAttrs)
           html += `\n${indent}`
       }
 
@@ -172,9 +174,10 @@ class HTMLGenerator {
    * Converts an attributes object into a string format.
    * @param {object} attrs - The attributes object.
    * @param {number} depth - The current depth in the tree, used for indentation.
+   * @param forceIndentation - Whether to force indentation even if there is only one attribute.
    * @returns {string} The string representation of the attributes.
    */
-  private attrsToString(attrs: Attributes, depth: number): string {
+  private attrsToString(attrs: Attributes, depth: number, forceIndentation: boolean = false): string {
     const pairs = entries(attrs).map(([key, value]) => {
       if (typeof value === 'string') {
         return `${key}="${value}"`
@@ -187,7 +190,7 @@ class HTMLGenerator {
       }
     })
 
-    if (pairs.length === 1) {
+    if (pairs.length === 1 && !forceIndentation) {
       return ` ${pairs[0]}`
     }
     else {
