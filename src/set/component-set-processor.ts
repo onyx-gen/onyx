@@ -9,7 +9,6 @@ import type {
   ComponentPropsWithState,
   GroupedComponentCollection,
   SinglePropertyObject,
-  VariantKey,
   VariantPermutation,
   VariantTrees,
 } from './types'
@@ -202,21 +201,6 @@ class ComponentSetProcessor {
     const variants: { [p: string]: ComponentNode | undefined } = this.findVariantsForPermutation(permutation, groupedCollection)
     const treesForPermutationByState = this.parseVariantsToTrees(variants, permutation)
     return this.mergeTreesBasedOnStates(treesForPermutationByState, permutation)
-  }
-
-  /**
-   * Computes a unique key for a given permutation of properties (called a `variant`).
-   * This method constructs the key by concatenating each property's key and value pair
-   * from the permutation, separated by a hyphen, and then joining all pairs with an underscore.
-   * This key is used to uniquely identify a tree configuration derived from a specific permutation.
-   *
-   * @param permutation - An object representing a permutation of property values.
-   * @returns A string representing the unique key for the tree derived from the permutation.
-   */
-  private static computeVariantKey(permutation: VariantPermutation): VariantKey {
-    return Object.entries(permutation).map(
-      ([key, value]) => `${key}-${value}`,
-    ).join('_')
   }
 
   /**
