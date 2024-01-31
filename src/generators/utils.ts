@@ -38,3 +38,11 @@ export function simplifyConditionalString(conditionalStr: string): string {
   // Filter out any empty strings and join the parts back together with spaces
   return simplifiedParts.filter(part => part !== '').join(' ')
 }
+
+export function transformPropKey(propKey: string): string {
+  // Regex to match only alphabetical characters, "-" and "_"
+  const allowedCharsRegex: RegExp = /^[A-Za-z-_]+$/
+
+  // Split the propKey into characters, filter based on the regex, and join back into a string
+  return propKey.split('').filter(char => allowedCharsRegex.test(char)).join('')
+}

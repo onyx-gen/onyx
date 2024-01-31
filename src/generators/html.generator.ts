@@ -7,7 +7,7 @@ import type {
 } from '../interfaces'
 import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
-import { simplifyConditionalString } from './utils'
+import { simplifyConditionalString, transformPropKey } from './utils'
 
 type AttributeValue = string | { [key: string]: string }
 interface Attributes { [key: string]: AttributeValue }
@@ -170,6 +170,16 @@ class HTMLGenerator {
       .filter(([, prop]) => prop.type === 'VARIANT')
       .forEach(([key, prop]) => {
         attrs[key] = `${prop.value}`
+      })
+
+    entries(treeNode.data.props)
+      .filter(([, prop]) => prop.type === 'INSTANCE_SWAP')
+      .forEach(([key, prop]) => {
+        if (typeof prop.value === 'string') {
+          const instance: BaseNode | null = figma.getNodeById(prop.value)
+          if (instance)
+            attrs[transformPropKey(`${key}`)] = `${instance.name}`
+        }
       })
 
     return attrs
