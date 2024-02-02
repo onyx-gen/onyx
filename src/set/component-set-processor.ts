@@ -1,5 +1,5 @@
 import FigmaNodeParser from '../parsers/figma-node.parser'
-import CodeGenerator from '../generators/code.generator'
+import HTMLGenerator from '../generators/html.generator'
 import { entries } from '../utils'
 import type { TreeNode } from '../interfaces'
 import StateTreeMerger from '../merge/state/state-tree-merger'
@@ -15,7 +15,7 @@ import type {
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
 class ComponentSetProcessor {
-  private codeGenerator = new CodeGenerator()
+  private htmlGenerator = new HTMLGenerator()
 
   public process(node: ComponentSetNode): string {
     // TODO MF: componentCollectionGroupedByState should be a class property
@@ -44,7 +44,7 @@ class ComponentSetProcessor {
     if (!tree)
       return ''
 
-    return this.codeGenerator.generate(tree)
+    return this.htmlGenerator.generate(tree)
   }
 
   /**

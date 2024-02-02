@@ -7,7 +7,7 @@
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 import FigmaNodeParser from './parsers/figma-node.parser'
-import CodeGenerator from './generators/code.generator'
+import HTMLGenerator from './generators/html.generator'
 import { getSelectedNode } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
 
@@ -27,7 +27,7 @@ figma.codegen.on('generate', async () => {
     return []
 
   const parser = new FigmaNodeParser()
-  const generator = new CodeGenerator()
+  const generator = new HTMLGenerator()
 
   let html = ''
 

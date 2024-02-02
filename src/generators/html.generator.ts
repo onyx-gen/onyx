@@ -17,10 +17,9 @@ type ConditionalFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string
 type TagFunction<T extends TreeNodeData> = ((node: TreeNode<T>) => string) | string
 
 /**
- * Class representing the mapping the intermediate design representation to code.
- * This class is responsible for generating a Vue component from a given tree node.
+ * Class representing the mapping from node types to their corresponding HTML tags and attributes.
  */
-class CodeGenerator {
+class HTMLGenerator {
   // Improve NodeTypeToTagMap to handle different node data types
   private nodeTypeToTag: NodeTypeToTagMap = {
     container: {
@@ -234,4 +233,4 @@ export type NodeTypeToTagMap = {
   }
 }
 
-export default CodeGenerator
+export default HTMLGenerator
