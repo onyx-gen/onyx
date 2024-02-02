@@ -4,6 +4,8 @@ import { entries } from '../utils'
 import type { TreeNode } from '../interfaces'
 import StateTreeMerger from '../merge/state/state-tree-merger'
 import VariantTreeMerger from '../merge/variant/variant-tree-merger'
+import { variantKey } from '../merge/utils'
+import ScriptSetupGenerator from '../generators/script-setup.generator'
 import type {
   ComponentCollection,
   ComponentPropsWithState,
@@ -16,6 +18,7 @@ import { getComponentProperties, groupComponentsByProp } from './utils'
 
 class ComponentSetProcessor {
   private htmlGenerator = new HTMLGenerator()
+  private scriptSetupGenerator = new ScriptSetupGenerator()
 
   public process(node: ComponentSetNode): string {
     // TODO MF: componentCollectionGroupedByState should be a class property
@@ -34,9 +37,20 @@ class ComponentSetProcessor {
       }
     })
 
+    const variantKeys = permutations.map(permutation => variantKey(permutation))
+
     const componentSetTree = this.mergeVariantTrees(variantTrees)
 
-    return this.generateHTML(componentSetTree)
+    const code: string[] = []
+
+    code.push(this.generateScriptSetup(variantKeys))
+    code.push(this.generateHTML(componentSetTree))
+
+    return code.join('\n\n')
+  }
+
+  private generateScriptSetup(variantKeys: string[]): string {
+    return this.scriptSetupGenerator.generate(variantKeys)
   }
 
   /**
