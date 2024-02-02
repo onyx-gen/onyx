@@ -39,7 +39,12 @@ class ComponentSetProcessor {
     return this.generateHTML(componentSetTree)
   }
 
-  // TODO MF: Documentation
+  /**
+   * Generates HTML from a given tree.
+   * @param tree - The tree to generate HTML from.
+   * @returns The generated HTML.
+   * @private
+   */
   private generateHTML(tree: TreeNode | null): string {
     if (!tree)
       return ''
