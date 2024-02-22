@@ -48,10 +48,25 @@ class FigmaNodeParser {
   private createIconNode(node: InstanceNode): TreeNode<IconNodeData> {
     const iconName = node.mainComponent?.name
 
+    const builder = new UnocssBuilder(node)
+    const css = builder.build()
+
     if (!iconName)
       console.warn('No icon name found for node', node)
 
-    return { children: [], data: { type: 'icon', name: iconName || '?' } }
+    const outputNode: TreeNode<IconNodeData> = {
+      children: [],
+      data: {
+        type: 'icon',
+        name: iconName || '?',
+      },
+    }
+
+    // Add CSS to the output node
+    if (css.size > 0)
+      outputNode.data.css = { [this.variant]: { css: [css] } }
+
+    return outputNode
   }
 
   /**

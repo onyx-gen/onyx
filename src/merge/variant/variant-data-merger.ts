@@ -1,9 +1,9 @@
 import { cloneDeep } from 'lodash-es'
 import type {
-  ContainerNodeCSSData,
   ContainerNodeData,
   IconNodeData,
   InstanceNodeData,
+  NodeCSSData,
   VariantCSS,
 } from '../../interfaces'
 import AbstractDataMerger from '../data-merger'
@@ -99,7 +99,7 @@ class VariantDataMerger extends AbstractDataMerger {
       return calculateVariantCSSDifference(union, defaultVariantCSS)
     })
 
-    const containerNodeCSSData: ContainerNodeCSSData = {
+    const containerNodeCSSData: NodeCSSData = {
       [VARIANT_KEY_DEFAULT]: defaultVariantCSS,
     }
 
@@ -145,7 +145,7 @@ class VariantDataMerger extends AbstractDataMerger {
     })
   }
 
-  private getOtherVariantKeys(cssData: ContainerNodeCSSData): string[] {
+  private getOtherVariantKeys(cssData: NodeCSSData): string[] {
     return Object.keys(cssData).filter(key => key !== 'default' && key !== this.variant)
   }
 

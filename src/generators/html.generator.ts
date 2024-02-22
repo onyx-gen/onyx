@@ -58,7 +58,20 @@ class HTMLGenerator {
     },
     icon: {
       tag: 'i',
-      attrs: treeNode => ({ class: `i-figma-${treeNode.data.name}` }),
+      attrs: (treeNode) => {
+        const attrs: Attributes = {
+          class: `i-figma-${treeNode.data.name}`,
+        }
+
+        if (treeNode.data.css) {
+          const defaultVariantCSS: VariantCSS | undefined = Object.values(treeNode.data.css)[0]
+
+          if (defaultVariantCSS)
+            attrs.class += ` ${translateVariantCSS(defaultVariantCSS)}`
+        }
+
+        return attrs
+      },
     },
     text: {},
     instance: {

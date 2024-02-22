@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash-es'
-import type { ContainerNodeCSSData, VariantCSS } from './interfaces'
+import type { NodeCSSData, VariantCSS } from './interfaces'
 import { difference } from './set/utils'
 import type { VariantKey } from './set/types'
 import { entries } from './utils'
@@ -35,7 +35,7 @@ export function translateVariantCSS(variantCSS: VariantCSS): string {
  *          representation of the input CSS data, with each variant's CSS stringified and
  *          appropriately formatted.
  */
-export function translateContainerNodeCSSData(data: ContainerNodeCSSData): Record<VariantKey, string> {
+export function translateContainerNodeCSSData(data: NodeCSSData): Record<VariantKey, string> {
   return Object.fromEntries(
     entries(data)
       .filter(([, variantCSS]) => variantCSS.css.length > 0)

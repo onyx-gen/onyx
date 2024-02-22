@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ContainerNodeCSSData, VariantCSS } from '../src/interfaces'
+import type { NodeCSSData, VariantCSS } from '../src/interfaces'
 import {
   appendSetToVariantCSS,
   appendToVariantCSS,
@@ -60,7 +60,7 @@ describe('css', () => {
 
   describe('translateContainerNodeCSSData', () => {
     it('translates variant CSS data', () => {
-      const data: ContainerNodeCSSData = {
+      const data: NodeCSSData = {
         primary: {
           css: [new Set(['bg-red'])],
         },
@@ -78,7 +78,7 @@ describe('css', () => {
     })
 
     it('ignores empty variant CSS data', () => {
-      const data: ContainerNodeCSSData = {
+      const data: NodeCSSData = {
         primary: {
           css: [new Set(['bg-red'])],
         },

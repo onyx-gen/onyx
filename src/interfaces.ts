@@ -9,7 +9,7 @@ export type TreeNodeData =
   | IconNodeData
   | TextNodeData
 
-export interface ContainerNodeCSSData {
+export interface NodeCSSData {
   [key: string]: VariantCSS
 }
 
@@ -25,7 +25,7 @@ export interface VariantCSS {
 
 export interface ContainerNodeData extends AbstractNodeData {
   type: 'container'
-  css?: ContainerNodeCSSData
+  css?: NodeCSSData
   element?: string
 }
 
@@ -43,4 +43,5 @@ export interface InstanceNodeData extends AbstractNodeData {
 export interface IconNodeData extends AbstractNodeData {
   type: 'icon'
   name: string
+  css?: NodeCSSData
 }
