@@ -130,6 +130,7 @@ export class UnocssBuilder {
       [Properties.typography]: () => this.attributes.add(`font-$${token}`),
       [Properties.fill]: () => this.attributes.add(this.node.type === 'TEXT' ? `color-$${token}` : `bg-$${token}`),
       [Properties.borderColor]: () => this.attributes.add(`border-color-$${token}`),
+      [Properties.boxShadow]: () => this.attributes.add(`shadow-$${token}`),
 
       ...paddingHandlers,
       ...borderWidthHandlers,
