@@ -101,6 +101,12 @@ class FigmaNodeParser {
       type: 'container',
       css: { [this.variant]: { css: [css] } },
     }
+
+    if (this.isSuperScriptTextNode(node))
+      parentNodeData.element = 'sup'
+    else if (this.isSubScriptTextNode(node))
+      parentNodeData.element = 'sub'
+
     const childNodeData: TextNodeData = { type: 'text', text: node.characters }
 
     return { data: parentNodeData, children: [{ children: [], data: childNodeData }] }
@@ -139,6 +145,50 @@ class FigmaNodeParser {
         if (childTree)
           treeNode.children.push(childTree)
       })
+  }
+
+  /**
+   * Checks if a given text node is a superscript text node.
+   *
+   * @param {TextNode} node - The text node to check.
+   * @returns {boolean} - Returns true if the text node is a superscript text node, otherwise false.
+   */
+  private isSuperScriptTextNode(node: TextNode): boolean {
+    // Get the OpenType features applied to the text in the node.
+    const openTypeFeatures = node.getRangeOpenTypeFeatures(0, node.characters.length)
+
+    // Check if there are any OpenType features applied.
+    if (Object.keys(openTypeFeatures).length > 0) {
+      // Check if the 'SUPS' (superscript) OpenType feature is applied.
+      // @ts-expect-error: SUPS is not in the type definition
+      if (openTypeFeatures.SUPS === true)
+        return true
+    }
+
+    // If no 'SUPS' feature is found, return false.
+    return false
+  }
+
+  /**
+   * Checks if a given text node is a subscript text node.
+   *
+   * @param {TextNode} node - The text node to check.
+   * @returns {boolean} - Returns true if the text node is a subtext text node, otherwise false.
+   */
+  private isSubScriptTextNode(node: TextNode): boolean {
+    // Get the OpenType features applied to the text in the node.
+    const openTypeFeatures = node.getRangeOpenTypeFeatures(0, node.characters.length)
+
+    // Check if there are any OpenType features applied.
+    if (Object.keys(openTypeFeatures).length > 0) {
+      // Check if the 'SUBS' (superscript) OpenType feature is applied.
+      // @ts-expect-error: SUBS is not in the type definition
+      if (openTypeFeatures.SUBS === true)
+        return true
+    }
+
+    // If no 'SUBS' feature is found, return false.
+    return false
   }
 }
 

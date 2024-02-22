@@ -26,6 +26,7 @@ export interface VariantCSS {
 export interface ContainerNodeData extends AbstractNodeData {
   type: 'container'
   css?: ContainerNodeCSSData
+  element?: string
 }
 
 export interface TextNodeData extends AbstractNodeData {

@@ -23,7 +23,7 @@ class HTMLGenerator {
   // Improve NodeTypeToTagMap to handle different node data types
   private nodeTypeToTag: NodeTypeToTagMap = {
     container: {
-      tag: 'div',
+      tag: treeNode => treeNode.data.element || 'div',
       attrs: (treeNode) => {
         const attrs: Attributes = {}
 
