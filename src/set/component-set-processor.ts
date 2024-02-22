@@ -26,7 +26,7 @@ class ComponentSetProcessor {
       = this.calculatePermutations(node)
 
     if (permutations.length === 0)
-      throw new Error('[ComponentSetProcessor] Handling of components without permutations not yet implemented.')
+      throw new Error('Handling of components without permutations is not possible.')
 
     const variantTrees: VariantTrees = permutations.map((permutation) => {
       const stateMergedTree = this.processPermutation(permutation, componentCollectionGroupedByState)
@@ -83,10 +83,26 @@ class ComponentSetProcessor {
     const componentCollection = this.mapComponentsToProperties(node)
     const componentCollectionWithState = this.filterComponentsWithState(componentCollection)
     const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
-    const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByState)
+
+    const componentCollectionGroupedByStateWithDefaultVariantIfNecessary: typeof componentCollectionGroupedByState = Object.fromEntries(
+      Object.entries(componentCollectionGroupedByState).map(
+        ([state, components]) => {
+          return [state, components.map((component) => {
+            if (Object.keys(component.props).length === 1) {
+              return { ...component, props: { ...component.props, variant: 'default' },
+              }
+            }
+
+            return component
+          })]
+        },
+      ),
+    )
+
+    const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByStateWithDefaultVariantIfNecessary)
     const permutations: VariantPermutation[] = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
 
-    return [permutations, componentCollectionGroupedByState]
+    return [permutations, componentCollectionGroupedByStateWithDefaultVariantIfNecessary]
   }
 
   /**
