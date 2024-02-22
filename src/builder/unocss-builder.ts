@@ -296,6 +296,66 @@ export class UnocssBuilder {
   }
 
   /**
+   * Handles the text node properties.
+   * It adds CSS classes based on the text properties of the node.
+   */
+  private handleTextNode() {
+    if (this.node.type !== 'TEXT')
+      return
+
+    const textNode = this.node as TextNode
+
+    if (this.isSuperScriptTextNode(textNode))
+      this.attributes.add('superscript')
+    else if (this.isSubScriptTextNode(textNode))
+      this.attributes.add('subscript')
+  }
+
+  /**
+   * Checks if a given text node is a superscript text node.
+   *
+   * @param {TextNode} node - The text node to check.
+   * @returns {boolean} - Returns true if the text node is a superscript text node, otherwise false.
+   */
+  private isSuperScriptTextNode(node: TextNode): boolean {
+    // Get the OpenType features applied to the text in the node.
+    const openTypeFeatures = node.getRangeOpenTypeFeatures(0, node.characters.length)
+
+    // Check if there are any OpenType features applied.
+    if (Object.keys(openTypeFeatures).length > 0) {
+      // Check if the 'SUPS' (superscript) OpenType feature is applied.
+      // @ts-expect-error: SUPS is not in the type definition
+      if (openTypeFeatures.SUPS === true)
+        return true
+    }
+
+    // If no 'SUPS' feature is found, return false.
+    return false
+  }
+
+  /**
+   * Checks if a given text node is a subscript text node.
+   *
+   * @param {TextNode} node - The text node to check.
+   * @returns {boolean} - Returns true if the text node is a subtext text node, otherwise false.
+   */
+  private isSubScriptTextNode(node: TextNode): boolean {
+    // Get the OpenType features applied to the text in the node.
+    const openTypeFeatures = node.getRangeOpenTypeFeatures(0, node.characters.length)
+
+    // Check if there are any OpenType features applied.
+    if (Object.keys(openTypeFeatures).length > 0) {
+      // Check if the 'SUBS' (superscript) OpenType feature is applied.
+      // @ts-expect-error: SUBS is not in the type definition
+      if (openTypeFeatures.SUBS === true)
+        return true
+    }
+
+    // If no 'SUBS' feature is found, return false.
+    return false
+  }
+
+  /**
    * Builds and returns the final CSS class string.
    * It combines all the handled attributes into a single CSS class string.
    * @returns The final CSS class string.
@@ -306,6 +366,7 @@ export class UnocssBuilder {
     this.handleBorderRadius()
 
     this.handleAutoLayout()
+    this.handleTextNode()
 
     // Lowercase all attributes
     this.attributes = new Set([...this.attributes].map(attr => attr.toLowerCase()))
