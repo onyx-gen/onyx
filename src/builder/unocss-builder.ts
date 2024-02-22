@@ -138,9 +138,17 @@ export class UnocssBuilder {
       ...sizingHandlers,
     }
 
+    const propertiesToIgnore = new Set([
+      Properties.fontFamilies,
+      Properties.fontWeights,
+      Properties.fontSizes,
+      Properties.lineHeights,
+      Properties.letterSpacing,
+    ])
+
     // Warn if there are unhandled properties
-    if (Object.keys(handlers).length !== Object.keys(Properties).length) {
-      const unhandledProperties = Object.keys(Properties).filter(property => !Object.keys(handlers).includes(property))
+    if (Object.keys(handlers).length + propertiesToIgnore.size !== Object.keys(Properties).length) {
+      const unhandledProperties = Object.keys(Properties).filter(property => !Object.keys(handlers).includes(property) && !propertiesToIgnore.has(property as Properties))
       console.warn(`There are ${unhandledProperties.length} properties that do not have a handler defined in UnocssBuilder: ${unhandledProperties.join(', ')}`)
     }
 
