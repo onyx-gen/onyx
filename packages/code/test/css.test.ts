@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { NodeCSSData, VariantCSS } from '../src/code/interfaces'
+import type { NodeCSSData, VariantCSS } from '../src/interfaces'
 import {
   appendSetToVariantCSS,
   appendToVariantCSS,
@@ -11,7 +11,7 @@ import {
   translateVariantCSS,
   wrapInVariant,
   wrapInVariants,
-} from '../src/code/css'
+} from '../src/css'
 
 describe('css', () => {
   describe('translateVariantCSS', () => {

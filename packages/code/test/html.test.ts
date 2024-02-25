@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { simplifyConditionalString, transformPropKey } from '../src/code/generators/utils'
+import { simplifyConditionalString, transformPropKey } from '../src/generators/utils'
 
 describe('html', () => {
   describe('simplifies conditionals', () => {

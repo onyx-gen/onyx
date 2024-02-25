@@ -10,7 +10,7 @@ const production = !process.env.ROLLUP_WATCH
  * @type {import('rollup').RollupOptions}
  */
 const config = {
-  input: `src/code/main.ts`,
+  input: `src/main.ts`,
 
   output: {
     format: `cjs`,

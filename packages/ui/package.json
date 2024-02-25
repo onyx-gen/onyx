@@ -1,0 +1,23 @@
+{
+  "name": "@unocss-variables/ui",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "dependencies": {
+    "@unocss-variables/tsconfig": "workspace:^",
+    "vue": "^3.4.19"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.87.0",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "shiki": "^1.1.7",
+    "typescript": "^5.3.3",
+    "unocss": "^0.58.5",
+    "vite": "^5.1.4",
+    "vite-plugin-singlefile": "^2.0.0"
+  }
+}

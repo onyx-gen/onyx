@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
-import { conditionalTree, variantKey } from '../src/code/merge/utils'
-import type { VariantPermutation } from '../src/code/set/types'
-import type { TreeNode } from '../src/code/interfaces'
+import { conditionalTree, variantKey } from '../src/merge/utils'
+import type { VariantPermutation } from '../src/set/types'
+import type { TreeNode } from '../src/interfaces'
 
 it('computes variant key from variant permutation', () => {
   const variantPermutation: VariantPermutation = {

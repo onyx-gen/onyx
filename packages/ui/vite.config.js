@@ -18,12 +18,8 @@ export default defineConfig({
     brotliSize: false,
     emptyOutDir: false,
     rollupOptions: {
-      output: {
-        // inlineDynamicImports: false,
-        // manualChunks: () => 'everything.js',
-      },
       input: {
-        index: path.resolve(__dirname, 'src/ui/ui.html'),
+        index: path.resolve(__dirname, 'src/ui.html'),
       },
     },
   },
