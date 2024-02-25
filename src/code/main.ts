@@ -10,3 +10,7 @@
 figma.skipInvisibleInstanceChildren = true
 
 figma.showUI(__html__)
+
+figma.on('selectionchange', () => {
+  figma.ui.postMessage(figma.currentPage.selection)
+})
