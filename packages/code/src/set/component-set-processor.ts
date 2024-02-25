@@ -25,6 +25,13 @@ class ComponentSetProcessor {
     const [permutations, componentCollectionGroupedByState]
       = this.calculatePermutations(node)
 
+    return this.processPermutations(permutations, componentCollectionGroupedByState)
+  }
+
+  private processPermutations(
+    permutations: VariantPermutation[],
+    componentCollectionGroupedByState: GroupedComponentCollection<ComponentPropsWithState>,
+  ): string {
     if (permutations.length === 0)
       throw new Error('Handling of components without permutations is not possible.')
 
