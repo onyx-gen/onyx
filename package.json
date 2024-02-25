@@ -11,8 +11,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "build:turbo": "turbo build",
-    "dev:turbo": "turbo dev",
+    "build": "turbo build",
+    "dev": "turbo dev",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
