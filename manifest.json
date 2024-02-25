@@ -2,7 +2,7 @@
   "name": "unocss-variables",
   "id": "1331160444558094836",
   "api": "1.0.0",
-  "ui": "packages/ui/dist/src/ui.html",
+  "ui": "packages/ui/dist/index.html",
   "main": "packages/code/dist/code.js",
   "capabilities": [
     "inspect"
