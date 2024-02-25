@@ -9,9 +9,4 @@
 
 figma.skipInvisibleInstanceChildren = true
 
-// figma.showUI(__html__)
-
-figma.showUI(
-  '<b>Hello from Figma</b>',
-  { width: 400, height: 200, title: 'My title', position: { x: 100, y: 100 } },
-)
+figma.showUI(__html__)

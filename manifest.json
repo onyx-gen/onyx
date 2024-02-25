@@ -2,8 +2,8 @@
   "name": "unocss-variables",
   "id": "1331160444558094836",
   "api": "1.0.0",
-  "ui": "ui.html",
-  "main": "dist/bundle.js",
+  "ui": "dist/src/ui/ui.html",
+  "main": "dist/code.js",
   "capabilities": [
     "inspect"
   ],

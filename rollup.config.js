@@ -10,12 +10,12 @@ const production = !process.env.ROLLUP_WATCH
  * @type {import('rollup').RollupOptions}
  */
 const config = {
-  input: `src/main.ts`,
+  input: `src/code/main.ts`,
 
   output: {
     format: `cjs`,
     name: `code`,
-    file: `dist/bundle.js`,
+    file: `dist/code.js`,
   },
 
   plugins: [
