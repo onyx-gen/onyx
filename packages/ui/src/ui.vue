@@ -6,7 +6,7 @@ import Code from './code.vue'
 <template>
   <Layout class="space-y-4">
     <div>
-      <h1 class="text-center">
+      <h1 class="text-center text-2xl font-bold">
         UnoCSS Variables
       </h1>
 
