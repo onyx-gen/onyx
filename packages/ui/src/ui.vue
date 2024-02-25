@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
+import type { PluginMessage } from '@unocss-variables/events'
 import Layout from './layout.vue'
 import Code from './code.vue'
 
@@ -7,9 +8,7 @@ const hasSelection = ref(false)
 
 onMounted(async () => {
   window.addEventListener('message', (m) => {
-    console.log('message', m)
-
-    hasSelection.value = m.data.pluginMessage.event !== 'unselected'
+    hasSelection.value = (m.data.pluginMessage as PluginMessage).event !== 'unselected'
   })
 })
 </script>

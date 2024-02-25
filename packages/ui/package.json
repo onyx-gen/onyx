@@ -9,6 +9,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@unocss-variables/events": "workspace:^",
     "@unocss-variables/tsconfig": "workspace:^",
     "@unocss/reset": "^0.58.5",
     "vue": "^3.4.19"

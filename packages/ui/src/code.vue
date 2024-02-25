@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import { codeToHtml } from 'shiki'
+import type { HtmlPluginMessage, PluginMessage } from '@unocss-variables/events'
 
 const code = ref('const a = 1')
 const html = ref('')
 
 onMounted(async () => {
   window.addEventListener('message', (m) => {
-    console.log('message', m)
+    const pluginMessage = m.data.pluginMessage as PluginMessage
 
-    if (m.data.pluginMessage.event === 'html')
-      code.value = m.data.pluginMessage.html
-    else if (m.data.pluginMessage.event === 'unselected')
-      console.log('unselected')
+    if (pluginMessage.event === 'html')
+      code.value = (pluginMessage as HtmlPluginMessage).data.html
   })
 })
 

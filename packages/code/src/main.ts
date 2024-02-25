@@ -1,3 +1,4 @@
+import type { HtmlPluginMessage, UnselectedPluginMessage } from '@unocss-variables/events'
 import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
 import { getSelectedNodes } from './utils'
@@ -19,10 +20,14 @@ figma.showUI(__html__, { themeColors: true })
 figma.on('selectionchange', async () => {
   const html = await generate()
 
-  if (html)
-    figma.ui.postMessage({ event: 'html', html })
-  else
-    figma.ui.postMessage({ event: 'unselected' })
+  if (html) {
+    const pluginMessage: HtmlPluginMessage = { event: 'html', data: { html } }
+    figma.ui.postMessage(pluginMessage)
+  }
+  else {
+    const pluginMessage: UnselectedPluginMessage = { event: 'unselected' }
+    figma.ui.postMessage(pluginMessage)
+  }
 })
 
 /**

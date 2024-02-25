@@ -1,0 +1,15 @@
+{
+  "name": "@unocss-variables/events",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "dependencies": {
+    "@unocss-variables/tsconfig": "workspace:^"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.87.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3"
+  }
+}

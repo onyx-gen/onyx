@@ -10,6 +10,7 @@
     "test": "vitest --ui"
   },
   "dependencies": {
+    "@unocss-variables/events": "workspace:^",
     "@unocss-variables/tsconfig": "workspace:^",
     "lodash-es": "^4.17.21"
   },

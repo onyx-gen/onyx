@@ -20,6 +20,9 @@ importers:
 
   packages/code:
     dependencies:
+      '@unocss-variables/events':
+        specifier: workspace:^
+        version: link:../events
       '@unocss-variables/tsconfig':
         specifier: workspace:^
         version: link:../tsconfig
@@ -61,6 +64,22 @@ importers:
         specifier: ^1.3.1
         version: 1.3.1(@vitest/ui@1.3.1)
 
+  packages/events:
+    dependencies:
+      '@unocss-variables/tsconfig':
+        specifier: workspace:^
+        version: link:../tsconfig
+    devDependencies:
+      '@figma/plugin-typings':
+        specifier: ^1.87.0
+        version: 1.87.0
+      tslib:
+        specifier: ^2.6.2
+        version: 2.6.2
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
+
   packages/tsconfig:
     devDependencies:
       '@vue/tsconfig':
@@ -69,6 +88,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@unocss-variables/events':
+        specifier: workspace:^
+        version: link:../events
       '@unocss-variables/tsconfig':
         specifier: workspace:^
         version: link:../tsconfig
