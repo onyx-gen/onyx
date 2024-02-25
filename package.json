@@ -7,7 +7,6 @@
   "description": "Your Figma Plugin",
   "author": "Miguel Franken",
   "license": "MIT",
-  "main": "code.js",
   "engines": {
     "node": ">=20"
   },
