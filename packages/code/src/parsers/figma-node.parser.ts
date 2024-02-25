@@ -20,7 +20,7 @@ class FigmaNodeParser {
    * @param node - The Figma node to process.
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
-  public parse(node: SceneNode): TreeNode | null {
+  public async parse(node: SceneNode): Promise<TreeNode | null> {
     if (node.type === 'INSTANCE')
       return this.parseInstanceNode(node)
     else
@@ -32,7 +32,7 @@ class FigmaNodeParser {
    * @param node - The instance node to process.
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
-  private parseInstanceNode(node: InstanceNode): TreeNode | null {
+  private async parseInstanceNode(node: InstanceNode): Promise<TreeNode | null> {
     const isIcon = node.name === 'icon'
     if (isIcon)
       return this.createIconNode(node)
@@ -45,28 +45,36 @@ class FigmaNodeParser {
    * @param node - The icon node to process.
    * @returns {TreeNode} The generated tree node for the icon.
    */
-  private createIconNode(node: InstanceNode): TreeNode<IconNodeData> {
-    const iconName = node.mainComponent?.name
+  private async createIconNode(node: InstanceNode): Promise<TreeNode<IconNodeData>> {
+    try {
+      const mainComponent = await node.getMainComponentAsync()
+      const iconName = mainComponent?.name
 
-    const builder = new UnocssBuilder(node)
-    const css = builder.build()
+      const builder = new UnocssBuilder(node)
+      const css = builder.build()
 
-    if (!iconName)
-      console.warn('No icon name found for node', node)
+      if (!iconName)
+        console.warn('No icon name found for node', node)
 
-    const outputNode: TreeNode<IconNodeData> = {
-      children: [],
-      data: {
-        type: 'icon',
-        name: iconName || '?',
-      },
+      const outputNode: TreeNode<IconNodeData> = {
+        children: [],
+        data: {
+          type: 'icon',
+          name: iconName || '?',
+        },
+      }
+
+      // Add CSS to the output node
+      if (css.size > 0)
+        outputNode.data.css = { [this.variant]: { css: [css] } }
+
+      return outputNode
     }
-
-    // Add CSS to the output node
-    if (css.size > 0)
-      outputNode.data.css = { [this.variant]: { css: [css] } }
-
-    return outputNode
+    catch (e) {
+      figma.notify('Not possible to create icon node')
+      console.error('Not possible to create icon node', e)
+      throw new Error('Not possible to create icon node')
+    }
   }
 
   /**
@@ -90,7 +98,7 @@ class FigmaNodeParser {
    * @param node - The node to process.
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
-  private parseNode(node: SceneNode): TreeNode | null {
+  private async parseNode(node: SceneNode): Promise<TreeNode | null> {
     const builder = new UnocssBuilder(node)
     const css = builder.build()
 
@@ -102,7 +110,7 @@ class FigmaNodeParser {
       return null
     }
 
-    return node.type === 'TEXT' ? this.createTextNode(node, css) : this.createContainerNode(node, css, hasChildren)
+    return node.type === 'TEXT' ? this.createTextNode(node, css) : await this.createContainerNode(node, css, hasChildren)
   }
 
   /**
@@ -129,7 +137,7 @@ class FigmaNodeParser {
    * @param {boolean} hasChildren - Flag indicating if the node has children.
    * @returns {TreeNode} The generated tree node for the container.
    */
-  private createContainerNode(node: SceneNode, css: Set<string>, hasChildren: boolean): TreeNode {
+  private async createContainerNode(node: SceneNode, css: Set<string>, hasChildren: boolean): Promise<TreeNode> {
     const data: ContainerNodeData = {
       type: 'container',
       css: { [this.variant]: { css: [css] } },
@@ -137,7 +145,7 @@ class FigmaNodeParser {
     const treeNode: TreeNode = { data, children: [] }
 
     if (hasChildren)
-      this.addChildrenToNode(node as SceneNode & ChildrenMixin, treeNode)
+      await this.addChildrenToNode(node as SceneNode & ChildrenMixin, treeNode)
 
     return treeNode
   }
@@ -147,14 +155,18 @@ class FigmaNodeParser {
    * @param {ChildrenMixin & SceneNode} node - The parent node.
    * @param {TreeNode} treeNode - The tree node to add children to.
    */
-  private addChildrenToNode(node: ChildrenMixin & SceneNode, treeNode: TreeNode): void {
-    node.children
+  private async addChildrenToNode(node: ChildrenMixin & SceneNode, treeNode: TreeNode): Promise<void> {
+    // Create an array to hold all the promises
+    const promises = node.children
       .filter(child => child.visible)
-      .forEach((child) => {
-        const childTree = this.parse(child)
+      .map(async (child) => { // Use map instead of forEach to return an array of promises
+        const childTree = await this.parse(child)
         if (childTree)
           treeNode.children.push(childTree)
       })
+
+    // Wait for all promises in the array to be resolved
+    await Promise.all(promises)
   }
 }
 

@@ -16,9 +16,8 @@ figma.skipInvisibleInstanceChildren = true
 
 figma.showUI(__html__, { themeColors: true })
 
-figma.on('selectionchange', () => {
-  const html = generate()
-
+figma.on('selectionchange', async () => {
+  const html = await generate()
   figma.ui.postMessage(html)
 })
 
@@ -28,7 +27,7 @@ figma.on('selectionchange', () => {
  * The generated code is displayed in the dev tools panel
  * inside Figma.
  */
-function generate(): string {
+async function generate(): Promise<string> {
   const nodes = getSelectedNodes()
 
   // Early return if no node is selected
@@ -47,7 +46,7 @@ function generate(): string {
       const componentSetProcessor = new ComponentSetProcessor()
 
       try {
-        html = componentSetProcessor.process(node)
+        html = await componentSetProcessor.process(node)
       }
       catch (error) {
         console.error(`[UnoCSS-Variables Plugin] Error during component set processing`, error)
@@ -55,9 +54,11 @@ function generate(): string {
       }
     }
     else {
-      const tree = parser.parse(node)
+      const tree = await parser.parse(node)
 
-      if (tree) { html = generator.generate(tree) }
+      if (tree) {
+        html = generator.generate(tree)
+      }
       else {
         console.error('It was not possible to generate HTML code for the selected node.')
         figma.notify('Error during HTML generation')
@@ -69,7 +70,7 @@ function generate(): string {
     const componentSetProcessor = new ComponentSetProcessor()
 
     try {
-      html = componentSetProcessor.process(nodes)
+      html = await componentSetProcessor.process(nodes)
     }
     catch (error) {
       console.error(`[UnoCSS-Variables Plugin] Error during multiple selected nodes processing`, error)

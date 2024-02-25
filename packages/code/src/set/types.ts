@@ -35,4 +35,5 @@ export interface VariantPermutation { [key: string]: string }
 
 export type VariantKey = string
 
-export type VariantTrees = { permutation: VariantPermutation, tree: TreeNode | null }[]
+export interface VariantTree { permutation: VariantPermutation, tree: TreeNode | null }
+export type VariantTrees = VariantTree[]

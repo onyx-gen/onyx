@@ -12,6 +12,7 @@ import type {
   GroupedComponentCollection,
   SinglePropertyObject,
   VariantPermutation,
+  VariantTree,
   VariantTrees,
 } from './types'
 import { getComponentProperties, groupComponentsByProp } from './utils'
@@ -20,30 +21,34 @@ class ComponentSetProcessor {
   private htmlGenerator = new HTMLGenerator()
   private scriptSetupGenerator = new ScriptSetupGenerator()
 
-  public process(data: ComponentSetNode | SceneNode[]): string {
+  public async process(data: ComponentSetNode | SceneNode[]): Promise<string> {
     const nodes = Array.isArray(data) ? data : [...data.children]
 
     const [permutations, componentCollectionGroupedByState]
       = this.calculatePermutations(nodes)
 
-    return this.processPermutations(permutations, componentCollectionGroupedByState)
+    return await this.processPermutations(permutations, componentCollectionGroupedByState)
   }
 
-  private processPermutations(
+  private async processPermutations(
     permutations: VariantPermutation[],
     componentCollectionGroupedByState: GroupedComponentCollection<ComponentPropsWithState>,
-  ): string {
+  ): Promise<string> {
     if (permutations.length === 0)
       throw new Error('Handling of components without permutations is not possible.')
 
-    const variantTrees: VariantTrees = permutations.map((permutation) => {
-      const stateMergedTree = this.processPermutation(permutation, componentCollectionGroupedByState)
+    const variantTreesPromises: Promise<VariantTree>[] = permutations.map(async (permutation) => {
+      const stateMergedTree = await this.processPermutation(permutation, componentCollectionGroupedByState)
 
-      return {
+      const variantTree: VariantTree = {
         permutation,
         tree: stateMergedTree,
       }
+
+      return variantTree
     })
+
+    const variantTrees: VariantTrees = await Promise.all(variantTreesPromises)
 
     const variantKeys = permutations.map(permutation => variantKey(permutation))
 
@@ -237,12 +242,12 @@ class ComponentSetProcessor {
    * @param permutation - An object representing a permutation of property values.
    * @param groupedCollection - A collection of components grouped by a state property.
    */
-  private processPermutation(
+  private async processPermutation(
     permutation: VariantPermutation,
     groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
-  ): TreeNode | null {
+  ): Promise<TreeNode | null> {
     const variants: { [p: string]: ComponentNode | undefined } = this.findVariantsForPermutation(permutation, groupedCollection)
-    const treesForPermutationByState = this.parseVariantsToTrees(variants, permutation)
+    const treesForPermutationByState = await this.parseVariantsToTrees(variants, permutation)
     return this.mergeTreesBasedOnStates(treesForPermutationByState, permutation)
   }
 
@@ -272,20 +277,29 @@ class ComponentSetProcessor {
    * Parses variants to trees for each state.
    *
    * @param variants - An object with states as keys and corresponding ComponentNodes or undefined.
+   * @param permutation - An object representing a permutation of property values.
    * @returns An object with states as keys and the parsed TreeNode or undefined.
    */
-  private parseVariantsToTrees(
+  private async parseVariantsToTrees(
     variants: { [key: string]: ComponentNode | undefined },
     permutation: VariantPermutation,
-  ): { [key: string]: TreeNode | null } {
-    return Object.fromEntries(
-      entries(variants)
-        .filter(([, component]) => component !== undefined)
-        .map(([state, component]) => {
-          const figmaNodeParser = new FigmaNodeParser(permutation)
-          return [state, figmaNodeParser.parse(component!)]
-        }),
-    )
+  ): Promise<{ [key: string]: TreeNode | null }> {
+    const allEntries = entries(variants)
+
+    // Map over the entries and process each component asynchronously
+    const processedEntriesPromises = allEntries
+      .filter(([, component]) => component !== undefined)
+      .map(async ([state, component]) => {
+        const figmaNodeParser = new FigmaNodeParser(permutation)
+        const parsedComponent = await figmaNodeParser.parse(component!)
+        return [state, parsedComponent]
+      })
+
+    // Wait for all asynchronous operations to complete
+    const processedEntries = await Promise.all(processedEntriesPromises)
+
+    // Construct and return the object from the processed entries
+    return Object.fromEntries(processedEntries)
   }
 
   /**
