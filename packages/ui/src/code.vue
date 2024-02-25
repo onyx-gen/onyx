@@ -15,17 +15,29 @@ onMounted(async () => {
 watch(code, async () => {
   html.value = await codeToHtml(code.value, {
     lang: 'vue-html',
-    theme: 'vitesse-light',
+    theme: 'vitesse-dark',
   })
 })
 </script>
 
 <template>
-  <div class="w-full overflow-hidden border border-black" v-html="html" />
+  <div class="w-full overflow-hidden" v-html="html" />
 </template>
 
 <style>
+code {
+  font-weight: 500 !important;
+  font-family: "Roboto Mono", Monaco, "Courier New", monospace !important;
+  font-size: 11px !important;
+  font-feature-settings: "liga", "calt" !important;
+}
+
 .shiki {
+  font-weight: 500 !important;
+  font-family: "Roboto Mono", Monaco, "Courier New", monospace !important;
+  font-size: 11px !important;
+  font-feature-settings: "liga", "calt" !important;
   overflow-x: auto;
+  background-color: transparent !important;
 }
 </style>
