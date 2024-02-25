@@ -23,19 +23,21 @@ watch(code, async () => {
 </script>
 
 <template>
-  <div>
-    <button class="bg-red" @click="counter--">
-      Decrement
-    </button>
-    {{ counter }}
-    <button @click="counter++">
-      Increment
-    </button>
+  <div class="w-screen h-full overflow-hidden bg-blue">
+    <div>
+      <button class="bg-red" @click="counter--">
+        Decrement
+      </button>
+      {{ counter }}
+      <button @click="counter++">
+        Increment
+      </button>
+    </div>
+
+    <h1>HTML</h1>
+
+    <div class="code" v-html="html" />
   </div>
-
-  <h1>HTML</h1>
-
-  <div class="code" v-html="html" />
 </template>
 
 <style scoped>
