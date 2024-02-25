@@ -24,7 +24,7 @@ watch(code, async () => {
 
 <template>
   <div>
-    <button @click="counter--">
+    <button class="bg-red" @click="counter--">
       Decrement
     </button>
     {{ counter }}

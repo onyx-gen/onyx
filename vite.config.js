@@ -1,10 +1,15 @@
 import path from 'node:path'
 import { defineConfig } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
+import UnoCSS from 'unocss/vite'
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
-  plugins: [vue(), viteSingleFile()],
+  plugins: [
+    vue(),
+    viteSingleFile(),
+    UnoCSS(),
+  ],
   build: {
     target: 'esnext',
     assetsInlineLimit: 100000000,
