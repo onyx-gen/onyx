@@ -14,7 +14,7 @@ import ComponentSetProcessor from './set/component-set-processor'
 
 figma.skipInvisibleInstanceChildren = true
 
-figma.showUI(__html__)
+figma.showUI(__html__, { themeColors: true })
 
 figma.on('selectionchange', () => {
   const html = generate()
