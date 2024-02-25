@@ -36,14 +36,12 @@ watch(code, async () => {
 
     <h1>HTML</h1>
 
-    <div class="code" v-html="html" />
+    <div class="w-full px-8 overflow-hidden" v-html="html" />
   </div>
 </template>
 
-<style scoped>
-.code {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+<style>
+.shiki {
+  overflow-x: auto;
 }
 </style>
