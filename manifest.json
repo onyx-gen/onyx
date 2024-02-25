@@ -2,19 +2,15 @@
   "name": "unocss-variables",
   "id": "1331160444558094836",
   "api": "1.0.0",
+  "ui": "ui.html",
   "main": "dist/bundle.js",
   "capabilities": [
-    "codegen"
+    "inspect"
   ],
   "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
   "editorType": [
     "dev"
-  ],
-  "codegenLanguages": [
-    {
-      "label": "Language Label",
-      "value": "language-value"
-    }
   ],
   "networkAccess": {
     "allowedDomains": [
