@@ -20,10 +20,11 @@ class ComponentSetProcessor {
   private htmlGenerator = new HTMLGenerator()
   private scriptSetupGenerator = new ScriptSetupGenerator()
 
-  public process(node: ComponentSetNode): string {
-    // TODO MF: componentCollectionGroupedByState should be a class property
+  public process(data: ComponentSetNode | SceneNode[]): string {
+    const nodes = Array.isArray(data) ? data : [...data.children]
+
     const [permutations, componentCollectionGroupedByState]
-      = this.calculatePermutations(node)
+      = this.calculatePermutations(nodes)
 
     return this.processPermutations(permutations, componentCollectionGroupedByState)
   }
@@ -79,15 +80,15 @@ class ComponentSetProcessor {
    * groups these components by their 'state', and then calculates all unique property permutations.
    * It's useful for generating different combinations of property values to create various component states.
    *
-   * @param node - The ComponentSetNode from which to derive permutations.
+   * @param nodes - The ComponentSetNode from which to derive permutations.
    * @returns A tuple where the first element is an array of permutations (each permutation is an object of property-value pairs),
    *          and the second element is the collection of components grouped by their state property.
    */
-  private calculatePermutations(node: ComponentSetNode): [
+  private calculatePermutations(nodes: SceneNode[]): [
     VariantPermutation[],
     GroupedComponentCollection<ComponentPropsWithState>,
   ] {
-    const componentCollection = this.mapComponentsToProperties(node)
+    const componentCollection = this.mapComponentsToProperties(nodes)
     const componentCollectionWithState = this.filterComponentsWithState(componentCollection)
     const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
 
@@ -115,11 +116,11 @@ class ComponentSetProcessor {
   /**
    * Maps each component of a node to an object containing the component and its parsed properties.
    *
-   * @param node - The node containing components.
+   * @param nodes - The nodes.
    * @returns A collection of components with their properties.
    */
-  private mapComponentsToProperties(node: ComponentSetNode): ComponentCollection {
-    return node.children.map(component => ({
+  private mapComponentsToProperties(nodes: SceneNode[]): ComponentCollection {
+    return nodes.map(component => ({
       component: component as ComponentNode,
       props: getComponentProperties(component as ComponentNode),
     }))

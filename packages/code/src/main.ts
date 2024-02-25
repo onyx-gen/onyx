@@ -1,6 +1,6 @@
 import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
-import { getSelectedNode } from './utils'
+import { getSelectedNodes } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
 
 /**
@@ -29,10 +29,10 @@ figma.on('selectionchange', () => {
  * inside Figma.
  */
 function generate(): string {
-  const node = getSelectedNode()
+  const nodes = getSelectedNodes()
 
   // Early return if no node is selected
-  if (!node)
+  if (nodes.length === 0)
     return ''
 
   const parser = new FigmaNodeParser()
@@ -40,23 +40,38 @@ function generate(): string {
 
   let html = ''
 
-  if (node.type === 'COMPONENT_SET') {
+  if (nodes.length === 1) {
+    const node = nodes[0]
+
+    if (node.type === 'COMPONENT_SET') {
+      const componentSetProcessor = new ComponentSetProcessor()
+
+      try {
+        html = componentSetProcessor.process(node)
+      }
+      catch (error) {
+        console.error(`[UnoCSS-Variables Plugin] Error during component set processing`, error)
+      }
+    }
+    else {
+      const tree = parser.parse(node)
+
+      if (tree)
+        html = generator.generate(tree)
+      else
+        console.error('It was not possible to generate HTML code for the selected node.')
+    }
+  }
+  else {
+    console.log('multiple nodes selected', nodes)
     const componentSetProcessor = new ComponentSetProcessor()
 
     try {
-      html = componentSetProcessor.process(node)
+      html = componentSetProcessor.process(nodes)
     }
     catch (error) {
       console.error(`[UnoCSS-Variables Plugin] Error during component set processing`, error)
     }
-  }
-  else {
-    const tree = parser.parse(node)
-
-    if (tree)
-      html = generator.generate(tree)
-    else
-      console.error('It was not possible to generate HTML code for the selected node.')
   }
 
   return html

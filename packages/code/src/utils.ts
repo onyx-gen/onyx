@@ -13,6 +13,15 @@ export function createIndent(depth: number): string {
 }
 
 /**
+ * Retrieves the selected nodes in the Figma document.
+ *
+ * @returns {SceneNode[]} The first selected node if any, null otherwise.
+ */
+export function getSelectedNodes(): SceneNode[] {
+  return [...figma.currentPage.selection]
+}
+
+/**
  * Retrieves the first selected node in the Figma document.
  *
  * @returns {SceneNode | null} The first selected node if any, null otherwise.
