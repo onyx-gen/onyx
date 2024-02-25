@@ -13,6 +13,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "test": "turbo test",
     "clean": "turbo clean",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
