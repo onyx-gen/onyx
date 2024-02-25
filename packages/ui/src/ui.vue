@@ -1,6 +1,17 @@
 <script lang="ts" setup>
+import { onMounted, ref } from 'vue'
 import Layout from './layout.vue'
 import Code from './code.vue'
+
+const hasSelection = ref(false)
+
+onMounted(async () => {
+  window.addEventListener('message', (m) => {
+    console.log('message', m)
+
+    hasSelection.value = m.data.pluginMessage.event !== 'unselected'
+  })
+})
 </script>
 
 <template>
@@ -10,13 +21,25 @@ import Code from './code.vue'
         UnoCSS Variables
       </h1>
 
-      <div class="flex flex-col w-full bg-$figma-color-bg-secondary divide-y divide-[#4c4c4c] rounded-sm overflow-hidden">
+      <div
+        v-show="hasSelection"
+        class="flex flex-col w-full bg-$figma-color-bg-secondary divide-y divide-[#4c4c4c] rounded-sm overflow-hidden"
+      >
         <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
           Generated Code
         </div>
 
         <div class="px-3 py-2">
           <Code />
+        </div>
+      </div>
+
+      <div
+        v-show="!hasSelection"
+        class="bg-$figma-color-bg-secondary w-max divide-y divide-[#4c4c4c] rounded-sm overflow-hidden"
+      >
+        <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
+          Please select a node!
         </div>
       </div>
     </div>

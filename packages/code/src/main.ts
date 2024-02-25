@@ -18,7 +18,11 @@ figma.showUI(__html__, { themeColors: true })
 
 figma.on('selectionchange', async () => {
   const html = await generate()
-  figma.ui.postMessage(html)
+
+  if (html)
+    figma.ui.postMessage({ event: 'html', html })
+  else
+    figma.ui.postMessage({ event: 'unselected' })
 })
 
 /**
@@ -27,12 +31,12 @@ figma.on('selectionchange', async () => {
  * The generated code is displayed in the dev tools panel
  * inside Figma.
  */
-async function generate(): Promise<string> {
+async function generate(): Promise<string | null> {
   const nodes = getSelectedNodes()
 
   // Early return if no node is selected
   if (nodes.length === 0)
-    return ''
+    return null
 
   const parser = new FigmaNodeParser()
   const generator = new HTMLGenerator()

@@ -8,7 +8,11 @@ const html = ref('')
 onMounted(async () => {
   window.addEventListener('message', (m) => {
     console.log('message', m)
-    code.value = m.data.pluginMessage
+
+    if (m.data.pluginMessage.event === 'html')
+      code.value = m.data.pluginMessage.html
+    else if (m.data.pluginMessage.event === 'unselected')
+      console.log('unselected')
   })
 })
 
