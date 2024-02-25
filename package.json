@@ -20,7 +20,6 @@
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.4",
     "eslint": "^8.57.0",
-    "tslib": "^2.6.2",
     "turbo": "^1.12.4"
   }
 }

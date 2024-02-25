@@ -14,9 +14,6 @@ importers:
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
-      tslib:
-        specifier: ^2.6.2
-        version: 2.6.2
       turbo:
         specifier: ^1.12.4
         version: 1.12.4
