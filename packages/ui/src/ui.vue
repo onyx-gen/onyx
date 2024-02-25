@@ -1,48 +1,16 @@
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue'
-
-import { codeToHtml } from 'shiki'
-import { sum } from './util'
-
-const counter = ref(0)
-const code = ref('const a = 1')
-const html = ref('')
-
-onMounted(async () => {
-  window.addEventListener('message', (m) => {
-    console.log('message', m)
-    code.value = m.data.pluginMessage
-  })
-})
-
-watch(code, async () => {
-  html.value = await codeToHtml(code.value, {
-    lang: 'vue',
-    theme: 'vitesse-light',
-  })
-})
+import Layout from './layout.vue'
+import Code from './code.vue'
 </script>
 
 <template>
-  <div class="w-screen h-full overflow-hidden bg-blue">
+  <Layout class="space-y-4">
     <div>
-      <button class="bg-red" @click="counter--">
-        Decrement
-      </button>
-      {{ counter }} / {{ sum(counter, counter) }}
-      <button @click="counter++">
-        Increment
-      </button>
+      <h1 class="text-center">
+        UnoCSS Variables
+      </h1>
+
+      <Code />
     </div>
-
-    <h1>HTML</h1>
-
-    <div class="w-full px-8 overflow-hidden" v-html="html" />
-  </div>
+  </Layout>
 </template>
-
-<style>
-.shiki {
-  overflow-x: auto;
-}
-</style>
