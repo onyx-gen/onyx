@@ -1,13 +1,23 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+
+import { codeToHtml } from 'shiki'
 
 const counter = ref(0)
-const message = ref('')
+const code = ref('const a = 1')
+const html = ref('')
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('message', (m) => {
     console.log('message', m)
-    message.value = JSON.stringify(m.data.pluginMessage)
+    code.value = m.data.pluginMessage
+  })
+})
+
+watch(code, async () => {
+  html.value = await codeToHtml(code.value, {
+    lang: 'vue',
+    theme: 'vitesse-light',
   })
 })
 </script>
@@ -23,7 +33,15 @@ onMounted(() => {
     </button>
   </div>
 
-  <div>
-    Message: {{ message }}
-  </div>
+  <h1>HTML</h1>
+
+  <div class="code" v-html="html" />
 </template>
+
+<style scoped>
+.code {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+</style>
