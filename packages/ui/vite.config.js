@@ -1,4 +1,3 @@
-import path from 'node:path'
 import { defineConfig } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
 import UnoCSS from 'unocss/vite'
@@ -18,9 +17,9 @@ export default defineConfig({
     brotliSize: false,
     emptyOutDir: false,
     rollupOptions: {
-      input: {
-        index: path.resolve(__dirname, 'src/ui.html'),
-      },
+      // input: {
+      // index: path.resolve(__dirname, 'src/ui.html'),
+      // },
     },
   },
 })
