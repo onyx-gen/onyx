@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import { codeToHtml } from 'shiki'
-import type { HtmlPluginMessage, PluginMessage } from '@unocss-variables/events'
+import type { PluginMessageEvent } from '@unocss-variables/events'
 
 const code = ref('const a = 1')
 const html = ref('')
 
 onMounted(async () => {
-  window.addEventListener('message', (m) => {
-    const pluginMessage = m.data.pluginMessage as PluginMessage
+  window.addEventListener('message', (m: PluginMessageEvent) => {
+    const pluginMessage = m.data.pluginMessage
 
     if (pluginMessage.event === 'html')
-      code.value = (pluginMessage as HtmlPluginMessage).data.html
+      code.value = pluginMessage.data.html
   })
 })
 
