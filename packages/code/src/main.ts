@@ -51,15 +51,17 @@ function generate(): string {
       }
       catch (error) {
         console.error(`[UnoCSS-Variables Plugin] Error during component set processing`, error)
+        figma.notify('Error during component set processing')
       }
     }
     else {
       const tree = parser.parse(node)
 
-      if (tree)
-        html = generator.generate(tree)
-      else
+      if (tree) { html = generator.generate(tree) }
+      else {
         console.error('It was not possible to generate HTML code for the selected node.')
+        figma.notify('Error during HTML generation')
+      }
     }
   }
   else {
@@ -70,7 +72,8 @@ function generate(): string {
       html = componentSetProcessor.process(nodes)
     }
     catch (error) {
-      console.error(`[UnoCSS-Variables Plugin] Error during component set processing`, error)
+      console.error(`[UnoCSS-Variables Plugin] Error during multiple selected nodes processing`, error)
+      figma.notify('Error during multiple selected nodes processing')
     }
   }
 
