@@ -2,6 +2,7 @@
 import { onMounted, ref, watch } from 'vue'
 
 import { codeToHtml } from 'shiki'
+import { sum } from './util'
 
 const counter = ref(0)
 const code = ref('const a = 1')
@@ -28,7 +29,7 @@ watch(code, async () => {
       <button class="bg-red" @click="counter--">
         Decrement
       </button>
-      {{ counter }}
+      {{ counter }} / {{ sum(counter, counter) }}
       <button @click="counter++">
         Increment
       </button>
