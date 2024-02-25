@@ -14,7 +14,7 @@ onMounted(async () => {
 
 watch(code, async () => {
   html.value = await codeToHtml(code.value, {
-    lang: 'vue',
+    lang: 'vue-html',
     theme: 'vitesse-light',
   })
 })
