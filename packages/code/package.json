@@ -1,5 +1,5 @@
 {
-  "name": "@unocss-variables/code",
+  "name": "@onyx/code",
   "type": "module",
   "version": "0.0.0",
   "private": true,
@@ -10,8 +10,8 @@
     "test": "vitest --ui"
   },
   "dependencies": {
-    "@unocss-variables/events": "workspace:^",
-    "@unocss-variables/tsconfig": "workspace:^",
+    "@onyx/events": "workspace:^",
+    "@onyx/tsconfig": "workspace:^",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {

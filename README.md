@@ -1,4 +1,4 @@
-# UnoCSS Variables Figma Plugin
+# Onyx Figma Plugin
 
 ```shell
 pnpm install

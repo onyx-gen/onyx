@@ -1,5 +1,5 @@
 {
-  "extends": "@unocss-variables/tsconfig/vue.json",
+  "extends": "@onyx/tsconfig/vue.json",
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",

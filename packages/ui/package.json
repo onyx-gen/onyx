@@ -1,5 +1,5 @@
 {
-  "name": "@unocss-variables/ui",
+  "name": "@onyx/ui",
   "type": "module",
   "version": "0.0.0",
   "private": true,
@@ -9,8 +9,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@unocss-variables/events": "workspace:^",
-    "@unocss-variables/tsconfig": "workspace:^",
+    "@onyx/events": "workspace:^",
+    "@onyx/tsconfig": "workspace:^",
     "@unocss/reset": "^0.58.5",
     "@vueuse/core": "^10.8.0",
     "vue": "^3.4.19"

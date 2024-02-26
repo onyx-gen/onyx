@@ -1,11 +1,11 @@
 {
-  "name": "@unocss-variables/events",
+  "name": "@onyx/events",
   "type": "module",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.ts",
   "dependencies": {
-    "@unocss-variables/tsconfig": "workspace:^"
+    "@onyx/tsconfig": "workspace:^"
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.87.0",

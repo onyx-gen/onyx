@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import type { PluginMessageEvent } from '@unocss-variables/events'
+import type { PluginMessageEvent } from '@onyx/events'
 import Layout from './layout.vue'
 import Code from './code.vue'
 
@@ -17,7 +17,7 @@ onMounted(async () => {
   <Layout>
     <div>
       <h1 class="text-2xl font-bold mb-4">
-        UnoCSS Variables
+        Onyx
       </h1>
 
       <div

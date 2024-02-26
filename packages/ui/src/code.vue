@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { codeToHtml } from 'shiki'
-import type { PluginMessageEvent } from '@unocss-variables/events'
+import type { PluginMessageEvent } from '@onyx/events'
 import { computedAsync } from '@vueuse/core'
 import { useTheme } from './useTheme'
 

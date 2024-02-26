@@ -1,8 +1,8 @@
-import type { HtmlPluginMessage, UnselectedPluginMessage } from '@unocss-variables/events'
+import type { HtmlPluginMessage, UnselectedPluginMessage } from '@onyx/events'
 
 /**
  * This function sends a message to the Figma UI when no node is selected.
- * The message is of type UnselectedPluginMessage, which is defined in '@unocss-variables/events'.
+ * The message is of type UnselectedPluginMessage, which is defined in '@onyx/events'.
  * The event property of the message is set to 'unselected'.
  */
 export function sendUnselectedMessage() {

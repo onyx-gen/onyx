@@ -34,7 +34,7 @@ export default async function generate(): Promise<string | void> {
         html = await componentSetProcessor.process(node)
       }
       catch (error) {
-        console.error(`[UnoCSS-Variables Plugin] Error during component set processing`, error)
+        console.error(`[Onyx Plugin] Error during component set processing`, error)
         figma.notify('Error during component set processing')
       }
     }
@@ -57,7 +57,7 @@ export default async function generate(): Promise<string | void> {
       html = await componentSetProcessor.process(nodes)
     }
     catch (error) {
-      console.error(`[UnoCSS-Variables Plugin] Error during multiple selected nodes processing`, error)
+      console.error(`[Onyx Plugin] Error during multiple selected nodes processing`, error)
       figma.notify('Error during multiple selected nodes processing')
     }
   }
