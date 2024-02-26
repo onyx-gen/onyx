@@ -320,14 +320,19 @@ class ComponentSetProcessor {
     trees: { [key: string]: TreeNode | null },
     permutation: VariantPermutation,
   ): TreeNode | null {
-    let mergedTree = trees.default
-    const previousStates = ['default']
+    const allStates = Object.keys(trees)
+    let defaultState = allStates[0]
+    if ('default' in allStates)
+      defaultState = 'default'
+
+    let mergedTree = trees[defaultState]
+    const previousStates = [defaultState]
 
     if (!mergedTree)
       return null
 
     Object.entries(trees).forEach(([state, tree]) => {
-      if (tree && state !== 'default') {
+      if (tree && state !== defaultState) {
         const treeMerger = new StateTreeMerger(state, permutation, previousStates)
         mergedTree = treeMerger.merge(mergedTree!, tree)
         previousStates.push(state)
