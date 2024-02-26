@@ -378,6 +378,48 @@ describe('css', () => {
         expect(calculateVariantCSSUnion(map3, map5)).toEqual(unionMap3Map5)
       })
 
+      it('calculates the union of the variant css maps with same variants at root', () => {
+        const map1: VariantCSS = {
+          variant: 'hover',
+          css: [],
+        }
+
+        const map2: VariantCSS = {
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11', 'color-green']),
+          ],
+        }
+
+        const map3: VariantCSS = {
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11', 'bg-red']),
+          ],
+        }
+
+        expect(calculateVariantCSSUnion(map1, map2)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11', 'color-green']),
+          ],
+        })
+
+        expect(calculateVariantCSSUnion(map1, map3)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11', 'bg-red']),
+          ],
+        })
+
+        expect(calculateVariantCSSUnion(map2, map3)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11', 'bg-red', 'color-green']),
+          ],
+        })
+      })
+
       it('calculates the union of the variant css maps with different variants at root', () => {
         const map1: VariantCSS = {
           variant: 'focus',
