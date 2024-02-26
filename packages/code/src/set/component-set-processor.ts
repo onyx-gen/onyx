@@ -239,29 +239,30 @@ class ComponentSetProcessor {
     permutation: VariantPermutation,
     groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
   ): { [key: string]: ComponentNode | undefined } { // mapping of state to component for permutation
-    const allEntries = entries(groupedCollection)
-      .map(([state, collection]) => {
-        const components = collection.filter(
-          (component) => {
-            return Object.entries(permutation).every(([permutationKey, permutationValue]) => {
-              return permutationKey in component.props && component.props[permutationKey] === permutationValue
-            })
-          },
-        )
-          .map(({ component }) => component)
+    try {
+      const allEntries = entries(groupedCollection)
+        .map(([state, collection]) => {
+          const componentWrapper = collection.find(
+            (component) => {
+              return Object.entries(permutation)
+                .every(
+                  ([permutationKey, permutationValue]) => {
+                    return permutationKey in component.props && component.props[permutationKey] === permutationValue
+                  }
+                )
+            },
+          )
 
-        if (components.length === 0) {
-          console.error('No component found for permutation', { allEntries, permutation, groupedCollection })
-          throw new Error(`No component found for permutation ${printObject(permutation)} and state ${state}`)
-        }
+          const component = componentWrapper?.component
 
-        if (components.length > 1)
-          console.warn('More than one component found for permutation', { allEntries, permutation, groupedCollection })
+          return [state as string, component]
+        })
 
-        return [state as string, components[0]]
-      })
-
-    return Object.fromEntries(allEntries)
+      return Object.fromEntries(allEntries)
+    } catch (e) {
+      console.error('Error finding variants for permutation', e, { permutation, groupedCollection })
+      return {}
+    }
   }
 
   /**
@@ -277,6 +278,7 @@ class ComponentSetProcessor {
     groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
   ): Promise<TreeNode | null> {
     const variants: { [p: string]: ComponentNode | undefined } = this.findVariantsForPermutation(permutation, groupedCollection)
+    console.log('variants', printObject(variants), permutation)
     const treesForPermutationByState = await this.parseVariantsToTrees(variants, permutation)
     return this.mergeTreesBasedOnStates(treesForPermutationByState, permutation)
   }
