@@ -17,6 +17,7 @@ figma.skipInvisibleInstanceChildren = true
 
 figma.showUI(__html__, { themeColors: true })
 
+generate()
 figma.on('selectionchange', generate)
 
 /**
