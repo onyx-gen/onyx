@@ -6,6 +6,7 @@ import StateTreeMerger from '../merge/state/state-tree-merger'
 import VariantTreeMerger from '../merge/variant/variant-tree-merger'
 import { variantKey } from '../merge/utils'
 import ScriptSetupGenerator from '../generators/script-setup.generator'
+import CssTraverser from '../traverser/css.traverser'
 import type {
   ComponentCollection,
   ComponentPropsWithState,
@@ -340,6 +341,12 @@ class ComponentSetProcessor {
     let defaultState = allStates[0]
     if ('default' in allStates)
       defaultState = 'default'
+
+    if (defaultState !== 'default') {
+      const cssTraverser = new CssTraverser(defaultState)
+      trees[defaultState] = cssTraverser.traverse(trees[defaultState]!)
+      console.log('defaultState', printObject(trees[defaultState]))
+    }
 
     let mergedTree = trees[defaultState]
     const previousStates = [defaultState]
