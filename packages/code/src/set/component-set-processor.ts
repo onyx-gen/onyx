@@ -238,16 +238,30 @@ class ComponentSetProcessor {
   private findVariantsForPermutation(
     permutation: VariantPermutation,
     groupedCollection: GroupedComponentCollection<ComponentPropsWithState>,
-  ): { [key: string]: ComponentNode | undefined } {
-    const permutationKey = Object.keys(permutation)[0]
-    const permutationValue = permutation[permutationKey]
+  ): { [key: string]: ComponentNode | undefined } { // mapping of state to component for permutation
+    const allEntries = entries(groupedCollection)
+      .map(([state, collection]) => {
+        const components = collection.filter(
+          (component) => {
+            return Object.entries(permutation).every(([permutationKey, permutationValue]) => {
+              return permutationKey in component.props && component.props[permutationKey] === permutationValue
+            })
+          },
+        )
+          .map(({ component }) => component)
 
-    return Object.fromEntries(
-      Object.entries(groupedCollection).map(([state, collection]) => ([
-        state,
-        collection.find(component => permutationKey in component.props && component.props[permutationKey] === permutationValue)?.component,
-      ])),
-    )
+        if (components.length === 0) {
+          console.error('No component found for permutation', { allEntries, permutation, groupedCollection })
+          throw new Error(`No component found for permutation ${printObject(permutation)} and state ${state}`)
+        }
+
+        if (components.length > 1)
+          console.warn('More than one component found for permutation', { allEntries, permutation, groupedCollection })
+
+        return [state as string, components[0]]
+      })
+
+    return Object.fromEntries(allEntries)
   }
 
   /**
