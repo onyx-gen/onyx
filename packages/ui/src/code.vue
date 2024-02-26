@@ -24,7 +24,7 @@ watch(code, async () => {
 </script>
 
 <template>
-  <div class="w-full overflow-hidden" v-html="html" />
+  <div class="w-full max-h-full overflow-hidden" v-html="html" />
 </template>
 
 <style>

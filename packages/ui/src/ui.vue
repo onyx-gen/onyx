@@ -15,20 +15,20 @@ onMounted(async () => {
 
 <template>
   <Layout>
-    <div class="space-y-4">
-      <h1 class="text-2xl font-bold">
+    <div>
+      <h1 class="text-2xl font-bold mb-4">
         UnoCSS Variables
       </h1>
 
       <div
         v-show="hasSelection"
-        class="flex flex-col w-full bg-$figma-color-bg-secondary divide-y divide-[rgba(0, 0, 0, 0.898)] rounded-sm overflow-hidden"
+        class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-[rgba(0, 0, 0, 0.898)] rounded-sm overflow-hidden"
       >
         <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
           Generated Code
         </div>
 
-        <div class="px-3 py-2">
+        <div class="px-3 py-2 overflow-scroll">
           <Code />
         </div>
       </div>
