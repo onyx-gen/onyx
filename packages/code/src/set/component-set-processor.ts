@@ -99,14 +99,24 @@ class ComponentSetProcessor {
     GroupedComponentCollection<ComponentPropsWithState>,
   ] {
     const componentCollection = this.mapComponentsToProperties(nodes)
-    const componentCollectionWithState = this.filterComponentsWithState(componentCollection)
+    let componentCollectionWithState = this.filterComponentsWithState(componentCollection)
+
+    if (componentCollectionWithState.length === 0) {
+      componentCollection.forEach((componentData) => {
+        componentData.props.state = 'default'
+      })
+      componentCollectionWithState = this.filterComponentsWithState(componentCollection)
+    }
+
     const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
 
     const componentCollectionGroupedByStateWithDefaultVariantIfNecessary: typeof componentCollectionGroupedByState = Object.fromEntries(
       Object.entries(componentCollectionGroupedByState).map(
         ([state, components]) => {
           return [state, components.map((component) => {
-            if (Object.keys(component.props).length === 1) {
+            const hasVariant = 'variant' in component.props
+
+            if (!hasVariant) {
               return { ...component, props: { ...component.props, variant: 'default' },
               }
             }
