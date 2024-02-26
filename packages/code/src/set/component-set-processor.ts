@@ -331,6 +331,12 @@ class ComponentSetProcessor {
     permutation: VariantPermutation,
   ): TreeNode | null {
     const allStates = Object.keys(trees)
+
+    if (allStates.length === 0) {
+      console.error('[ComponentSetProcessor] No states found')
+      return null
+    }
+
     let defaultState = allStates[0]
     if ('default' in allStates)
       defaultState = 'default'
