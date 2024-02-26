@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { codeToHtml } from 'shiki'
 import type { PluginMessageEvent } from '@unocss-variables/events'
+import { computedAsync } from '@vueuse/core'
+import { useTheme } from './useTheme'
 
-const code = ref('const a = 1')
-const html = ref('')
+const code = ref('')
 
 onMounted(async () => {
   window.addEventListener('message', (m: PluginMessageEvent) => {
@@ -15,12 +16,15 @@ onMounted(async () => {
   })
 })
 
-watch(code, async () => {
-  html.value = await codeToHtml(code.value, {
+const { theme } = useTheme()
+
+const html = computedAsync(
+  async () => codeToHtml(code.value, {
     lang: 'vue-html',
-    theme: 'vitesse-dark',
-  })
-})
+    theme: theme.value,
+  }),
+  '',
+)
 </script>
 
 <template>
