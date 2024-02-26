@@ -1,17 +1,14 @@
-
-
 Variants = (Variant1, Variant2, Variant3, CurrentVariant)
 
 Current ContainerNodeCSSData:
 ```json
 {
-  "default": ...,
-  "variant1": ...,
-  "variant2": ...,
-  "variant3": ...,
+  "default": "...",
+  "variant1": "...",
+  "variant2": "...",
+  "variant3": "..."
 }
 ```
-
 
 ### Aim
 
@@ -48,12 +45,10 @@ const variantsCSS = [variant1VariantCSS, variant2VariantCSS, variant3VariantCSS]
 Output ContainerNodeCSSData:
 ```json
 {
-  "default": defaultVariantCSS,
-  "currentVariant": currentVariantCSS,
-  "variant1": variant1VariantCSS,
-  "variant2": variant2VariantCSS,
-  "variant3": variant3VariantCSS,
+  "default": "defaultVariantCSS",
+  "currentVariant": "currentVariantCSS",
+  "variant1": "variant1VariantCSS",
+  "variant2": "variant2VariantCSS",
+  "variant3": "variant3VariantCSS"
 }
 ```
-
-
