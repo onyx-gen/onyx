@@ -102,6 +102,10 @@ export function calculateVariantCSSDifference(variantCSS1: VariantCSS | undefine
 
   const copyVariantCSS1 = makeCopy(variantCSS1)!
   const copyVariantCSS2 = makeCopy(variantCSS2)!
+
+  if (copyVariantCSS1.variant !== copyVariantCSS2.variant)
+    return copyVariantCSS1
+
   return { css: diff(copyVariantCSS1.css, copyVariantCSS2.css) }
 }
 
@@ -198,14 +202,42 @@ export function calculateVariantCSSUnion(variantCSS1: VariantCSS | undefined, va
     return result
   }
 
+  const hasVariant1 = copyVariantCSS1.css.length > 0
+  const hasVariant2 = copyVariantCSS2.css.length > 0
+
   // Handle distinct variant cases
   const result: VariantCSS = { css: [] }
-  if (copyVariantCSS1.variant === undefined)
-    result.css = [...copyVariantCSS1.css, copyVariantCSS2]
-  else if (copyVariantCSS2.variant === undefined)
-    result.css = [...copyVariantCSS2.css, copyVariantCSS1]
-  else
-    result.css = [copyVariantCSS1, copyVariantCSS2]
+  if (copyVariantCSS1.variant === undefined) {
+    if (!hasVariant1)
+      return copyVariantCSS2
+
+    result.css = [...copyVariantCSS1.css]
+
+    if (hasVariant2)
+      result.css.push(copyVariantCSS2)
+  }
+  else if (copyVariantCSS2.variant === undefined) {
+    if (!hasVariant2)
+      return copyVariantCSS1
+
+    result.css = [...copyVariantCSS2.css]
+
+    if (hasVariant1)
+      result.css.push(copyVariantCSS1)
+  }
+  else {
+    result.css = []
+
+    if (hasVariant1 && hasVariant2) {
+      result.css = [copyVariantCSS1, copyVariantCSS2]
+      return result
+    }
+
+    if (hasVariant1)
+      return copyVariantCSS1
+    if (hasVariant2)
+      return copyVariantCSS2
+  }
 
   return result
 }

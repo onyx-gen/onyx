@@ -96,159 +96,334 @@ describe('css', () => {
   })
 
   describe('set composition', () => {
-    it('calculates the difference between two variant css maps', () => {
-      const map1: VariantCSS = {
-        css: [
-          new Set(['bg-red', 'px-4']),
-          {
-            variant: 'hover',
-            css: [
-              new Set(['bg-blue', 'px-8']),
-            ],
-          },
-          {
-            variant: 'focus',
-            css: [
-              new Set(['bg-green', 'px-12']),
-              {
-                variant: 'disabled',
-                css: [
-                  new Set(['bg-gray-300']),
-                ],
-              },
-            ],
-          },
-        ],
-      }
+    describe('calculateVariantCSSDifference', () => {
+      it('calculates the difference between two variant css maps', () => {
+        const map1: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8']),
+              ],
+            },
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-green', 'px-12']),
+                {
+                  variant: 'disabled',
+                  css: [
+                    new Set(['bg-gray-300']),
+                  ],
+                },
+              ],
+            },
+          ],
+        }
 
-      const map2: VariantCSS = {
-        css: [
-          new Set(['bg-red', 'px-4']),
-          {
-            variant: 'hover',
-            css: [
-              new Set(['bg-blue', 'px-8']),
-            ],
-          },
-          {
-            variant: 'focus',
-            css: [
-              new Set(['bg-green', 'px-12']),
-              {
-                variant: 'disabled',
-                css: [
-                  new Set(['bg-gray-300']),
-                ],
-              },
-            ],
-          },
-        ],
-      }
+        const map2: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8']),
+              ],
+            },
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-green', 'px-12']),
+                {
+                  variant: 'disabled',
+                  css: [
+                    new Set(['bg-gray-300']),
+                  ],
+                },
+              ],
+            },
+          ],
+        }
 
-      const map3: VariantCSS = {
-        css: [
-          {
-            variant: 'focus',
-            css: [
-              new Set(['bg-green', 'px-12']),
-              {
-                variant: 'disabled',
-                css: [
-                  new Set(['bg-gray-300']),
-                ],
-              },
-            ],
-          },
-        ],
-      }
+        const map3: VariantCSS = {
+          css: [
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-green', 'px-12']),
+                {
+                  variant: 'disabled',
+                  css: [
+                    new Set(['bg-gray-300']),
+                  ],
+                },
+              ],
+            },
+          ],
+        }
 
-      const map4: VariantCSS = {
-        css: [
-          {
-            variant: 'hover',
-            css: [
-              new Set(['bg-blue']),
-            ],
-          },
-        ],
-      }
+        const map4: VariantCSS = {
+          css: [
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue']),
+              ],
+            },
+          ],
+        }
 
-      const map5: VariantCSS = {
-        css: [
-          new Set(['bg-yellow', 'px-6']),
-          {
-            variant: 'hover',
-            css: [
-              new Set(['bg-red', 'px-4']),
-            ],
-          },
-          {
-            variant: 'focus',
-            css: [
-              new Set(['bg-blue', 'px-8']),
-              {
-                variant: 'disabled',
-                css: [
-                  new Set(['bg-gray-400']),
-                ],
-              },
-            ],
-          },
-        ],
-      }
+        const map5: VariantCSS = {
+          css: [
+            new Set(['bg-yellow', 'px-6']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-red', 'px-4']),
+              ],
+            },
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-blue', 'px-8']),
+                {
+                  variant: 'disabled',
+                  css: [
+                    new Set(['bg-gray-400']),
+                  ],
+                },
+              ],
+            },
+          ],
+        }
 
-      const diffMap1Map2: VariantCSS = { css: [] }
-      expect(calculateVariantCSSDifference(map1, map2)).toEqual(diffMap1Map2)
+        const diffMap1Map2: VariantCSS = { css: [] }
+        expect(calculateVariantCSSDifference(map1, map2)).toEqual(diffMap1Map2)
 
-      const diffMap1Map3: VariantCSS = {
-        css: [
-          new Set(['bg-red', 'px-4']),
-          {
-            variant: 'hover',
-            css: [
-              new Set(['bg-blue', 'px-8']),
-            ],
-          },
-        ],
-      }
-      expect(calculateVariantCSSDifference(map1, map3)).toEqual(diffMap1Map3)
+        const diffMap1Map3: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue', 'px-8']),
+              ],
+            },
+          ],
+        }
+        expect(calculateVariantCSSDifference(map1, map3)).toEqual(diffMap1Map3)
 
-      const diffMap1Map4: VariantCSS = {
-        css: [
-          new Set(['bg-red', 'px-4']),
-          {
-            variant: 'hover',
-            css: [
-              new Set(['px-8']),
-            ],
-          },
-          {
-            variant: 'focus',
-            css: [
-              new Set(['bg-green', 'px-12']),
-              {
-                variant: 'disabled',
-                css: [
-                  new Set(['bg-gray-300']),
-                ],
-              },
-            ],
-          },
-        ],
-      }
-      expect(calculateVariantCSSDifference(map1, map4)).toEqual(diffMap1Map4)
+        const diffMap1Map4: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['px-8']),
+              ],
+            },
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-green', 'px-12']),
+                {
+                  variant: 'disabled',
+                  css: [
+                    new Set(['bg-gray-300']),
+                  ],
+                },
+              ],
+            },
+          ],
+        }
+        expect(calculateVariantCSSDifference(map1, map4)).toEqual(diffMap1Map4)
 
-      expect(calculateVariantCSSDifference(map1, map5)).toEqual(map1)
+        expect(calculateVariantCSSDifference(map1, map5)).toEqual(map1)
 
-      // If variantCSS1 is undefined, returns an empty VariantCSS.
-      expect(calculateVariantCSSDifference(undefined, map1)).toEqual({ css: [] })
+        // If variantCSS1 is undefined, returns an empty VariantCSS.
+        expect(calculateVariantCSSDifference(undefined, map1)).toEqual({ css: [] })
 
-      expect(calculateVariantCSSDifference(undefined, undefined)).toEqual({ css: [] })
+        expect(calculateVariantCSSDifference(undefined, undefined)).toEqual({ css: [] })
 
-      expect(calculateVariantCSSDifference(map1, undefined)).toEqual(map1)
+        expect(calculateVariantCSSDifference(map1, undefined)).toEqual(map1)
+      })
+
+      it('calculates the difference between two variant css maps with different variants at root', () => {
+        const map1: VariantCSS = {
+          css: [],
+        }
+
+        const map2: VariantCSS = {
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11']),
+          ],
+        }
+
+        const map3: VariantCSS = {
+          variant: 'focus',
+          css: [],
+        }
+
+        expect(calculateVariantCSSDifference(map2, map1)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11']),
+          ],
+        })
+
+        expect(calculateVariantCSSDifference(map2, map3)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11']),
+          ],
+        })
+      })
     })
 
     describe('calculateVariantCSSUnion', () => {
+      it('calculates the union of the variant css maps', () => {
+        const map1: VariantCSS = {
+          css: [
+            new Set(['bg-red']),
+          ],
+        }
+
+        const map2: VariantCSS = {
+          css: [
+            new Set(['px-4']),
+          ],
+        }
+
+        const map3: VariantCSS = {
+          variant: 'focus',
+          css: [
+            new Set(['bg-blue']),
+          ],
+        }
+
+        const map4: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-6']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['my-4']),
+              ],
+            },
+          ],
+        }
+
+        const map5: VariantCSS = {
+          variant: 'hover',
+          css: [
+            new Set(['bg-blue']),
+          ],
+        }
+
+        const unionMap3Map5: VariantCSS = {
+          css: [
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-blue']),
+              ],
+            },
+            {
+              variant: 'hover',
+              css: [
+                new Set(['bg-blue']),
+              ],
+            },
+          ],
+        }
+
+        const unionMap1Map2: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-4']),
+          ],
+        }
+
+        const unionMap1Map3: VariantCSS = {
+          css: [
+            // directly from map1
+            new Set(['bg-red']),
+
+            // directly from map3
+            {
+              variant: 'focus',
+              css: [
+                new Set(['bg-blue']),
+              ],
+            },
+          ],
+        }
+
+        const unionMap1Map4: VariantCSS = {
+          css: [
+            new Set(['bg-red', 'px-6']),
+            {
+              variant: 'hover',
+              css: [
+                new Set(['my-4']),
+              ],
+            },
+          ],
+        }
+
+        expect(calculateVariantCSSUnion(map1, map2)).toEqual(unionMap1Map2)
+        expect(calculateVariantCSSUnion(map1, map3)).toEqual(unionMap1Map3)
+        expect(calculateVariantCSSUnion(map1, map4)).toEqual(unionMap1Map4)
+        expect(calculateVariantCSSUnion(map3, map5)).toEqual(unionMap3Map5)
+      })
+
+      it('calculates the union of the variant css maps with different variants at root', () => {
+        const map1: VariantCSS = {
+          variant: 'focus',
+          css: [],
+        }
+
+        const map2: VariantCSS = {
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11']),
+          ],
+        }
+
+        const map3: VariantCSS = {
+          css: [],
+        }
+
+        expect(calculateVariantCSSUnion(map1, map2)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11']),
+          ],
+        })
+
+        expect(calculateVariantCSSUnion(map2, map1)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11']),
+          ],
+        })
+
+        expect(calculateVariantCSSUnion(map3, map2)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11']),
+          ],
+        })
+
+        expect(calculateVariantCSSUnion(map2, map3)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['h-$sizing.11']),
+          ],
+        })
+      })
+
       it('can optimize', () => {
         const variantCSS1: VariantCSS = {
           css: [
@@ -300,101 +475,6 @@ describe('css', () => {
 
         expect(calculateVariantCSSUnion(variantCSS1, variantCSS2)).toEqual(expectedUnion)
       })
-    })
-
-    it('calculates the union of the variant css maps', () => {
-      const map1: VariantCSS = {
-        css: [
-          new Set(['bg-red']),
-        ],
-      }
-
-      const map2: VariantCSS = {
-        css: [
-          new Set(['px-4']),
-        ],
-      }
-
-      const map3: VariantCSS = {
-        variant: 'focus',
-        css: [
-          new Set(['bg-blue']),
-        ],
-      }
-
-      const map4: VariantCSS = {
-        css: [
-          new Set(['bg-red', 'px-6']),
-          {
-            variant: 'hover',
-            css: [
-              new Set(['my-4']),
-            ],
-          },
-        ],
-      }
-
-      const map5: VariantCSS = {
-        variant: 'hover',
-        css: [
-          new Set(['bg-blue']),
-        ],
-      }
-
-      const unionMap3Map5: VariantCSS = {
-        css: [
-          {
-            variant: 'focus',
-            css: [
-              new Set(['bg-blue']),
-            ],
-          },
-          {
-            variant: 'hover',
-            css: [
-              new Set(['bg-blue']),
-            ],
-          },
-        ],
-      }
-
-      const unionMap1Map2: VariantCSS = {
-        css: [
-          new Set(['bg-red', 'px-4']),
-        ],
-      }
-
-      const unionMap1Map3: VariantCSS = {
-        css: [
-          // directly from map1
-          new Set(['bg-red']),
-
-          // directly from map3
-          {
-            variant: 'focus',
-            css: [
-              new Set(['bg-blue']),
-            ],
-          },
-        ],
-      }
-
-      const unionMap1Map4: VariantCSS = {
-        css: [
-          new Set(['bg-red', 'px-6']),
-          {
-            variant: 'hover',
-            css: [
-              new Set(['my-4']),
-            ],
-          },
-        ],
-      }
-
-      expect(calculateVariantCSSUnion(map1, map2)).toEqual(unionMap1Map2)
-      expect(calculateVariantCSSUnion(map1, map3)).toEqual(unionMap1Map3)
-      expect(calculateVariantCSSUnion(map1, map4)).toEqual(unionMap1Map4)
-      expect(calculateVariantCSSUnion(map3, map5)).toEqual(unionMap3Map5)
     })
 
     describe('calculateVariantCSSSymmetricDifference', () => {
