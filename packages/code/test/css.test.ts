@@ -249,6 +249,34 @@ describe('css', () => {
         expect(calculateVariantCSSDifference(map1, undefined)).toEqual(map1)
       })
 
+      it('calculates the difference between two variant css maps with same variants at root', () => {
+        const map1: VariantCSS = {
+          variant: 'hover',
+          css: [
+            new Set(['bg-red', 'color-green']),
+          ],
+        }
+
+        const map2: VariantCSS = {
+          variant: 'hover',
+          css: [
+            new Set(['color-green']),
+          ],
+        }
+
+        expect(calculateVariantCSSDifference(map1, map2)).toEqual({
+          variant: 'hover',
+          css: [
+            new Set(['bg-red']),
+          ],
+        })
+
+        expect(calculateVariantCSSDifference(map2, map1)).toEqual({
+          variant: 'hover',
+          css: [],
+        })
+      })
+
       it('calculates the difference between two variant css maps with different variants at root', () => {
         const map1: VariantCSS = {
           css: [],

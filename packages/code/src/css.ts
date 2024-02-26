@@ -106,7 +106,10 @@ export function calculateVariantCSSDifference(variantCSS1: VariantCSS | undefine
   if (copyVariantCSS1.variant !== copyVariantCSS2.variant)
     return copyVariantCSS1
 
-  return { css: diff(copyVariantCSS1.css, copyVariantCSS2.css) }
+  return {
+    variant: copyVariantCSS1.variant,
+    css: diff(copyVariantCSS1.css, copyVariantCSS2.css),
+  }
 }
 
 function makeCopy(variantCSS: VariantCSS | undefined): VariantCSS | undefined {
