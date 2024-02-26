@@ -276,7 +276,7 @@ class ComponentSetProcessor {
 
     console.log('variantTrees', variantTrees.length, variantTrees)
 
-    variantTrees.reverse().forEach(({ permutation, tree }) => {
+    variantTrees.forEach(({ permutation, tree }) => {
       if (tree) {
         const variantTreeMerger = new VariantTreeMerger(permutation)
         mergedTree = variantTreeMerger.merge(mergedTree || tree, tree)
