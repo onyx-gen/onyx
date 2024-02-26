@@ -23,9 +23,12 @@ export interface VariantCSS {
   css: (VariantCSS | Set<string>)[]
 }
 
-export interface ContainerNodeData extends AbstractNodeData {
-  type: 'container'
+export interface HasNodeCSSData {
   css?: NodeCSSData
+}
+
+export interface ContainerNodeData extends AbstractNodeData, HasNodeCSSData {
+  type: 'container'
   element?: string
 }
 
@@ -40,8 +43,7 @@ export interface InstanceNodeData extends AbstractNodeData {
   props: ComponentProperties
 }
 
-export interface IconNodeData extends AbstractNodeData {
+export interface IconNodeData extends AbstractNodeData, HasNodeCSSData {
   type: 'icon'
   name: string
-  css?: NodeCSSData
 }

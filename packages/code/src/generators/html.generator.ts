@@ -1,5 +1,6 @@
 import { cloneDeep } from 'lodash-es'
-import type {
+import {
+  HasNodeCSSData,
   InstanceNodeData,
   TreeNode,
   TreeNodeData,
@@ -9,8 +10,16 @@ import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import { simplifyConditionalString, transformPropKey } from './utils'
 
-type AttributeValue = string | { [key: string]: string }
+type StaticAttributeValue = string
+type DynamicAttributeValue = { [key: string]: string }
+
+type AttributeValue = StaticAttributeValue | DynamicAttributeValue
 interface Attributes { [key: string]: AttributeValue }
+
+interface CSSAttributes {
+  "static"?: StaticAttributeValue
+  "dynamic"?: DynamicAttributeValue 
+}
 
 type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => Attributes
 type ConditionalFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string | undefined
@@ -26,28 +35,14 @@ class HTMLGenerator {
       tag: treeNode => treeNode.data.element || 'div',
       attrs: (treeNode) => {
         const attrs: Attributes = {}
-
-        if (treeNode.data.css) {
-          const defaultVariantCSS: VariantCSS | undefined = Object.values(treeNode.data.css)[0]
-
-          if (defaultVariantCSS)
-            attrs.class = translateVariantCSS(defaultVariantCSS)
-
-          // Remove empty variant CSS entries
-          const filteredEntries = Object.fromEntries(
-            entries(treeNode.data.css)
-              .filter(([, value]) => !!value)
-              .filter(([, value]) => value.css.length > 0),
-          )
-
-          const length = Object.keys(filteredEntries).length
-
-          if (length > 1) {
-            const clonedCSS = cloneDeep(treeNode.data.css)
-            delete clonedCSS.default
-            attrs[':class'] = translateContainerNodeCSSData(clonedCSS)
-          }
-        }
+        
+        const cssAttributes: CSSAttributes = this.getCSSAttributes(treeNode)
+        
+        if (cssAttributes.static)
+          attrs.class = cssAttributes.static
+        
+        if (cssAttributes.dynamic)
+          attrs[':class'] = cssAttributes.dynamic
 
         return attrs
       },
@@ -63,12 +58,13 @@ class HTMLGenerator {
           class: `i-figma-${treeNode.data.name}`,
         }
 
-        if (treeNode.data.css) {
-          const defaultVariantCSS: VariantCSS | undefined = Object.values(treeNode.data.css)[0]
+        const cssAttributes: CSSAttributes = this.getCSSAttributes(treeNode)
 
-          if (defaultVariantCSS)
-            attrs.class += ` ${translateVariantCSS(defaultVariantCSS)}`
-        }
+        if (cssAttributes.static)
+          attrs.class += ` ${cssAttributes.static}`
+
+        if (cssAttributes.dynamic)
+          attrs[':class'] = cssAttributes.dynamic
 
         return attrs
       },
@@ -78,6 +74,42 @@ class HTMLGenerator {
       tag: this.getInstanceNodeHTMLTag,
       attrs: this.getInstanceNodeHTMLAttrs,
     },
+  }
+  
+  /**
+   * Retrieves the CSS attributes from a TreeNode with CSS data.
+   *
+   * @param {TreeNode<TreeNodeData & HasNodeCSSData>} tree - The TreeNode with CSS data.
+   * @returns {CSSAttributes} - The CSS attributes extracted from the TreeNode.
+   */
+  private getCSSAttributes(tree: TreeNode<TreeNodeData & HasNodeCSSData>): CSSAttributes {
+    const attrs: CSSAttributes = {}
+    
+    if (tree.data.css) {
+      const defaultVariantCSS: VariantCSS | undefined = Object.values(tree.data.css)[0]
+
+      if (defaultVariantCSS)
+        attrs.static = translateVariantCSS(defaultVariantCSS)
+
+      // Remove empty top-level variant CSS entries
+      // TODO: Optimization is incomplete as it does not remove recursively empty variant CSS entries
+      // TODO: optimization should not be done here, but in the CSS set operations
+      const filteredEntries = Object.fromEntries(
+        entries(tree.data.css)
+          .filter(([, value]) => !!value)
+          .filter(([, value]) => value.css.length > 0),
+      )
+
+      const length = Object.keys(filteredEntries).length
+
+      if (length > 1) {
+        const clonedCSS = cloneDeep(tree.data.css)
+        delete clonedCSS.default // TODO: We have a symbol for that
+        attrs.dynamic = translateContainerNodeCSSData(clonedCSS)
+      }
+    }
+    
+    return attrs
   }
 
   /**

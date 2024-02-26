@@ -1,9 +1,11 @@
 import { cloneDeep } from 'lodash-es'
 import type {
   ContainerNodeData,
+  HasNodeCSSData,
   IconNodeData,
   InstanceNodeData,
   NodeCSSData,
+  TreeNodeData,
   VariantCSS,
 } from '../../interfaces'
 import AbstractDataMerger from '../data-merger'
@@ -18,27 +20,26 @@ type MergedCSSVariants = [VariantCSS, VariantCSS, VariantCSS]
 class VariantDataMerger extends AbstractDataMerger {
   constructor(private readonly variantPermutation: VariantPermutation) {
     super()
+    console.log('VariantDataMerger constructor', { variantPermutation })
   }
 
   private get variant(): VariantKey {
     return variantKey(this.variantPermutation)
   }
 
-  protected mergeContainerData(
-    data1: ContainerNodeData,
-    data2: ContainerNodeData,
-  ): ContainerNodeData {
+  protected mergeDataWithCSS(
+    data1: TreeNodeData & HasNodeCSSData,
+    data2: TreeNodeData & HasNodeCSSData,
+  ): NodeCSSData {
     data1.css = data1.css || {}
     data2.css = data2.css || {}
 
     const otherKeys = this.getOtherVariantKeys(data1.css)
     if (otherKeys.length === 0) {
+      console.log('[VariantDataMerger] otherKeys empty', { data1, data2 })
       return {
-        type: 'container',
-        css: {
-          [VARIANT_KEY_DEFAULT]: data1.css[this.variant],
-          [this.variant]: { css: [] },
-        },
+        [VARIANT_KEY_DEFAULT]: data1.css[this.variant],
+        [this.variant]: { css: [] },
       }
     }
 
@@ -111,10 +112,20 @@ class VariantDataMerger extends AbstractDataMerger {
     if (currentVariantCSS.css.length !== 0)
       containerNodeCSSData[this.variant] = currentVariantCSS
 
-    return { type: 'container', css: containerNodeCSSData }
+    return containerNodeCSSData
   }
 
-  private getMergedDefaultCSSData(data1: ContainerNodeData, data2: ContainerNodeData) {
+  protected mergeContainerData(
+    data1: ContainerNodeData,
+    data2: ContainerNodeData,
+  ): ContainerNodeData {
+    return {
+      type: 'container',
+      css: this.mergeDataWithCSS(data1, data2),
+    }
+  }
+
+  private getMergedDefaultCSSData(data1: TreeNodeData & HasNodeCSSData, data2: TreeNodeData & HasNodeCSSData) {
     const cssData1Variant: VariantCSS = data1.css?.[VARIANT_KEY_DEFAULT] || { css: [] }
     const cssData2Variant: VariantCSS | undefined = data2.css?.[this.variant]
 
@@ -126,7 +137,7 @@ class VariantDataMerger extends AbstractDataMerger {
     return this.mergeCSSData(cssData1Variant, cssData2Variant)
   }
 
-  private getMergedNonDefaultCSSData(data1: ContainerNodeData, data2: ContainerNodeData): MergedCSSVariants[] {
+  private getMergedNonDefaultCSSData(data1: TreeNodeData & HasNodeCSSData, data2: TreeNodeData & HasNodeCSSData): MergedCSSVariants[] {
     const css1 = data1.css ? cloneDeep(data1.css) : {}
     const css2 = data2.css ? cloneDeep(data2.css) : {}
 
@@ -189,9 +200,16 @@ class VariantDataMerger extends AbstractDataMerger {
     return data1
   }
 
-  protected mergeIconData(data1: IconNodeData, data2: IconNodeData): IconNodeData {
+  protected mergeIconData(_data1: IconNodeData, _data2: IconNodeData): IconNodeData {
+    const data1 = cloneDeep(_data1)
+    const data2 = cloneDeep(_data2)
+
     console.error('[VariantDataMerger] mergeIconData method not yet implemented.', { data1, data2 })
-    return data1
+
+    return {
+      ...data1,
+      css: this.mergeDataWithCSS(data1, data2),
+    }
   }
 }
 
