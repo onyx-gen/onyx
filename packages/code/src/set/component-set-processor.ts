@@ -1,6 +1,6 @@
 import FigmaNodeParser from '../parsers/figma-node.parser'
 import HTMLGenerator from '../generators/html.generator'
-import { entries } from '../utils'
+import { entries, printObject } from '../utils'
 import type { TreeNode } from '../interfaces'
 import StateTreeMerger from '../merge/state/state-tree-merger'
 import VariantTreeMerger from '../merge/variant/variant-tree-merger'
@@ -274,7 +274,7 @@ class ComponentSetProcessor {
   private mergeVariantTrees(variantTrees: VariantTrees): TreeNode | null {
     let mergedTree: TreeNode | null = null
 
-    console.log('variantTrees', variantTrees.length, variantTrees)
+    console.log('variantTrees', printObject(variantTrees))
 
     variantTrees.forEach(({ permutation, tree }) => {
       if (tree) {
