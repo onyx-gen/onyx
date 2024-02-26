@@ -63,3 +63,31 @@ export function* zip<T>(arr1: T[], arr2: T[]): Generator<[T, T]> {
   for (let i = 0; i < length; i++)
     yield [arr1[i], arr2[i]]
 }
+
+/**
+ * Transforms the input object into a more printable format.
+ * If the object is a Set, it is converted to an array.
+ * If the object is an array or a non-null object, it is recursively transformed.
+ * In the case of an array, a new array is returned with the same elements.
+ * In the case of an object, a new object is returned with the same properties.
+ * If the object is neither a Set, an array, nor a non-null object, it is returned as is.
+ *
+ * @param {any} obj - The object to transform.
+ * @returns {any} The transformed object.
+ */
+export function printObject(obj: any): any {
+  if (obj instanceof Set) {
+    return Array.from(obj)
+  }
+  else if (typeof obj === 'object' && obj !== null) {
+    const transformedObj: any = Array.isArray(obj) ? [] : {}
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key))
+        transformedObj[key] = printObject(obj[key])
+    }
+    return transformedObj
+  }
+  else {
+    return obj
+  }
+}
