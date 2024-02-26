@@ -199,6 +199,8 @@ export function calculateVariantCSSUnion(variantCSS1: VariantCSS | undefined, va
       css: mergeCSSArrays(copyVariantCSS1.css, copyVariantCSS2.css),
     }
 
+    // copyVariantCSS1 is used here, but it could be
+    // copyVariantCSS2 as well as the variants are the same.
     if (copyVariantCSS1.variant !== undefined)
       result.variant = copyVariantCSS1.variant
 
