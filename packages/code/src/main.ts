@@ -17,18 +17,7 @@ figma.skipInvisibleInstanceChildren = true
 
 figma.showUI(__html__, { themeColors: true })
 
-figma.on('selectionchange', async () => {
-  const html = await generate()
-
-  if (html) {
-    const pluginMessage: HtmlPluginMessage = { event: 'html', data: { html } }
-    figma.ui.postMessage(pluginMessage)
-  }
-  else {
-    const pluginMessage: UnselectedPluginMessage = { event: 'unselected' }
-    figma.ui.postMessage(pluginMessage)
-  }
-})
+figma.on('selectionchange', generate)
 
 /**
  * Event listener for the 'generate' event in Figma.
@@ -36,12 +25,14 @@ figma.on('selectionchange', async () => {
  * The generated code is displayed in the dev tools panel
  * inside Figma.
  */
-async function generate(): Promise<string | null> {
+async function generate(): Promise<string | void> {
   const nodes = getSelectedNodes()
 
   // Early return if no node is selected
-  if (nodes.length === 0)
-    return null
+  if (nodes.length === 0) {
+    sendUnselectedMessage()
+    return
+  }
 
   const parser = new FigmaNodeParser()
   const generator = new HTMLGenerator()
@@ -87,5 +78,22 @@ async function generate(): Promise<string | null> {
     }
   }
 
-  return html
+  // only send message if html is not empty
+  if (html) {
+    const pluginMessage: HtmlPluginMessage = { event: 'html', data: { html } }
+    figma.ui.postMessage(pluginMessage)
+  }
+  else {
+    sendUnselectedMessage()
+  }
+}
+
+/**
+ * This function sends a message to the Figma UI when no node is selected.
+ * The message is of type UnselectedPluginMessage, which is defined in '@unocss-variables/events'.
+ * The event property of the message is set to 'unselected'.
+ */
+function sendUnselectedMessage() {
+  const pluginMessage: UnselectedPluginMessage = { event: 'unselected' }
+  figma.ui.postMessage(pluginMessage)
 }
