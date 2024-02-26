@@ -52,6 +52,11 @@ class ComponentSetProcessor {
 
     const variantKeys = permutations.map(permutation => variantKey(permutation))
 
+    if (variantTrees.length === 0 || variantTrees.filter(tree => tree.tree !== null).length === 0) {
+      console.error('[ComponentSetProcessor] There are no variantTrees to process.')
+      throw new Error('No variant trees were generated.')
+    }
+
     const componentSetTree = this.mergeVariantTrees(variantTrees)
 
     const code: string[] = []
@@ -257,6 +262,8 @@ class ComponentSetProcessor {
    */
   private mergeVariantTrees(variantTrees: VariantTrees): TreeNode | null {
     let mergedTree: TreeNode | null = null
+
+    console.log('variantTrees', variantTrees.length, variantTrees)
 
     variantTrees.reverse().forEach(({ permutation, tree }) => {
       if (tree) {
