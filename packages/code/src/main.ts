@@ -1,100 +1,20 @@
-import type { HtmlPluginMessage, UnselectedPluginMessage } from '@unocss-variables/events'
-import FigmaNodeParser from './parsers/figma-node.parser'
-import HTMLGenerator from './generators/html.generator'
-import { getSelectedNodes } from './utils'
-import ComponentSetProcessor from './set/component-set-processor'
-
-/**
- * This plugin generates HTML code that reflects the structure and styling
- * of components in Figma. It uses the UnoCSS framework to handle styling.
- * The plugin operates within the Figma environment and can process selected
- * components to output corresponding HTML structure.
- */
+import generate from './generate'
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
-
 figma.skipInvisibleInstanceChildren = true
 
+/**
+ * Show the UI of the plugin.
+ *
+ * Notes:
+ * __html__ is a global variable that is injected by the build process.
+ * The global variable shows the UI that can be found
+ * in the `packages/ui?  package of this repository.
+ */
 figma.showUI(__html__, { themeColors: true })
 
+// Generate HTML code when the plugin is opened
 generate()
+
+// Generate HTML code when the selection changes
 figma.on('selectionchange', generate)
-
-/**
- * Event listener for the 'generate' event in Figma.
- * Processes the selected node and generates HTML code.
- * The generated code is displayed in the dev tools panel
- * inside Figma.
- */
-async function generate(): Promise<string | void> {
-  const nodes = getSelectedNodes()
-
-  // Early return if no node is selected
-  if (nodes.length === 0) {
-    sendUnselectedMessage()
-    return
-  }
-
-  const parser = new FigmaNodeParser()
-  const generator = new HTMLGenerator()
-
-  let html = ''
-
-  if (nodes.length === 1) {
-    const node = nodes[0]
-
-    if (node.type === 'COMPONENT_SET') {
-      const componentSetProcessor = new ComponentSetProcessor()
-
-      try {
-        html = await componentSetProcessor.process(node)
-      }
-      catch (error) {
-        console.error(`[UnoCSS-Variables Plugin] Error during component set processing`, error)
-        figma.notify('Error during component set processing')
-      }
-    }
-    else {
-      const tree = await parser.parse(node)
-
-      if (tree) {
-        html = generator.generate(tree)
-      }
-      else {
-        console.error('It was not possible to generate HTML code for the selected node.')
-        figma.notify('Error during HTML generation')
-      }
-    }
-  }
-  else {
-    console.log('multiple nodes selected', nodes)
-    const componentSetProcessor = new ComponentSetProcessor()
-
-    try {
-      html = await componentSetProcessor.process(nodes)
-    }
-    catch (error) {
-      console.error(`[UnoCSS-Variables Plugin] Error during multiple selected nodes processing`, error)
-      figma.notify('Error during multiple selected nodes processing')
-    }
-  }
-
-  // only send message if html is not empty
-  if (html) {
-    const pluginMessage: HtmlPluginMessage = { event: 'html', data: { html } }
-    figma.ui.postMessage(pluginMessage)
-  }
-  else {
-    sendUnselectedMessage()
-  }
-}
-
-/**
- * This function sends a message to the Figma UI when no node is selected.
- * The message is of type UnselectedPluginMessage, which is defined in '@unocss-variables/events'.
- * The event property of the message is set to 'unselected'.
- */
-function sendUnselectedMessage() {
-  const pluginMessage: UnselectedPluginMessage = { event: 'unselected' }
-  figma.ui.postMessage(pluginMessage)
-}
