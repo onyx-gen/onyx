@@ -9,21 +9,8 @@ import {
 import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import { simplifyConditionalString, transformPropKey } from './utils'
+import {Attributes, CSSAttributes, NodeTypeToTagMap} from "./types";
 
-type StaticAttributeValue = string
-type DynamicAttributeValue = { [key: string]: string }
-
-type AttributeValue = StaticAttributeValue | DynamicAttributeValue
-interface Attributes { [key: string]: AttributeValue }
-
-interface CSSAttributes {
-  "static"?: StaticAttributeValue
-  "dynamic"?: DynamicAttributeValue 
-}
-
-type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => Attributes
-type ConditionalFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string | undefined
-type TagFunction<T extends TreeNodeData> = ((node: TreeNode<T>) => string) | string
 
 /**
  * Class representing the mapping from node types to their corresponding HTML tags and attributes.
@@ -258,23 +245,6 @@ class HTMLGenerator {
       const indent = createIndent(depth + 1)
       return `\n${indent}${pairs.join(`\n${indent}`)}\n${createIndent(depth)}`
     }
-  }
-}
-
-type ExtractedNodeDataType<K extends TreeNodeData['type']> = Extract<TreeNodeData, { type: K }>
-
-/**
- * Maps each 'type' of TreeNodeData to its corresponding HTML tag configuration.
- * For each type (e.g., 'container', 'text'), it defines the HTML start and end tags,
- * and a function to generate the HTML attributes appropriate for that type.
- * This mapping leverages TypeScript's conditional types and mapped types to automatically
- * associate the correct subtype of TreeNodeData with its tag configuration, ensuring type safety.
- */
-export type NodeTypeToTagMap = {
-  [K in TreeNodeData['type']]: {
-    tag?: TagFunction<ExtractedNodeDataType<K>>
-    attrs?: AttrsFunction<ExtractedNodeDataType<K>>
-    if?: ConditionalFunction<ExtractedNodeDataType<K>>
   }
 }
 
