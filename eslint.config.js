@@ -5,4 +5,5 @@ export default antfu({
   rules: { 'no-console': 'off' },
   typescript: true,
   vue: true,
+  yaml: true,
 })
