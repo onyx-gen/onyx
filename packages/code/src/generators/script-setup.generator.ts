@@ -73,6 +73,8 @@ class ScriptSetupGenerator {
   interface Props {
     ${interfacePropsBody}
   }
+  
+  const { ${Object.keys(this.types).join(', ')} } = toRefs(defineProps<Props>())
 
   ${computedPropertiesBodies.join(`\n${createIndent(1)}`)}
 </script>
