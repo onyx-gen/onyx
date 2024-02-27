@@ -1,6 +1,7 @@
 import type { DesignTokens } from '../tokens/tokens'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
+import { replaceToken } from '../tokens/replacer'
 import AutoLayoutBuilder from './auto-layout-builder'
 import type { RectCorners, RectSides } from './types'
 
@@ -63,7 +64,9 @@ export class UnocssBuilder {
    * @param token The value of the design token.
    * @param tokenType The type of the design token.
    */
-  private handleToken(token: string, tokenType: Properties) {
+  private handleToken(_token: string, tokenType: Properties) {
+    const token = replaceToken(_token)
+
     const paddingHandlers: TokenHandlers = {
       [Properties.paddingLeft]: () => this.padding.left = token,
       [Properties.paddingRight]: () => this.padding.right = token,
