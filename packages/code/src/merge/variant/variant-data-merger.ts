@@ -20,7 +20,7 @@ type MergedCSSVariants = [VariantCSS, VariantCSS, VariantCSS]
 class VariantDataMerger extends AbstractDataMerger {
   constructor(private readonly variantPermutation: VariantPermutation) {
     super()
-    console.log('VariantDataMerger constructor', { variantPermutation })
+    console.log('[VariantDataMerger] Constructed', { variantPermutation })
   }
 
   private get variant(): VariantKey {

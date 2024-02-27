@@ -6,7 +6,7 @@ import VariantDataMerger from './variant-data-merger'
 
 class VariantTreeMerger extends AbstractTreeMerger {
   constructor(private readonly variantPermutation: VariantPermutation) {
-    console.log('Constructed VariantTreeMerger', { variantPermutation })
+    console.log('[VariantTreeMerger] Constructed', { variantPermutation })
     const dataMerger = new VariantDataMerger(variantPermutation)
     super(dataMerger)
   }
