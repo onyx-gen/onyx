@@ -1,4 +1,5 @@
 import type { ComponentCollection, ComponentProps, GroupedComponentCollection } from './types'
+import { removeNonAlphanumericChars, replaceComponentPropValue } from './replacer'
 
 /**
  * Extracts and parses properties from a component's name.
@@ -13,14 +14,33 @@ import type { ComponentCollection, ComponentProps, GroupedComponentCollection } 
  *
  * @param component - A ComponentNode whose name is to be parsed. The name should follow
  * the key=value pair format.
+ * @param valueCountsDictionary - An object that keeps track of the count of each value.
  * @returns An object representing the properties extracted from the component's name.
  */
-export function getComponentProperties(component: ComponentNode): { [key: string]: string } {
+export function getComponentProperties(
+  component: ComponentNode,
+  valueCountsDictionary: { [key: string]: number } = {},
+): { [key: string]: string } {
   return Object.fromEntries(
     component.name
-      .replaceAll(',', '')
-      .split(' ')
-      .map(pair => pair.split('=')),
+      // Split the component name into pairs by ', '.
+      .split(', ')
+      // Convert each pair into a key-value array.
+      .map(pair => pair.split('='))
+      // Replace each value with the result of `replaceComponentPropValue`.
+      .map(([key, value]) => ([key, replaceComponentPropValue(value)]))
+      // Modify each value: remove non-alphanumeric characters, and ensure uniqueness by appending a count if necessary.
+      .map(([key, value]) => {
+        value = removeNonAlphanumericChars(value.replaceAll(' ', ''))
+        if (value in valueCountsDictionary) {
+          valueCountsDictionary[value]++
+          value = `${value}${valueCountsDictionary[value]}`
+        }
+        else {
+          valueCountsDictionary[value] = 1
+        }
+        return [key, value]
+      }),
   )
 }
 
