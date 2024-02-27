@@ -341,8 +341,10 @@ class ComponentSetProcessor {
     }
 
     let defaultState = allStates[0]
-    if ('default' in allStates)
+    if (allStates.includes('default'))
       defaultState = 'default'
+
+    console.log('[Component Set Processor] All found states', { allStates, defaultState })
 
     if (defaultState !== 'default') {
       const cssTraverser = new CssTraverser(defaultState)

@@ -14,6 +14,7 @@ class StateTreeMerger extends AbstractTreeMerger {
     private readonly variantPermutation: VariantPermutation,
     private readonly previousStates: string[] = [],
   ) {
+    console.log('[StateTreeMerger] Constructed', { state, variantPermutation, previousStates })
     const dataMerger = new StateDataMerger(state, variantPermutation)
     super(dataMerger)
   }
