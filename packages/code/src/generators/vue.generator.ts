@@ -1,5 +1,6 @@
 import type { VariantPermutation } from '../set/types'
 import type { TreeNode } from '../interfaces'
+import { createIndent } from '../utils'
 import HTMLGenerator from './html.generator'
 import ScriptSetupGenerator from './script-setup.generator'
 import type { ComputedProperties, PermutationKey, PermutationUnionType, PermutationValue } from './types'
@@ -37,8 +38,11 @@ class VueGenerator {
 
     code.push(this.scriptSetupGenerator.generate())
 
-    if (this.treeNode)
-      code.push(this.htmlGenerator.generate(this.treeNode))
+    if (this.treeNode) {
+      const html = this.htmlGenerator.generate(this.treeNode)
+      const wrappedHtml = `<template>\n${createIndent(1)}${html.trim().replaceAll('\n', `\n${createIndent(1)}`)}\n</template>`
+      code.push(wrappedHtml)
+    }
 
     return code.join('\n\n')
   }
