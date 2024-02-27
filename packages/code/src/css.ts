@@ -45,7 +45,12 @@ export function translateContainerNodeCSSData(data: NodeCSSData): Record<Variant
   )
 }
 
-// Type predicate to check if an item is VariantCSS
+/**
+ * Checks if the given item is a VariantCSS object.
+ *
+ * @param {VariantCSS | Set<string>} item - The item to be checked.
+ * @returns {boolean} - True if the item is a VariantCSS object, false otherwise.
+ */
 function isVariantCSS(item: VariantCSS | Set<string>): item is VariantCSS {
   return (item as VariantCSS).css !== undefined
 }
@@ -112,6 +117,12 @@ export function calculateVariantCSSDifference(variantCSS1: VariantCSS | undefine
   }
 }
 
+/**
+ * Creates a deep copy of the given VariantCSS object.
+ *
+ * @param {VariantCSS | undefined} variantCSS - The VariantCSS object to be copied.
+ * @returns {VariantCSS | undefined} A deep copy of the VariantCSS object, or undefined if the given object is undefined.
+ */
 function makeCopy(variantCSS: VariantCSS | undefined): VariantCSS | undefined {
   if (!variantCSS)
     return undefined

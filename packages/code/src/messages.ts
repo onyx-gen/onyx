@@ -10,7 +10,14 @@ export function sendUnselectedMessage() {
   figma.ui.postMessage(pluginMessage)
 }
 
-export function sendHtmlMessage(html: string) {
+/**
+ * Sends an HTML message to the UI plugin.
+ *
+ * @param {string} html - The HTML content to send.
+ *
+ * @return {void}
+ */
+export function sendHtmlMessage(html: string): void {
   const pluginMessage: HtmlPluginMessage = { event: 'html', data: { html } }
   figma.ui.postMessage(pluginMessage)
 }

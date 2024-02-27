@@ -10,6 +10,12 @@ import { variantKey } from '../merge/utils'
 class FigmaNodeParser {
   constructor(private readonly variantPermutation: VariantPermutation = { default: 'default' }) {}
 
+  /**
+   * Returns the unique variant key based on the current permutation.
+   *
+   * @private
+   * @returns {VariantKey} The variant key.
+   */
   private get variant(): VariantKey {
     return variantKey(this.variantPermutation)
   }

@@ -362,7 +362,6 @@ class ComponentSetProcessor {
     if (defaultState !== 'default') {
       const cssTraverser = new CssTraverser(defaultState)
       trees[defaultState] = cssTraverser.traverse(trees[defaultState]!)
-      console.log('defaultState', printObject(trees[defaultState]))
     }
 
     let mergedTree = trees[defaultState]

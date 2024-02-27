@@ -5,10 +5,9 @@ import ComponentSetProcessor from './set/component-set-processor'
 import { sendHtmlMessage, sendUnselectedMessage } from './messages'
 
 /**
- * Event listener for the 'generate' event in Figma.
- * Processes the selected node and generates HTML code.
- * The generated code is displayed in the dev tools panel
- * inside Figma.
+ * Generate HTML code for the selected Figma nodes.
+ *
+ * @returns A Promise that resolves to the generated HTML code as a string or void if no node is selected.
  */
 export default async function generate(): Promise<string | void> {
   const nodes = getSelectedNodes()

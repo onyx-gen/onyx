@@ -11,6 +11,14 @@ class VariantTreeMerger extends AbstractTreeMerger {
     super(dataMerger)
   }
 
+  /**
+   * Retrieves the unique `VariantKey` based on the current `variantPermutation`.
+   *
+   * The variant key is unique for each permutation of the variant.
+   *
+   * @returns {VariantKey} The `VariantKey` calculated from the current `variantPermutation`.
+   * @private
+   */
   private get variant(): VariantKey {
     return variantKey(this.variantPermutation)
   }
