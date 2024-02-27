@@ -1,5 +1,6 @@
 import { createIndent } from '../utils'
 import type { VariantPermutation } from '../set/types'
+import { toPascalCase } from './utils'
 
 /**
  * Type representing a permutation key.
@@ -140,7 +141,7 @@ class ScriptSetupGenerator {
       Object.entries(permutationCollection).map(([key, values]) => {
         const namesMap = Object.fromEntries(
           Array.from(values).map((value) => {
-            const name = `is${key[0].toUpperCase()}${key.slice(1)}${value[0].toUpperCase()}${value.slice(1)}`
+            const name = `is${toPascalCase(key)}${toPascalCase(value)}`
             return [value, name]
           }),
         )

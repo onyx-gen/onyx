@@ -39,10 +39,29 @@ export function simplifyConditionalString(conditionalStr: string): string {
   return simplifiedParts.filter(part => part !== '').join(' ')
 }
 
+/**
+ * Transforms the given property key by removing any characters that are not alphabetical, "-" or "_".
+ *
+ * @param {string} propKey - The property key to transform.
+ * @returns {string} The transformed property key.
+ */
 export function transformPropKey(propKey: string): string {
   // Regex to match only alphabetical characters, "-" and "_"
   const allowedCharsRegex: RegExp = /^[A-Za-z-_]+$/
 
   // Split the propKey into characters, filter based on the regex, and join back into a string
   return propKey.split('').filter(char => allowedCharsRegex.test(char)).join('')
+}
+
+/**
+ * Converts a string to PascalCase.
+ *
+ * @param {string} string - The string to convert.
+ * @returns {string} The converted string in PascalCase.
+ */
+export function toPascalCase(string: string): string {
+  return string
+    .split(/[-_ ]/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('')
 }
