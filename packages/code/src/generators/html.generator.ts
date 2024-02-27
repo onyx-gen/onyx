@@ -198,7 +198,7 @@ class HTMLGenerator {
         else
           html += ` `
 
-        html += ` v-if="${conditionals}"`
+        html += `v-if="${conditionals}"`
 
         if (hasAttrsObject || hasMultipleAttrs)
           html += `\n${indent}`
