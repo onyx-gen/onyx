@@ -2,20 +2,7 @@ import type { DesignTokens } from '../tokens/tokens'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
 import AutoLayoutBuilder from './auto-layout-builder'
-
-interface RectSides {
-  top: string | null
-  bottom: string | null
-  left: string | null
-  right: string | null
-}
-
-interface RectCorners {
-  topLeft: string | null
-  topRight: string | null
-  bottomLeft: string | null
-  bottomRight: string | null
-}
+import type { RectCorners, RectSides } from './types'
 
 type TokenHandler = () => void
 type TokenHandlers = { [key in Properties]?: TokenHandler }
