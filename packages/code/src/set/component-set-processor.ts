@@ -1,11 +1,10 @@
 import FigmaNodeParser from '../parsers/figma-node.parser'
-import HTMLGenerator from '../generators/html.generator'
 import { entries, printObject } from '../utils'
 import type { TreeNode } from '../interfaces'
 import StateTreeMerger from '../merge/state/state-tree-merger'
 import VariantTreeMerger from '../merge/variant/variant-tree-merger'
-import ScriptSetupGenerator from '../generators/script-setup.generator'
 import CssTraverser from '../traverser/css.traverser'
+import VueGenerator from '../generators/vue.generator'
 import type {
   ComponentCollection,
   ComponentPropsWithState,
@@ -54,39 +53,8 @@ class ComponentSetProcessor {
 
     const componentSetTree = this.mergeVariantTrees(variantTrees)
 
-    const code: string[] = []
-
-    code.push(this.generateScriptSetup(permutations))
-    code.push(this.generateHTML(componentSetTree, permutations))
-
-    return code.join('\n\n')
-  }
-
-  /**
-   * Generates Vue's script setup code block based on the given permutations.
-   *
-   * @param {VariantPermutation[]} permutations - An array of VariantPermutation objects representing the permutations.
-   *
-   * @return {string} The generated script setup.
-   */
-  private generateScriptSetup(permutations: VariantPermutation[]): string {
-    const scriptSetupGenerator = new ScriptSetupGenerator(permutations)
-    return scriptSetupGenerator.generate()
-  }
-
-  /**
-   * Generates HTML from a given tree.
-   * @param tree - The tree to generate HTML from.
-   * @param permutations - The permutations used to generate the HTML.
-   * @returns The generated HTML.
-   * @private
-   */
-  private generateHTML(tree: TreeNode | null, permutations: VariantPermutation[]): string {
-    if (!tree)
-      return ''
-
-    const htmlGenerator = new HTMLGenerator(permutations)
-    return htmlGenerator.generate(tree)
+    const vueGenerator = new VueGenerator(permutations, componentSetTree)
+    return vueGenerator.generate()
   }
 
   /**
