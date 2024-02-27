@@ -248,7 +248,7 @@ class ComponentSetProcessor {
                 .every(
                   ([permutationKey, permutationValue]) => {
                     return permutationKey in component.props && component.props[permutationKey] === permutationValue
-                  }
+                  },
                 )
             },
           )
@@ -259,7 +259,8 @@ class ComponentSetProcessor {
         })
 
       return Object.fromEntries(allEntries)
-    } catch (e) {
+    }
+    catch (e) {
       console.error('Error finding variants for permutation', e, { permutation, groupedCollection })
       return {}
     }

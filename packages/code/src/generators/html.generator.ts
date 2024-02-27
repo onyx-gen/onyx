@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash-es'
-import {
+import type {
   HasNodeCSSData,
   InstanceNodeData,
   TreeNode,
@@ -9,8 +9,7 @@ import {
 import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import { simplifyConditionalString, transformPropKey } from './utils'
-import {Attributes, CSSAttributes, NodeTypeToTagMap} from "./types";
-
+import type { Attributes, CSSAttributes, NodeTypeToTagMap } from './types'
 
 /**
  * Class representing the mapping from node types to their corresponding HTML tags and attributes.
@@ -22,12 +21,12 @@ class HTMLGenerator {
       tag: treeNode => treeNode.data.element || 'div',
       attrs: (treeNode) => {
         const attrs: Attributes = {}
-        
+
         const cssAttributes: CSSAttributes = this.getCSSAttributes(treeNode)
-        
+
         if (cssAttributes.static)
           attrs.class = cssAttributes.static
-        
+
         if (cssAttributes.dynamic)
           attrs[':class'] = cssAttributes.dynamic
 
@@ -62,7 +61,7 @@ class HTMLGenerator {
       attrs: this.getInstanceNodeHTMLAttrs,
     },
   }
-  
+
   /**
    * Retrieves the CSS attributes from a TreeNode with CSS data.
    *
@@ -71,7 +70,7 @@ class HTMLGenerator {
    */
   private getCSSAttributes(tree: TreeNode<TreeNodeData & HasNodeCSSData>): CSSAttributes {
     const attrs: CSSAttributes = {}
-    
+
     if (tree.data.css) {
       const defaultVariantCSS: VariantCSS | undefined = Object.values(tree.data.css)[0]
 
@@ -95,7 +94,7 @@ class HTMLGenerator {
         attrs.dynamic = translateContainerNodeCSSData(clonedCSS)
       }
     }
-    
+
     return attrs
   }
 

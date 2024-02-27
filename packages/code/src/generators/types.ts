@@ -1,14 +1,14 @@
-import {TreeNode, TreeNodeData} from "../interfaces";
+import type { TreeNode, TreeNodeData } from '../interfaces'
 
 type StaticAttributeValue = string
-type DynamicAttributeValue = { [key: string]: string }
+interface DynamicAttributeValue { [key: string]: string }
 
 type AttributeValue = StaticAttributeValue | DynamicAttributeValue
 export interface Attributes { [key: string]: AttributeValue }
 
 export interface CSSAttributes {
-  "static"?: StaticAttributeValue
-  "dynamic"?: DynamicAttributeValue
+  'static'?: StaticAttributeValue
+  'dynamic'?: DynamicAttributeValue
 }
 
 type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => Attributes
