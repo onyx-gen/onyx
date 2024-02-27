@@ -5,6 +5,7 @@ import StateTreeMerger from '../merge/state/state-tree-merger'
 import VariantTreeMerger from '../merge/variant/variant-tree-merger'
 import CssTraverser from '../traverser/css.traverser'
 import VueGenerator from '../generators/vue.generator'
+import { variantKey } from '../merge/utils'
 import type {
   ComponentCollection,
   ComponentPropsWithState,
@@ -53,7 +54,14 @@ class ComponentSetProcessor {
 
     const componentSetTree = this.mergeVariantTrees(variantTrees)
 
-    const vueGenerator = new VueGenerator(permutations, componentSetTree)
+    // Remove duplicate permutations
+    const filteredPermutations = Object.values(
+      Object.fromEntries(
+        permutations.map(permutation => ([variantKey(permutation), permutation])),
+      ),
+    )
+
+    const vueGenerator = new VueGenerator(filteredPermutations, componentSetTree)
     return vueGenerator.generate()
   }
 

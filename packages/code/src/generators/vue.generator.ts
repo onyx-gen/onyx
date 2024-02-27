@@ -14,7 +14,7 @@ class VueGenerator {
   private readonly htmlGenerator: HTMLGenerator
 
   constructor(
-    permutations: VariantPermutation[],
+    private readonly permutations: VariantPermutation[],
     private readonly treeNode: TreeNode | null,
   ) {
     const permutationCollection: {
@@ -36,12 +36,13 @@ class VueGenerator {
   public generate(): string {
     const code: string[] = []
 
-    code.push(this.scriptSetupGenerator.generate())
+    if (this.permutations.length > 1)
+      code.push(this.scriptSetupGenerator.generate())
 
     if (this.treeNode) {
       const html = this.htmlGenerator.generate(this.treeNode)
       const wrappedHtml = `<template>\n${createIndent(1)}${html.trim().replaceAll('\n', `\n${createIndent(1)}`)}\n</template>`
-      code.push(wrappedHtml)
+      code.push(this.permutations.length > 1 ? wrappedHtml : html)
     }
 
     return code.join('\n\n')
