@@ -1,14 +1,48 @@
 import { createIndent } from '../utils'
 import type { VariantPermutation } from '../set/types'
 
+/**
+ * Type representing a permutation key.
+ *
+ * Permutation key is for example a variant name, like `size` or `color`.
+ */
 type PermutationKey = string
+
+/**
+ * Type representing a permutation value.
+ *
+ * Permutation value is for example a variant value, like `small` or `red`.
+ */
 type PermutationValue = string
+
+/**
+ * Type representing a computed property name.
+ *
+ * Computed property name is a string representing a computed property name for a permutation key/value pair.
+ *
+ * An example of a computed property name is `isSizeSmall` or `isColorRed`.
+ */
 type PermutationComputedPropertyName = string
+
+/**
+ * Type representing a collection of computed property names.
+ *
+ * Collection is structured for easy access to computed property names for a permutation key/value pair.
+ * Collection is also structured for easy iteration.
+ */
 interface ComputedProperties {
   [p: PermutationKey]: {
     [p: PermutationValue]: PermutationComputedPropertyName
   }
 }
+
+/**
+ * Type representing a permutation union type.
+ *
+ * Permutation union type is a string representing a TypeScript union type for a permutation key.
+ * An example of a permutation union type is `'small' | 'medium' | 'large'`.
+ */
+type PermutationUnionType = string
 
 /**
  * This class generates the `script setup` code block for the generated Vue component output.
@@ -25,17 +59,26 @@ class ScriptSetupGenerator {
   generate(permutations: VariantPermutation[]) {
     const indent = createIndent(2)
 
-    const permutationCollection = permutations.reduce((acc, permutation) => {
-      Object.entries(permutation).forEach(([key, value]) => {
-        if (acc[key])
-          acc[key].add(value)
-        else
-          acc[key] = new Set([value])
-      })
-      return acc
-    }, {} as { [key: string]: Set<string> })
+    // Create a collection of all unique permutation values for each permutation key in the permutations
+    const permutationCollection: {
+      [p: PermutationKey]: Set<PermutationValue>
+    } = permutations.reduce((acc, permutation) => {
+      Object.entries(permutation).forEach(
+        ([permutationKey, permutationValue]) => {
+          if (acc[permutationKey])
+            acc[permutationKey].add(permutationValue)
+          else
+            acc[permutationKey] = new Set([permutationValue])
+        },
+      )
 
-    const types = Object.fromEntries(
+      return acc
+    }, {} as { [key: PermutationKey]: Set<PermutationValue> })
+
+    // Create a Union Type for each key in the permutations
+    const types: {
+      [p: PermutationKey]: PermutationUnionType
+    } = Object.fromEntries(
       Object.entries(permutationCollection)
         .map(
           ([key, values]) => {
@@ -45,12 +88,14 @@ class ScriptSetupGenerator {
         ),
     )
 
+    // Create the interface properties body
     const interfacePropsBody = Object.entries(types)
       .map(
         ([key, value]) => `${key}: ${value}`,
       )
       .join(`\n${indent}`)
 
+    // Create the computed properties
     const computedProperties: ComputedProperties = Object.fromEntries(
       Object.entries(permutationCollection)
         .map(([key, value]) => {
