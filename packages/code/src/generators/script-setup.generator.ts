@@ -48,14 +48,17 @@ type PermutationUnionType = string
  * This class generates the `script setup` code block for the generated Vue component output.
  */
 class ScriptSetupGenerator {
+  /**
+   * Constructs a ScriptSetupGenerator instance with specified variant permutations.
+   *
+   * @param permutations - An array of variant permutations, where each permutation is represented by a key-value pair indicating the variant's name and value, respectively.
+   */
   constructor(private readonly permutations: VariantPermutation[]) {}
 
   /**
-   * Generate the script code block.
+   * Generates the script setup block for a Vue component, including TypeScript type unions for props and computed properties for each variant.
    *
-   * Each unique value of each key in the permutations will be a type union in the generated code.
-   *
-   * @returns - The generated script setup string.
+   * @returns A string representing the complete script setup code block with type definitions and computed properties.
    */
   generate(): string {
     const indent = createIndent(2)
@@ -67,6 +70,13 @@ class ScriptSetupGenerator {
     return this.composeFinalScript(interfacePropsBody, computedPropertiesBodies, indent)
   }
 
+  /**
+   * Collects unique permutation values for each key from the provided permutations, facilitating the generation of type unions and computed properties.
+   *
+   * @param permutations - An array of variant permutations to process.
+   * @returns An object mapping each permutation key to a Set of unique values.
+   * @private
+   */
   private collectUniquePermutationValues(permutations: VariantPermutation[]): { [key: PermutationKey]: Set<PermutationValue> } {
     return permutations.reduce((acc, permutation) => {
       Object.entries(permutation).forEach(([key, value]) => {
@@ -79,6 +89,13 @@ class ScriptSetupGenerator {
     }, {} as { [key: PermutationKey]: Set<PermutationValue> })
   }
 
+  /**
+   * Generates TypeScript union types for each permutation key based on collected unique values, aiding in the typing of component props.
+   *
+   * @param permutationCollection - An object mapping each permutation key to a Set of unique values.
+   * @returns An object mapping each permutation key to its corresponding TypeScript union type as a string.
+   * @private
+   */
   private generateUnionTypes(permutationCollection: { [key: PermutationKey]: Set<PermutationValue> }): { [key: PermutationKey]: PermutationUnionType } {
     return Object.fromEntries(
       Object.entries(permutationCollection).map(([key, values]) => {
@@ -88,12 +105,27 @@ class ScriptSetupGenerator {
     )
   }
 
+  /**
+   * Generates the properties of the Vue component's `Props` interface based on the generated union types, ensuring strong typing of component props.
+   *
+   * @param types - An object mapping each permutation key to its corresponding TypeScript union type.
+   * @param indent - A string representing the indentation to be used in the generated code.
+   * @returns A string representing the body of the `Props` interface for the component.
+   * @private
+   */
   private generateInterfaceProperties(types: { [key: PermutationKey]: PermutationUnionType }, indent: string): string {
     return Object.entries(types)
       .map(([key, value]) => `${key}: ${value}`)
       .join(`\n${indent}`)
   }
 
+  /**
+   * Generates a mapping of computed property names for each variant permutation, facilitating the definition of reactive computed properties in the component.
+   *
+   * @param permutationCollection - An object mapping each permutation key to a Set of unique values.
+   * @returns An object representing the computed property names organized by permutation key and value.
+   * @private
+   */
   private generateComputedProperties(permutationCollection: { [key: PermutationKey]: Set<PermutationValue> }): ComputedProperties {
     return Object.fromEntries(
       Object.entries(permutationCollection).map(([key, values]) => {
@@ -108,12 +140,28 @@ class ScriptSetupGenerator {
     )
   }
 
+  /**
+   * Generates the code bodies for computed properties based on the mapping of computed property names, enabling reactive behavior based on prop values.
+   *
+   * @param computedProperties - An object representing the computed property names organized by permutation key and value.
+   * @returns An array of strings, each representing the code for a computed property.
+   * @private
+   */
   private generateComputedPropertiesBodies(computedProperties: ComputedProperties): string[] {
     return Object.entries(computedProperties).flatMap(([key, values]) =>
       Object.entries(values).map(([value, name]) => `const ${name} = computed(() => ${key}.value === '${value}')`),
     )
   }
 
+  /**
+   * Composes the final script setup block by assembling the generated interface properties and computed properties bodies into a cohesive script.
+   *
+   * @param interfacePropsBody - A string representing the generated interface properties.
+   * @param computedPropertiesBodies - An array of strings, each representing a computed property's code.
+   * @param indent - A string representing the indentation to be used in the generated code.
+   * @returns A string representing the complete script setup block for the component.
+   * @private
+   */
   private composeFinalScript(interfacePropsBody: string, computedPropertiesBodies: string[], indent: string): string {
     return `
 <script setup lang="ts">
