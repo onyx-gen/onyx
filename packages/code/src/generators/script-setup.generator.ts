@@ -1,49 +1,7 @@
 import { createIndent } from '../utils'
 import type { VariantPermutation } from '../set/types'
 import { toPascalCase } from './utils'
-
-/**
- * Type representing a permutation key.
- *
- * Permutation key is for example a variant name, like `size` or `color`.
- */
-type PermutationKey = string
-
-/**
- * Type representing a permutation value.
- *
- * Permutation value is for example a variant value, like `small` or `red`.
- */
-type PermutationValue = string
-
-/**
- * Type representing a computed property name.
- *
- * Computed property name is a string representing a computed property name for a permutation key/value pair.
- *
- * An example of a computed property name is `isSizeSmall` or `isColorRed`.
- */
-type PermutationComputedPropertyName = string
-
-/**
- * Type representing a collection of computed property names.
- *
- * Collection is structured for easy access to computed property names for a permutation key/value pair.
- * Collection is also structured for easy iteration.
- */
-interface ComputedProperties {
-  [p: PermutationKey]: {
-    [p: PermutationValue]: PermutationComputedPropertyName
-  }
-}
-
-/**
- * Type representing a permutation union type.
- *
- * Permutation union type is a string representing a TypeScript union type for a permutation key.
- * An example of a permutation union type is `'small' | 'medium' | 'large'`.
- */
-type PermutationUnionType = string
+import type { ComputedProperties, PermutationKey, PermutationUnionType, PermutationValue } from './types'
 
 /**
  * This class generates the `script setup` code block for the generated Vue component output.

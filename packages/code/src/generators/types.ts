@@ -31,3 +31,46 @@ export type NodeTypeToTagMap = {
     if?: ConditionalFunction<ExtractedNodeDataType<K>>
   }
 }
+
+/**
+ * Type representing a permutation key.
+ *
+ * Permutation key is for example a variant name, like `size` or `color`.
+ */
+export type PermutationKey = string
+
+/**
+ * Type representing a permutation value.
+ *
+ * Permutation value is for example a variant value, like `small` or `red`.
+ */
+export type PermutationValue = string
+
+/**
+ * Type representing a computed property name.
+ *
+ * Computed property name is a string representing a computed property name for a permutation key/value pair.
+ *
+ * An example of a computed property name is `isSizeSmall` or `isColorRed`.
+ */
+export type PermutationComputedPropertyName = string
+
+/**
+ * Type representing a collection of computed property names.
+ *
+ * Collection is structured for easy access to computed property names for a permutation key/value pair.
+ * Collection is also structured for easy iteration.
+ */
+export interface ComputedProperties {
+  [p: PermutationKey]: {
+    [p: PermutationValue]: PermutationComputedPropertyName
+  }
+}
+
+/**
+ * Type representing a permutation union type.
+ *
+ * Permutation union type is a string representing a TypeScript union type for a permutation key.
+ * An example of a permutation union type is `'small' | 'medium' | 'large'`.
+ */
+export type PermutationUnionType = string
