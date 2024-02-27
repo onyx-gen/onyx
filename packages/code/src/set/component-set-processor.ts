@@ -17,6 +17,11 @@ import type {
 } from './types'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
+/**
+ * A class that processes a component set or multiple selected components.
+ * The class is responsible for orchestrating the entire process of
+ * generating code from the given set of components.
+ */
 class ComponentSetProcessor {
   public async process(data: ComponentSetNode | SceneNode[]): Promise<string> {
     const nodes = Array.isArray(data) ? data : [...data.children]
