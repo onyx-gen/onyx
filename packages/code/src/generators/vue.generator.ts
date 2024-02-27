@@ -77,6 +77,13 @@ class VueGenerator {
   private generateUnionTypes(permutationCollection: { [key: PermutationKey]: Set<PermutationValue> }): { [key: PermutationKey]: PermutationUnionType } {
     return Object.fromEntries(
       Object.entries(permutationCollection).map(([key, values]) => {
+        let isBoolean = false
+        if (values.size === 2 && values.has('true') && values.has('false'))
+          isBoolean = true
+
+        if (isBoolean)
+          return [key, 'boolean']
+
         const valuesString = Array.from(values).map(value => `'${value}'`).join(' | ')
         return [key, valuesString]
       }),
