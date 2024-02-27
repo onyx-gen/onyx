@@ -14,12 +14,10 @@ import { removeNonAlphanumericChars, replaceComponentPropValue } from './replace
  *
  * @param component - A ComponentNode whose name is to be parsed. The name should follow
  * the key=value pair format.
- * @param valueCountsDictionary - An object that keeps track of the count of each value.
  * @returns An object representing the properties extracted from the component's name.
  */
 export function getComponentProperties(
   component: ComponentNode,
-  valueCountsDictionary: { [key: string]: number } = {},
 ): { [key: string]: string } {
   return Object.fromEntries(
     component.name
@@ -32,13 +30,6 @@ export function getComponentProperties(
       // Modify each value: remove non-alphanumeric characters, and ensure uniqueness by appending a count if necessary.
       .map(([key, value]) => {
         value = removeNonAlphanumericChars(value.replaceAll(' ', ''))
-        if (value in valueCountsDictionary) {
-          valueCountsDictionary[value]++
-          value = `${value}${valueCountsDictionary[value]}`
-        }
-        else {
-          valueCountsDictionary[value] = 1
-        }
         return [key, value]
       }),
   )

@@ -126,12 +126,9 @@ class ComponentSetProcessor {
    * @returns A collection of components with their properties.
    */
   private mapComponentsToProperties(nodes: SceneNode[]): ComponentCollection {
-    // Initialize an object to store the counts of each value.
-    const valueCountsDictionary: { [key: string]: number } = {}
-
     return nodes.map(component => ({
       component: component as ComponentNode,
-      props: getComponentProperties(component as ComponentNode, valueCountsDictionary),
+      props: getComponentProperties(component as ComponentNode),
     }))
   }
 
