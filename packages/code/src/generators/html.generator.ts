@@ -5,7 +5,7 @@ import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
 import { simplifyConditionalString, transformPropKey } from './utils'
-import type { Attributes, CSSAttributes, ComputedProperties, NodeTypeToTagMap } from './types'
+import type { Attributes, CSSAttributes, ComputedProperties, DynamicAttributeValue, NodeTypeToTagMap } from './types'
 
 /**
  * Class representing the mapping from node types to their corresponding HTML tags and attributes.
@@ -253,9 +253,12 @@ class HTMLGenerator {
         return `${key}="${value}"`
       }
       else {
-        const pairValue = JSON.stringify(value, null, 2)
-          .replaceAll('"', '\'')
-          .replaceAll('\n', `\n${createIndent(depth + 1)}`)
+        const lines = Object.entries(value as DynamicAttributeValue).map(([key, value]) => {
+          return `'${key}': ${value}`
+        })
+
+        const pairValue = `{\n${createIndent(depth + 2)}${lines.join(`,\n${createIndent(depth + 2)}`)}\n${createIndent(depth + 1)}}`
+
         return `${key}="${pairValue}"`
       }
     })

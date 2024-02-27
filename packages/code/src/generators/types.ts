@@ -1,7 +1,7 @@
 import type { TreeNode, TreeNodeData } from '../interfaces'
 
 type StaticAttributeValue = string
-interface DynamicAttributeValue { [key: string]: string }
+export interface DynamicAttributeValue { [key: string]: string }
 
 type AttributeValue = StaticAttributeValue | DynamicAttributeValue
 export interface Attributes { [key: string]: AttributeValue }
