@@ -187,7 +187,7 @@ class HTMLGenerator {
 
       if (hasAttrs) {
         if (!hasAttrsObject && !hasMultipleAttrs)
-          html += ' '
+          html += ''
 
         html += this.attrsToString(attrs, depth, hasConditionals)
       }
