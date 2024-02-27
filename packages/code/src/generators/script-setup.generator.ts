@@ -48,17 +48,18 @@ type PermutationUnionType = string
  * This class generates the `script setup` code block for the generated Vue component output.
  */
 class ScriptSetupGenerator {
+  constructor(private readonly permutations: VariantPermutation[]) {}
+
   /**
    * Generate the script code block.
    *
    * Each unique value of each key in the permutations will be a type union in the generated code.
    *
-   * @param permutations - The set of permutations to generate TypeScript interface from.
    * @returns - The generated script setup string.
    */
-  generate(permutations: VariantPermutation[]): string {
+  generate(): string {
     const indent = createIndent(2)
-    const permutationCollection = this.collectUniquePermutationValues(permutations)
+    const permutationCollection = this.collectUniquePermutationValues(this.permutations)
     const types = this.generateUnionTypes(permutationCollection)
     const interfacePropsBody = this.generateInterfaceProperties(types, indent)
     const computedProperties = this.generateComputedProperties(permutationCollection)

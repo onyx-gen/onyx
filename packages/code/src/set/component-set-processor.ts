@@ -18,8 +18,6 @@ import type {
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
 class ComponentSetProcessor {
-  private scriptSetupGenerator = new ScriptSetupGenerator()
-
   public async process(data: ComponentSetNode | SceneNode[]): Promise<string> {
     const nodes = Array.isArray(data) ? data : [...data.children]
 
@@ -64,8 +62,16 @@ class ComponentSetProcessor {
     return code.join('\n\n')
   }
 
+  /**
+   * Generates Vue's script setup code block based on the given permutations.
+   *
+   * @param {VariantPermutation[]} permutations - An array of VariantPermutation objects representing the permutations.
+   *
+   * @return {string} The generated script setup.
+   */
   private generateScriptSetup(permutations: VariantPermutation[]): string {
-    return this.scriptSetupGenerator.generate(permutations)
+    const scriptSetupGenerator = new ScriptSetupGenerator(permutations)
+    return scriptSetupGenerator.generate()
   }
 
   /**
