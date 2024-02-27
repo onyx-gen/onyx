@@ -1,9 +1,12 @@
 import { createIndent } from '../utils'
+import type { VariantPermutation } from '../set/types'
+import { variantKey } from '../merge/utils'
 
 class ScriptSetupGenerator {
-  generate(variantKeys: string[]) {
+  generate(permutations: VariantPermutation[]) {
     const indent = createIndent(2)
 
+    const variantKeys = permutations.map(permutation => variantKey(permutation))
     const props = variantKeys.map(key => `'${key}': boolean`).join(`\n${indent}`)
 
     const code = `

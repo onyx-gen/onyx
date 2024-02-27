@@ -4,7 +4,6 @@ import { entries, printObject } from '../utils'
 import type { TreeNode } from '../interfaces'
 import StateTreeMerger from '../merge/state/state-tree-merger'
 import VariantTreeMerger from '../merge/variant/variant-tree-merger'
-import { variantKey } from '../merge/utils'
 import ScriptSetupGenerator from '../generators/script-setup.generator'
 import CssTraverser from '../traverser/css.traverser'
 import type {
@@ -51,8 +50,6 @@ class ComponentSetProcessor {
 
     const variantTrees: VariantTrees = await Promise.all(variantTreesPromises)
 
-    const variantKeys = permutations.map(permutation => variantKey(permutation))
-
     if (variantTrees.length === 0 || variantTrees.filter(tree => tree.tree !== null).length === 0) {
       console.error('[ComponentSetProcessor] There are no variantTrees to process.')
       throw new Error('No variant trees were generated.')
@@ -62,14 +59,14 @@ class ComponentSetProcessor {
 
     const code: string[] = []
 
-    code.push(this.generateScriptSetup(variantKeys))
+    code.push(this.generateScriptSetup(permutations))
     code.push(this.generateHTML(componentSetTree))
 
     return code.join('\n\n')
   }
 
-  private generateScriptSetup(variantKeys: string[]): string {
-    return this.scriptSetupGenerator.generate(variantKeys)
+  private generateScriptSetup(permutations: VariantPermutation[]): string {
+    return this.scriptSetupGenerator.generate(permutations)
   }
 
   /**
