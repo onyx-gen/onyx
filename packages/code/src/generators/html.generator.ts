@@ -1,17 +1,11 @@
 import { cloneDeep } from 'lodash-es'
-import type {
-  HasNodeCSSData,
-  InstanceNodeData,
-  TreeNode,
-  TreeNodeData,
-  VariantCSS,
-} from '../interfaces'
+import type { HasNodeCSSData, InstanceNodeData, TreeNode, TreeNodeData, VariantCSS } from '../interfaces'
 import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
 import { simplifyConditionalString, transformPropKey } from './utils'
-import type { Attributes, CSSAttributes, NodeTypeToTagMap } from './types'
+import type { Attributes, CSSAttributes, ComputedProperties, NodeTypeToTagMap } from './types'
 
 /**
  * Class representing the mapping from node types to their corresponding HTML tags and attributes.
@@ -19,7 +13,10 @@ import type { Attributes, CSSAttributes, NodeTypeToTagMap } from './types'
 class HTMLGenerator {
   private readonly permutationMap: { [key: VariantKey]: VariantPermutation }
 
-  constructor(private readonly permutations: VariantPermutation[] = []) {
+  constructor(
+    private readonly permutations: VariantPermutation[] = [],
+    private readonly computedProperties: ComputedProperties = {},
+  ) {
     this.permutationMap = Object.fromEntries(
       this.permutations.map((permutation) => {
         return [variantKey(permutation), permutation]
@@ -104,13 +101,13 @@ class HTMLGenerator {
         const clonedCSS = cloneDeep(tree.data.css)
         delete clonedCSS.default // TODO: We have a symbol for that
         const translatedCSSData = translateContainerNodeCSSData(clonedCSS)
-        const dynamicCSSObject = Object.fromEntries(
+        attrs.dynamic = Object.fromEntries(
           Object.entries(translatedCSSData).map(([key, value]) => {
             const permutation: VariantPermutation | undefined = this.permutationMap[key]
 
             if (permutation) {
-              const conditional = Object.entries(permutation).map(([key, value]) => {
-                return `${key} === '${value}'`
+              const conditional = Object.entries(permutation).map(([permutationKey, permutationValue]) => {
+                return this.computedProperties[permutationKey]?.[permutationValue]
               }).join(' && ')
               return [value, conditional]
             }
@@ -119,8 +116,6 @@ class HTMLGenerator {
             }
           }),
         )
-
-        attrs.dynamic = dynamicCSSObject
       }
     }
 
