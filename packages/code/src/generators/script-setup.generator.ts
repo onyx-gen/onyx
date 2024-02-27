@@ -76,7 +76,7 @@ class ScriptSetupGenerator {
     const interfacePropsBody = this.generateInterfaceProperties(this.types, indent)
     const computedPropertiesBodies = this.generateComputedPropertiesBodies(this.computedProperties)
 
-    return this.composeFinalScript(interfacePropsBody, computedPropertiesBodies, indent)
+    return this.composeFinalScript(interfacePropsBody, computedPropertiesBodies)
   }
 
   /**
@@ -167,11 +167,10 @@ class ScriptSetupGenerator {
    *
    * @param interfacePropsBody - A string representing the generated interface properties.
    * @param computedPropertiesBodies - An array of strings, each representing a computed property's code.
-   * @param indent - A string representing the indentation to be used in the generated code.
    * @returns A string representing the complete script setup block for the component.
    * @private
    */
-  private composeFinalScript(interfacePropsBody: string, computedPropertiesBodies: string[], indent: string): string {
+  private composeFinalScript(interfacePropsBody: string, computedPropertiesBodies: string[]): string {
     return `
 <script setup lang="ts">
   import { computed, toRefs } from 'vue'
