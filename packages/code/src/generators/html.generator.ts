@@ -8,6 +8,8 @@ import type {
 } from '../interfaces'
 import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
+import type { VariantKey, VariantPermutation } from '../set/types'
+import { variantKey } from '../merge/utils'
 import { simplifyConditionalString, transformPropKey } from './utils'
 import type { Attributes, CSSAttributes, NodeTypeToTagMap } from './types'
 
@@ -15,6 +17,16 @@ import type { Attributes, CSSAttributes, NodeTypeToTagMap } from './types'
  * Class representing the mapping from node types to their corresponding HTML tags and attributes.
  */
 class HTMLGenerator {
+  private readonly permutationMap: { [key: VariantKey]: VariantPermutation }
+
+  constructor(private readonly permutations: VariantPermutation[] = []) {
+    this.permutationMap = Object.fromEntries(
+      this.permutations.map((permutation) => {
+        return [variantKey(permutation), permutation]
+      }),
+    )
+  }
+
   // Improve NodeTypeToTagMap to handle different node data types
   private nodeTypeToTag: NodeTypeToTagMap = {
     container: {
@@ -91,7 +103,24 @@ class HTMLGenerator {
       if (length > 1) {
         const clonedCSS = cloneDeep(tree.data.css)
         delete clonedCSS.default // TODO: We have a symbol for that
-        attrs.dynamic = translateContainerNodeCSSData(clonedCSS)
+        const translatedCSSData = translateContainerNodeCSSData(clonedCSS)
+        const dynamicCSSObject = Object.fromEntries(
+          Object.entries(translatedCSSData).map(([key, value]) => {
+            const permutation: VariantPermutation | undefined = this.permutationMap[key]
+
+            if (permutation) {
+              const conditional = Object.entries(permutation).map(([key, value]) => {
+                return `${key} === '${value}'`
+              }).join(' && ')
+              return [value, conditional]
+            }
+            else {
+              return [value, key]
+            }
+          }),
+        )
+
+        attrs.dynamic = dynamicCSSObject
       }
     }
 

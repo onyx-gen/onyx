@@ -1,5 +1,5 @@
 import type { TreeNode } from '../interfaces'
-import type { VariantPermutation } from '../set/types'
+import type { VariantKey, VariantPermutation } from '../set/types'
 
 /**
  * Merges an array of conditionals into the `if` property of a tree node's `data` object.
@@ -26,6 +26,6 @@ export function conditionalTree(tree: TreeNode, ...conditional: string[]): TreeN
  * Returns a string representing a variant permutation.
  * @param variantPermutation
  */
-export function variantKey(variantPermutation: VariantPermutation): string {
+export function variantKey(variantPermutation: VariantPermutation): VariantKey {
   return Object.entries(variantPermutation).map(([key, value]) => `${key}-${value}`).join('_')
 }

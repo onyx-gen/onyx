@@ -18,7 +18,6 @@ import type {
 import { getComponentProperties, groupComponentsByProp } from './utils'
 
 class ComponentSetProcessor {
-  private htmlGenerator = new HTMLGenerator()
   private scriptSetupGenerator = new ScriptSetupGenerator()
 
   public async process(data: ComponentSetNode | SceneNode[]): Promise<string> {
@@ -60,7 +59,7 @@ class ComponentSetProcessor {
     const code: string[] = []
 
     code.push(this.generateScriptSetup(permutations))
-    code.push(this.generateHTML(componentSetTree))
+    code.push(this.generateHTML(componentSetTree, permutations))
 
     return code.join('\n\n')
   }
@@ -72,14 +71,16 @@ class ComponentSetProcessor {
   /**
    * Generates HTML from a given tree.
    * @param tree - The tree to generate HTML from.
+   * @param permutations - The permutations used to generate the HTML.
    * @returns The generated HTML.
    * @private
    */
-  private generateHTML(tree: TreeNode | null): string {
+  private generateHTML(tree: TreeNode | null, permutations: VariantPermutation[]): string {
     if (!tree)
       return ''
 
-    return this.htmlGenerator.generate(tree)
+    const htmlGenerator = new HTMLGenerator(permutations)
+    return htmlGenerator.generate(tree)
   }
 
   /**
