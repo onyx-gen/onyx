@@ -56,75 +56,65 @@ class ScriptSetupGenerator {
    * @param permutations - The set of permutations to generate TypeScript interface from.
    * @returns - The generated script setup string.
    */
-  generate(permutations: VariantPermutation[]) {
+  generate(permutations: VariantPermutation[]): string {
     const indent = createIndent(2)
+    const permutationCollection = this.collectUniquePermutationValues(permutations)
+    const types = this.generateUnionTypes(permutationCollection)
+    const interfacePropsBody = this.generateInterfaceProperties(types, indent)
+    const computedProperties = this.generateComputedProperties(permutationCollection)
+    const computedPropertiesBodies = this.generateComputedPropertiesBodies(computedProperties)
+    return this.composeFinalScript(interfacePropsBody, computedPropertiesBodies, indent)
+  }
 
-    // Create a collection of all unique permutation values for each permutation key in the permutations
-    const permutationCollection: {
-      [p: PermutationKey]: Set<PermutationValue>
-    } = permutations.reduce((acc, permutation) => {
-      Object.entries(permutation).forEach(
-        ([permutationKey, permutationValue]) => {
-          if (acc[permutationKey])
-            acc[permutationKey].add(permutationValue)
-          else
-            acc[permutationKey] = new Set([permutationValue])
-        },
-      )
+  private collectUniquePermutationValues(permutations: VariantPermutation[]): { [key: PermutationKey]: Set<PermutationValue> } {
+    return permutations.reduce((acc, permutation) => {
+      Object.entries(permutation).forEach(([key, value]) => {
+        if (!acc[key])
+          acc[key] = new Set()
 
+        acc[key].add(value)
+      })
       return acc
     }, {} as { [key: PermutationKey]: Set<PermutationValue> })
+  }
 
-    // Create a Union Type for each key in the permutations
-    const types: {
-      [p: PermutationKey]: PermutationUnionType
-    } = Object.fromEntries(
-      Object.entries(permutationCollection)
-        .map(
-          ([key, values]) => {
-            const valuesString = Array.from(values).map(value => `'${value}'`).join(' | ')
-            return [key, valuesString]
-          },
-        ),
+  private generateUnionTypes(permutationCollection: { [key: PermutationKey]: Set<PermutationValue> }): { [key: PermutationKey]: PermutationUnionType } {
+    return Object.fromEntries(
+      Object.entries(permutationCollection).map(([key, values]) => {
+        const valuesString = Array.from(values).map(value => `'${value}'`).join(' | ')
+        return [key, valuesString]
+      }),
     )
+  }
 
-    // Create the interface properties body
-    const interfacePropsBody = Object.entries(types)
-      .map(
-        ([key, value]) => `${key}: ${value}`,
-      )
+  private generateInterfaceProperties(types: { [key: PermutationKey]: PermutationUnionType }, indent: string): string {
+    return Object.entries(types)
+      .map(([key, value]) => `${key}: ${value}`)
       .join(`\n${indent}`)
+  }
 
-    // Create the computed properties
-    const computedProperties: ComputedProperties = Object.fromEntries(
-      Object.entries(permutationCollection)
-        .map(([key, value]) => {
-          const namesMap = Object.fromEntries(
-            Array.from(value)
-              .map((permutationValue) => {
-                const name = `is${key[0].toUpperCase()}${key.slice(1)}${permutationValue[0].toUpperCase()}${permutationValue.slice(1)}`
-                return [permutationValue, name]
-              }),
-          )
-          return [key, namesMap]
-        }),
-    ) as ComputedProperties
+  private generateComputedProperties(permutationCollection: { [key: PermutationKey]: Set<PermutationValue> }): ComputedProperties {
+    return Object.fromEntries(
+      Object.entries(permutationCollection).map(([key, values]) => {
+        const namesMap = Object.fromEntries(
+          Array.from(values).map((value) => {
+            const name = `is${key[0].toUpperCase()}${key.slice(1)}${value[0].toUpperCase()}${value.slice(1)}`
+            return [value, name]
+          }),
+        )
+        return [key, namesMap]
+      }),
+    )
+  }
 
-    const computedPropertyNames = Object.keys(types)
+  private generateComputedPropertiesBodies(computedProperties: ComputedProperties): string[] {
+    return Object.entries(computedProperties).flatMap(([key, values]) =>
+      Object.entries(values).map(([value, name]) => `const ${name} = computed(() => ${key}.value === '${value}')`),
+    )
+  }
 
-    const computedPropertiesBodies = Object.entries(computedProperties)
-      .flatMap(
-        ([permutationKey, permutationValueMapping]: [PermutationKey, { [p: PermutationValue]: PermutationComputedPropertyName }]) => {
-          return Object.entries(permutationValueMapping)
-            .map(
-              ([permutationValue, computedPropertyName]) => {
-                return `const ${computedPropertyName} = computed(() => ${permutationKey}.value === '${permutationValue}')`
-              },
-            )
-        },
-      )
-
-    const code = `
+  private composeFinalScript(interfacePropsBody: string, computedPropertiesBodies: string[], indent: string): string {
+    return `
 <script setup lang="ts">
   import { computed, toRefs } from 'vue'
 
@@ -132,13 +122,9 @@ class ScriptSetupGenerator {
     ${interfacePropsBody}
   }
 
-  const { ${computedPropertyNames.join(', ')} } = toRefs(defineProps<Props>())
-  
   ${computedPropertiesBodies.join(`\n${createIndent(1)}`)}
 </script>
-    `
-
-    return code.trim()
+    `.trim()
   }
 }
 
