@@ -48,12 +48,23 @@ type PermutationUnionType = string
  * This class generates the `script setup` code block for the generated Vue component output.
  */
 class ScriptSetupGenerator {
+  private readonly computedProperties: ComputedProperties
+  private readonly types: { [key: PermutationKey]: PermutationUnionType }
+
   /**
    * Constructs a ScriptSetupGenerator instance with specified variant permutations.
    *
    * @param permutations - An array of variant permutations, where each permutation is represented by a key-value pair indicating the variant's name and value, respectively.
    */
-  constructor(private readonly permutations: VariantPermutation[]) {}
+  constructor(permutations: VariantPermutation[]) {
+    const permutationCollection: {
+      [key: PermutationKey]: Set<PermutationValue>
+    } = this.collectUniquePermutationValues(permutations)
+
+    this.types = this.generateUnionTypes(permutationCollection)
+
+    this.computedProperties = this.generateComputedProperties(permutationCollection)
+  }
 
   /**
    * Generates the script setup block for a Vue component, including TypeScript type unions for props and computed properties for each variant.
@@ -62,11 +73,9 @@ class ScriptSetupGenerator {
    */
   generate(): string {
     const indent = createIndent(2)
-    const permutationCollection = this.collectUniquePermutationValues(this.permutations)
-    const types = this.generateUnionTypes(permutationCollection)
-    const interfacePropsBody = this.generateInterfaceProperties(types, indent)
-    const computedProperties = this.generateComputedProperties(permutationCollection)
-    const computedPropertiesBodies = this.generateComputedPropertiesBodies(computedProperties)
+    const interfacePropsBody = this.generateInterfaceProperties(this.types, indent)
+    const computedPropertiesBodies = this.generateComputedPropertiesBodies(this.computedProperties)
+
     return this.composeFinalScript(interfacePropsBody, computedPropertiesBodies, indent)
   }
 
