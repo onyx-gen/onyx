@@ -5,7 +5,15 @@ import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
 import { simplifyConditionalString, transformPropKey } from './utils'
-import type { Attributes, CSSAttributes, ComputedProperties, DynamicAttributeValue, NodeTypeToTagMap } from './types'
+import type {
+  Attributes,
+  CSSAttributes,
+  ComputedProperties,
+  DynamicAttributeValue,
+  NodeTypeToTagMap,
+  PermutationComputedPropertyName,
+  PermutationValue,
+} from './types'
 
 /**
  * Class representing the mapping from node types to their corresponding HTML tags and attributes.
@@ -106,9 +114,24 @@ class HTMLGenerator {
             const permutation: VariantPermutation | undefined = this.permutationMap[key]
 
             if (permutation) {
-              const conditional = Object.entries(permutation).map(([permutationKey, permutationValue]) => {
-                return this.computedProperties[permutationKey]?.[permutationValue]
-              }).join(' && ')
+              const conditional = Object.entries(permutation)
+                // Filter out permutations that have only one value
+                .filter(([permutationKey]) => {
+                  const valuePropMapping: {
+                    [p: PermutationValue]: PermutationComputedPropertyName
+                  } | undefined = this.computedProperties[permutationKey]
+                  return valuePropMapping && Object.keys(valuePropMapping).length > 1
+                })
+
+                // Map to computed property names
+                .map(
+                  ([permutationKey, permutationValue]) => {
+                    return this.computedProperties[permutationKey]?.[permutationValue]
+                  },
+                )
+
+                // Use && concatenation to join the computed property names
+                .join(' && ')
               return [value, conditional]
             }
             else {
