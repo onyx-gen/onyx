@@ -1,14 +1,22 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import type { PluginMessageEvent } from '@onyx/events'
+import type { PluginMessageEvent, SelectedNode } from '@onyx/events'
 import Layout from './layout.vue'
 import Code from './code.vue'
 
 const hasSelection = ref(false)
 
+const selectedNodes = ref<SelectedNode[]>([])
+
 onMounted(async () => {
   window.addEventListener('message', (m: PluginMessageEvent) => {
     hasSelection.value = m.data.pluginMessage.event !== 'unselected'
+
+    if (m.data.pluginMessage.event === 'unselected')
+      selectedNodes.value = []
+
+    if (m.data.pluginMessage.event === 'selected')
+      selectedNodes.value = m.data.pluginMessage.data.nodes
   })
 })
 </script>
@@ -20,16 +28,33 @@ onMounted(async () => {
         Onyx
       </h1>
 
-      <div
-        v-show="hasSelection"
-        class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-[rgba(0, 0, 0, 0.898)] rounded-sm overflow-hidden"
-      >
-        <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
-          Generated Code
+      <div v-show="hasSelection" class="space-y-4">
+        <div
+          class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-[rgba(0, 0, 0, 0.898)] rounded-sm overflow-hidden"
+        >
+          <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
+            Generated Code
+          </div>
+
+          <div class="px-3 py-2 overflow-scroll">
+            <Code />
+          </div>
         </div>
 
-        <div class="px-3 py-2 overflow-scroll">
-          <Code />
+        <div>
+          <div class="py-2 color-$figma-color-text-secondary my-font">
+            Selected Nodes
+          </div>
+
+          <ol class="flex gap-4">
+            <li
+              v-for="selectedNode in selectedNodes"
+              :key="selectedNode.id"
+              class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
+            >
+              {{ selectedNode.id }}
+            </li>
+          </ol>
         </div>
       </div>
 

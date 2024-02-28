@@ -2,7 +2,7 @@ import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
 import { getSelectedNodes } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
-import { sendHtmlMessage, sendUnselectedMessage } from './messages'
+import { sendHtmlMessage, sendSelectedMessage, sendUnselectedMessage } from './messages'
 
 /**
  * Generate HTML code for the selected Figma nodes.
@@ -17,6 +17,8 @@ export default async function generate(): Promise<string | void> {
     sendUnselectedMessage()
     return
   }
+
+  sendSelectedMessage(nodes.map(node => ({ id: node.id })))
 
   const parser = new FigmaNodeParser()
   const generator = new HTMLGenerator()

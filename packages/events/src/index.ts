@@ -15,4 +15,15 @@ export interface UnselectedPluginMessage extends BasePluginMessage {
   event: 'unselected'
 }
 
-export type PluginMessage = HtmlPluginMessage | UnselectedPluginMessage
+export interface SelectedNode {
+  id: string
+}
+
+export interface SelectedPluginMessage extends BasePluginMessage {
+  event: 'selected'
+  data: {
+    nodes: SelectedNode[]
+  }
+}
+
+export type PluginMessage = HtmlPluginMessage | UnselectedPluginMessage | SelectedPluginMessage

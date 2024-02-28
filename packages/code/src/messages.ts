@@ -1,4 +1,4 @@
-import type { HtmlPluginMessage, UnselectedPluginMessage } from '@onyx/events'
+import type { HtmlPluginMessage, SelectedNode, SelectedPluginMessage, UnselectedPluginMessage } from '@onyx/events'
 
 /**
  * This function sends a message to the Figma UI when no node is selected.
@@ -7,6 +7,20 @@ import type { HtmlPluginMessage, UnselectedPluginMessage } from '@onyx/events'
  */
 export function sendUnselectedMessage() {
   const pluginMessage: UnselectedPluginMessage = { event: 'unselected' }
+  figma.ui.postMessage(pluginMessage)
+}
+
+/**
+ * Sends a message to the Figma UI when a node is selected.
+ *
+ * The message contains the selected nodes.
+ *
+ * @param {SelectedNode[]} nodes - The selected nodes to send.
+ *
+ * @return {void}
+ */
+export function sendSelectedMessage(nodes: SelectedNode[]): void {
+  const pluginMessage: SelectedPluginMessage = { event: 'selected', data: { nodes } }
   figma.ui.postMessage(pluginMessage)
 }
 
