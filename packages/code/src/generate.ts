@@ -19,10 +19,6 @@ export default async function generate(): Promise<string | void> {
     return
   }
 
-  const componentNodes = nodes.filter(node => node.type === 'COMPONENT') as ComponentNode[]
-
-  sendSelectedMessage(componentNodes.map(node => ({ id: node.id, props: getComponentProperties(node) })))
-
   const parser = new FigmaNodeParser()
   const generator = new HTMLGenerator()
 
@@ -64,6 +60,16 @@ export default async function generate(): Promise<string | void> {
       console.error(`[Onyx Plugin] Error during multiple selected nodes processing`, error)
       figma.notify('Error during multiple selected nodes processing')
     }
+  }
+
+  if (nodes.length === 1 && nodes[0].type === 'COMPONENT_SET') {
+    const componentSet = nodes[0] as ComponentSetNode
+    const componentNodes = componentSet.children as ComponentNode[]
+    sendSelectedMessage(componentNodes.map(node => ({ id: node.id, props: getComponentProperties(node) })))
+  }
+  else {
+    const componentNodes = nodes.filter(node => node.type === 'COMPONENT') as ComponentNode[]
+    sendSelectedMessage(componentNodes.map(node => ({ id: node.id, props: getComponentProperties(node) })))
   }
 
   // only send message if html is not empty
