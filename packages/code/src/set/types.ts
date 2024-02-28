@@ -1,3 +1,4 @@
+import type { ComponentProps } from '@onyx/events'
 import type { TreeNode } from '../interfaces'
 
 export interface GroupedComponentCollection<T extends ComponentProps> {
@@ -5,10 +6,6 @@ export interface GroupedComponentCollection<T extends ComponentProps> {
     component: ComponentNode
     props: T
   }[]
-}
-
-export interface ComponentProps {
-  [key: string]: string
 }
 
 export interface ComponentPropsWithState extends ComponentProps {

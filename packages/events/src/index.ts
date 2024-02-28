@@ -1,5 +1,9 @@
 export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
 
+export interface ComponentProps {
+  [key: string]: string
+}
+
 interface BasePluginMessage {
   event: string
 }
@@ -17,6 +21,7 @@ export interface UnselectedPluginMessage extends BasePluginMessage {
 
 export interface SelectedNode {
   id: string
+  props?: ComponentProps
 }
 
 export interface SelectedPluginMessage extends BasePluginMessage {

@@ -1,4 +1,5 @@
-import type { ComponentCollection, ComponentProps, GroupedComponentCollection } from './types'
+import type { ComponentProps } from '@onyx/events'
+import type { ComponentCollection, GroupedComponentCollection } from './types'
 import { removeNonAlphanumericChars, replaceComponentPropValue } from './replacer'
 
 /**
@@ -18,7 +19,7 @@ import { removeNonAlphanumericChars, replaceComponentPropValue } from './replace
  */
 export function getComponentProperties(
   component: ComponentNode,
-): { [key: string]: string } {
+): ComponentProps {
   return Object.fromEntries(
     component.name
       // Split the component name into pairs by ', '.

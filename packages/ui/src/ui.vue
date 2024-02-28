@@ -52,7 +52,11 @@ onMounted(async () => {
               :key="selectedNode.id"
               class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
             >
-              {{ selectedNode.id }}
+              <ul v-if="selectedNode.props">
+                <li v-for="(value, key) in selectedNode.props" :key="key">
+                  {{ key }}: {{ value }}
+                </li>
+              </ul>
             </li>
           </ol>
         </div>
