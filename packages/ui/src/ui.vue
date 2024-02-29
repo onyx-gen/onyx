@@ -4,6 +4,7 @@ import type { ComponentProps, PluginMessageEvent, SelectedNode } from '@onyx/eve
 import Layout from './layout.vue'
 import Code from './code.vue'
 import Select from './select.vue'
+import type { SelectOption } from '@/select.vue'
 
 const hasSelection = ref(false)
 
@@ -67,13 +68,24 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
   return selectedNodes.value.find(node => node.props?.state === state && node.props?.[permutationKey] === permutationValue)
 }
 
-const model = ref({
-  name: 'Wade Cooper',
-})
+type Mode = 'inferred' | 'variables'
+
+const model = ref<Mode>('variables')
 
 watch(model, (val) => {
   console.log('model value changed', val)
 })
+
+const options: SelectOption[] = [
+  {
+    value: 'inferred',
+    label: 'Inferred',
+  },
+  {
+    value: 'variables',
+    label: 'Variables',
+  },
+]
 </script>
 
 <template>
@@ -88,7 +100,7 @@ watch(model, (val) => {
           Configuration
         </h2>
 
-        <Select v-model="model" />
+        <Select v-model="model" :options="options" />
       </div>
 
       <div v-show="hasSelection" class="divide-y divide-$figma-color-border">

@@ -7,24 +7,20 @@ import {
 } from '@headlessui/vue'
 import { CheckIcon } from '@heroicons/vue/20/solid'
 
-const people = [
-  { name: 'Wade Cooper' },
-  { name: 'Arlene Mccoy' },
-  { name: 'Devon Webb' },
-  { name: 'Tom Cook' },
-  { name: 'Tanya Fox' },
-  { name: 'Hellen Schmidt' },
-]
+const { options } = defineProps<{
+  options: SelectOption[]
+}>()
 
-interface Person {
-  name: string
+export interface SelectOption {
+  value: string
+  label: string
 }
 
-const model = defineModel<Person>()
+const model = defineModel<string>()
 </script>
 
 <template>
-  <Listbox v-model="model" by="name">
+  <Listbox v-model="model">
     <div class="relative mt-1">
       <ListboxButton
         class="
@@ -41,7 +37,7 @@ const model = defineModel<Person>()
           hover:border-color-$figma-color-border
         "
       >
-        <span class="inline-block truncate color-$figma-color-text my-font">{{ model?.name }}</span>
+        <span class="inline-block truncate color-$figma-color-text my-font">{{ options.find(option => option.value === model)?.label }}</span>
         <span
           class="pointer-events-none flex items-center"
         >
@@ -58,10 +54,10 @@ const model = defineModel<Person>()
           class="absolute mt-1 max-h-60 overflow-auto rounded-sm bg-[rgb(30,30,30)] py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
         >
           <ListboxOption
-            v-for="person in people"
+            v-for="option in options"
             v-slot="{ active, selected }"
-            :key="person.name"
-            :value="person"
+            :key="option.value"
+            :value="option.value"
             as="template"
           >
             <li
@@ -70,7 +66,7 @@ const model = defineModel<Person>()
                 'bg-$figma-color-bg-success': active,
               }"
             >
-              <span class="block truncate my-font color-$figma-color-text">{{ person.name }}</span>
+              <span class="block truncate my-font color-$figma-color-text">{{ option.label }}</span>
               <span
                 v-if="selected"
                 class="absolute inset-y-0 left-0 flex items-center pl-2"
