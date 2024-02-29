@@ -3,6 +3,7 @@ import type { NodeCSSData, VariantCSS } from './interfaces'
 import { difference } from './set/utils'
 import type { VariantKey } from './set/types'
 import { entries } from './utils'
+import config from './config'
 
 /**
  * Translates a VariantCSS object into a string representation.
@@ -10,17 +11,39 @@ import { entries } from './utils'
  * that represents the CSS classes and their respective variants.
  *
  * @param variantCSS - The VariantCSS object to be translated.
+ * @param variantGroup - If true, generate variant groups. If false, no group.
+ * @param parentVariant - The parent variant name to be used when generating the CSS string.
  * @returns A string representing the translated VariantCSS object.
  */
-export function translateVariantCSS(variantCSS: VariantCSS): string {
-  const translated = variantCSS.css.map((css) => {
-    return isVariantCSS(css) ? translateVariantCSS(css) : [...css.values()].join(' ')
-  }).join(' ')
+export function translateVariantCSS(
+  variantCSS: VariantCSS,
+  variantGroup: boolean = true,
+  parentVariant?: string,
+): string {
+  const variant = variantCSS.variant ? (parentVariant ? `${parentVariant}:${variantCSS.variant}` : variantCSS.variant) : parentVariant
 
-  const variant = variantCSS.variant
-  const requiresParentheses = translated.includes(' ') && variant !== undefined
+  if (variantGroup) {
+    const translated = variantCSS.css.map((css) => {
+      return isVariantCSS(css) ? translateVariantCSS(css, variantGroup) : [...css.values()].join(' ')
+    }).join(' ')
 
-  return `${variant ? `${variant}:` : ''}${requiresParentheses ? '(' : ''}${translated}${requiresParentheses ? ')' : ''}`
+    const variant = variantCSS.variant
+    const requiresParentheses = translated.includes(' ') && variant !== undefined
+
+    return `${variant ? `${variant}:` : ''}${requiresParentheses ? '(' : ''}${translated}${requiresParentheses ? ')' : ''}`
+  }
+  else {
+    // New behavior when variantGroup is false
+    return variantCSS.css.map((css) => {
+      if (isVariantCSS(css)) {
+        // recursively call the translateVariantCSS function and pass the parent variant
+        return translateVariantCSS(css, variantGroup, variant)
+      }
+      else {
+        return [...css.values()].map(value => variant ? `${variant}:${value}` : value).join(' ')
+      }
+    }).join(' ')
+  }
 }
 
 /**
@@ -40,7 +63,7 @@ export function translateContainerNodeCSSData(data: NodeCSSData): Record<Variant
     entries(data)
       .filter(([, variantCSS]) => variantCSS.css.length > 0)
       .map(([variant, variantCSS]) => {
-        return [variant, translateVariantCSS(variantCSS)]
+        return [variant, translateVariantCSS(variantCSS, config.tailwind.variantGroup)]
       }),
   )
 }

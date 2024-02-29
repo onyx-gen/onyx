@@ -53,8 +53,16 @@ describe('css', () => {
       expect(translateVariantCSS(multiClassVariantCSS)).toBe('hover:(bg-red px-4)')
     })
 
+    it('translates multiple classes without variant groups', () => {
+      expect(translateVariantCSS(multiClassVariantCSS, false)).toBe('hover:bg-red hover:px-4')
+    })
+
     it('translates nested variant CSS structures', () => {
       expect(translateVariantCSS(complexVariantCSS)).toBe('bg-red px-4 hover:(bg-blue px-8) focus:(bg-green px-12 disabled:bg-gray-300)')
+    })
+
+    it('translates nested variant CSS structures without variant groups', () => {
+      expect(translateVariantCSS(complexVariantCSS, false)).toBe('bg-red px-4 hover:bg-blue hover:px-8 focus:bg-green focus:px-12 focus:disabled:bg-gray-300')
     })
   })
 

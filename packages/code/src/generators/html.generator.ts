@@ -4,6 +4,7 @@ import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
+import config from '../config'
 import { simplifyConditionalString, transformPropKey } from './utils'
 import type {
   Attributes,
@@ -92,7 +93,7 @@ class HTMLGenerator {
       const defaultVariantCSS: VariantCSS | undefined = Object.values(tree.data.css)[0]
 
       if (defaultVariantCSS)
-        attrs.static = translateVariantCSS(defaultVariantCSS)
+        attrs.static = translateVariantCSS(defaultVariantCSS, config.tailwind.variantGroup)
 
       // Remove empty top-level variant CSS entries
       // TODO: Optimization is incomplete as it does not remove recursively empty variant CSS entries
