@@ -186,7 +186,7 @@ class Builder {
           }
 
           if (!utilityValue)
-            utilityValue = this.getNearestSolidColor(stroke)
+            utilityValue = this.getInferredSolidColor(stroke)
 
           const value = this.translateUtilityValue(utilityValue)
           this.attributes.add(`border-color-${value}`)
@@ -282,7 +282,7 @@ class Builder {
           }
 
           if (!utilityValue)
-            utilityValue = this.getNearestSolidColor(fill)
+            utilityValue = this.getInferredSolidColor(fill)
 
           const value = this.translateUtilityValue(utilityValue)
           this.attributes.add(`bg-${value}`)
@@ -327,19 +327,30 @@ class Builder {
     return value
   }
 
-  private getNearestSolidColor(paint: SolidPaint): ColorUtilityValue {
-    console.error('[Builder] Nearest solid color is not yet implemented.', paint)
+  private getInferredSolidColor(paint: SolidPaint): ColorUtilityValue {
     const color = rgbToHex(
       Math.floor(paint.color.r * 256),
       Math.floor(paint.color.g * 256),
       Math.floor(paint.color.b * 256),
-    )
+    ).toLowerCase()
+
+    const opacity = paint.opacity ? paint.opacity * 100 : undefined
+
+    const tailwindColor: string | undefined = config.tailwind.colorMap[color]
+    if (tailwindColor) {
+      return {
+        mode: 'inferred',
+        type: 'color',
+        value: tailwindColor,
+        opacity,
+      }
+    }
 
     return {
       mode: 'arbitrary',
       type: 'color',
       value: color,
-      opacity: paint.opacity ? paint.opacity * 100 : undefined,
+      opacity,
     }
   }
 }
