@@ -1,24 +1,5 @@
 import { rgbToHex } from './utils'
-import type { RectCornersNew, RectSidesNew } from './types'
-
-interface BaseUtilityValue {
-  mode: 'inferred' | 'arbitrary' | 'variable'
-  type: string
-  value: string
-}
-
-interface ColorUtilityValue extends BaseUtilityValue {
-  type: 'color'
-  opacity?: number
-}
-
-interface GenericUtilityValue extends BaseUtilityValue {
-  type: 'generic'
-}
-
-type UtilityValue =
-  | GenericUtilityValue
-  | ColorUtilityValue
+import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
 
 class Builder {
   private attributes: Set<string> = new Set()

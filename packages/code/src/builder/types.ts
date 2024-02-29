@@ -42,3 +42,22 @@ export interface RectCornersNew {
   bottomLeft: number | null
   bottomRight: number | null
 }
+
+interface BaseUtilityValue {
+  mode: 'inferred' | 'arbitrary' | 'variable'
+  type: string
+  value: string
+}
+
+export interface ColorUtilityValue extends BaseUtilityValue {
+  type: 'color'
+  opacity?: number
+}
+
+export interface GenericUtilityValue extends BaseUtilityValue {
+  type: 'generic'
+}
+
+export type UtilityValue =
+  | GenericUtilityValue
+  | ColorUtilityValue
