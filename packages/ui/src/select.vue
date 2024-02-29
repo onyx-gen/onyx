@@ -51,7 +51,7 @@ const model = defineModel<string>()
         leave-to-class="opacity-0"
       >
         <ListboxOptions
-          class="absolute mt-1 max-h-60 overflow-auto rounded-sm bg-[rgb(30,30,30)] py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
+          class="z-50 absolute mt-1 max-h-60 overflow-auto rounded-sm bg-[rgb(30,30,30)] py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
         >
           <ListboxOption
             v-for="option in options"
