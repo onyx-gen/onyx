@@ -165,24 +165,30 @@ class Builder {
     const {
       strokes,
       strokeWeight,
-      strokeJoin,
-      strokeAlign,
-      dashPattern,
     } = node
-
-    console.log({
-      strokes,
-      strokeWeight,
-      strokeJoin,
-      strokeAlign,
-      dashPattern,
-    })
 
     if (Array.isArray(strokes) && strokes.length > 0) {
       if (strokes.length === 1) {
         const stroke = strokes[0]
         if (stroke.type === 'SOLID') {
-          const value = this.translateUtilityValue(this.getNearestSolidColor(stroke))
+          let utilityValue: ColorUtilityValue | null = null
+
+          if (config.mode === 'variables') {
+            const token = this.getTokenByType(node, Properties.borderColor)
+
+            if (token) {
+              utilityValue = {
+                mode: 'variable',
+                type: 'color',
+                value: token,
+              }
+            }
+          }
+
+          if (!utilityValue)
+            utilityValue = this.getNearestSolidColor(stroke)
+
+          const value = this.translateUtilityValue(utilityValue)
           this.attributes.add(`border-color-${value}`)
         }
         else { console.error('[Builder] Only solid strokes are supported yet.') }
