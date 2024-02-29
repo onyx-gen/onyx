@@ -121,20 +121,22 @@ function sendNearestChangedMessage(nearestColor: boolean) {
         Onyx
       </h1>
 
-      <div class="mb-4">
-        <h2 class="my-font font-semibold color-$figma-color-text">
-          Mode
-        </h2>
+      <div class="mb-4 flex gap-4">
+        <div>
+          <h2 class="my-font font-semibold color-$figma-color-text">
+            Mode
+          </h2>
 
-        <Select v-model="model" :options="options" />
-      </div>
+          <Select v-model="model" :options="options" />
+        </div>
 
-      <div class="mb-4">
-        <h2 class="my-font font-semibold color-$figma-color-text">
-          Nearest Inference
-        </h2>
+        <div>
+          <h2 class="my-font font-semibold color-$figma-color-text">
+            Nearest Inference
+          </h2>
 
-        <Switch v-model="nearestInference" class="mt-2" />
+          <Switch v-model="nearestInference" class="mt-2" />
+        </div>
       </div>
 
       <div v-show="hasSelection" class="divide-y divide-$figma-color-border">
