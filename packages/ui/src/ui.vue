@@ -7,6 +7,7 @@ import type {
   NearestChangedPluginMessage,
   PluginMessageEvent,
   SelectedNode,
+  VariantGroupChangedPluginMessage,
 } from '@onyx/types'
 import Layout from './layout.vue'
 import Code from './code.vue'
@@ -112,6 +113,19 @@ function sendNearestChangedMessage(nearestColor: boolean) {
   }
   parent.postMessage({ pluginMessage }, '*')
 }
+
+const variantGroup = ref(true)
+watch(variantGroup, sendVariantGroupChangedMessage)
+
+function sendVariantGroupChangedMessage(variantGroup: boolean) {
+  const pluginMessage: VariantGroupChangedPluginMessage = {
+    event: 'variant-group-changed',
+    data: {
+      variantGroup,
+    },
+  }
+  parent.postMessage({ pluginMessage }, '*')
+}
 </script>
 
 <template>
@@ -136,6 +150,14 @@ function sendNearestChangedMessage(nearestColor: boolean) {
           </h2>
 
           <Switch v-model="nearestInference" class="mt-2" />
+        </div>
+
+        <div>
+          <h2 class="my-font font-semibold color-$figma-color-text">
+            Variant Group
+          </h2>
+
+          <Switch v-model="variantGroup" class="mt-2" />
         </div>
       </div>
 

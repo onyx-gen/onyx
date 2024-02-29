@@ -42,6 +42,13 @@ export interface NearestChangedPluginMessage extends BasePluginMessage {
   }
 }
 
+export interface VariantGroupChangedPluginMessage extends BasePluginMessage {
+  event: 'variant-group-changed'
+  data: {
+    variantGroup: boolean
+  }
+}
+
 /**
  * Interface representing a plugin message emitted
  * when the user unselects all nodes.
@@ -73,3 +80,4 @@ export type PluginMessage =
   | SelectedPluginMessage
   | ModeChangedPluginMessage
   | NearestChangedPluginMessage
+  | VariantGroupChangedPluginMessage

@@ -32,4 +32,9 @@ figma.ui.onmessage = async (message: PluginMessage) => {
     config.inference.nearest = message.data.nearestColor
     await generate()
   }
+  else if (message.event === 'variant-group-changed') {
+    console.log('Variant group changed:', message.data.variantGroup)
+    config.tailwind.variantGroup = message.data.variantGroup
+    await generate()
+  }
 }

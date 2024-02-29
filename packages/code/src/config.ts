@@ -12,6 +12,7 @@ interface OnyxConfiguration {
   tailwind: {
     colorMap: TailwindColorMap
     dimensionMap: TailwindDimensionMap
+    variantGroup: boolean
   }
 }
 
@@ -23,6 +24,7 @@ const config: OnyxConfiguration = {
   tailwind: {
     colorMap,
     dimensionMap,
+    variantGroup: true,
   },
 }
 
