@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
-import type { PluginMessageEvent, SelectedNode } from '@onyx/events'
+import { computed, onMounted, ref } from 'vue'
+import type { ComponentProps, PluginMessageEvent, SelectedNode } from '@onyx/events'
 import Layout from './layout.vue'
 import Code from './code.vue'
 
@@ -19,6 +19,52 @@ onMounted(async () => {
       selectedNodes.value = m.data.pluginMessage.data.nodes
   })
 })
+
+const selectedNodeProps = computed(() => {
+  return selectedNodes.value
+    .filter(node => node.props)
+    .map((node) => {
+      return node.props as ComponentProps
+    })
+})
+
+const states = computed(() => selectedNodes.value.reduce((acc, node) => {
+  if (node.props) {
+    Object.keys(node.props)
+      .filter(prop => prop === 'state').forEach((key) => {
+        acc.add(node.props![key])
+      })
+  }
+
+  return acc
+}, new Set<string>()))
+
+const permutationKeys = computed(() => selectedNodes.value.reduce((acc, node) => {
+  if (node.props) {
+    Object.keys(node.props)
+      .filter(prop => prop !== 'state').forEach((key) => {
+        acc.add(key)
+      })
+  }
+
+  return acc
+}, new Set<string>()))
+
+const permutationMapping = computed(() => {
+  return Array.from(permutationKeys.value).reduce((acc, key) => {
+    if (!acc[key])
+      acc[key] = new Set<string>()
+
+    selectedNodeProps.value.map(props => props[key]).forEach((permutationValue) => {
+      acc[key].add(permutationValue)
+    })
+    return acc
+  }, {} as Record<string, Set<string>>)
+})
+
+function getPermutationNode(permutationKey: string, permutationValue: string, state: string) {
+  return selectedNodes.value.find(node => node.props?.state === state && node.props?.[permutationKey] === permutationValue)
+}
 </script>
 
 <template>
@@ -45,6 +91,53 @@ onMounted(async () => {
           <div class="my-font font-semibold color-$figma-color-text">
             Selected Nodes
           </div>
+
+          <table class="border-separate border-spacing-2">
+            <thead>
+              <tr>
+                <th class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font">
+                  Variant
+                </th>
+                <th
+                  v-for="state in states"
+                  :key="state"
+                  class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
+                >
+                  {{ state }}
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <template
+                v-for="permutationKey in permutationKeys"
+                :key="permutationKey"
+              >
+                <tr
+                  v-for="(permutationValue, idx) in permutationMapping[permutationKey]"
+                  :key="permutationValue"
+                >
+                  <th
+                    v-if="idx === 0"
+                    class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
+                    :rowspan="permutationMapping[permutationKey].size"
+                  >
+                    {{ permutationKey }}
+                  </th>
+                  <td
+                    v-for="state in states"
+                    :key="state"
+                    class="opacity-0 p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
+                    :class="{
+                      'opacity-100': !!getPermutationNode(permutationKey, permutationValue, state),
+                    }"
+                  >
+                    {{ getPermutationNode(permutationKey, permutationValue, state)?.props?.[permutationKey] }}
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
 
           <ol class="flex gap-4">
             <li
