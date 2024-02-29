@@ -134,7 +134,7 @@ function sendNearestChangedMessage(nearestColor: boolean) {
           Nearest Inference
         </h2>
 
-        <Switch v-model="nearestInference" />
+        <Switch v-model="nearestInference" class="mt-2" />
       </div>
 
       <div v-show="hasSelection" class="divide-y divide-$figma-color-border">
