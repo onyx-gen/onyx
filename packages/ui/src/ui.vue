@@ -28,7 +28,7 @@ onMounted(async () => {
         Onyx
       </h1>
 
-      <div v-show="hasSelection" class="space-y-4">
+      <div v-show="hasSelection" class="divide-y divide-$figma-color-border">
         <div
           class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-[rgba(0, 0, 0, 0.898)] rounded-sm overflow-hidden"
         >
@@ -41,8 +41,8 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div>
-          <div class="py-2 color-$figma-color-text-secondary my-font">
+        <div class="mt-4 pt-4 space-y-4">
+          <div class="my-font font-semibold color-$figma-color-text">
             Selected Nodes
           </div>
 
