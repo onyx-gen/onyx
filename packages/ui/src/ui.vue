@@ -95,9 +95,7 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
           <table class="border-separate border-spacing-2">
             <thead>
               <tr>
-                <th class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font">
-                  Variant
-                </th>
+                <th class="opacity-0" />
                 <th
                   v-for="state in states"
                   :key="state"
@@ -127,31 +125,48 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
                   <td
                     v-for="state in states"
                     :key="state"
-                    class="opacity-0 p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
+                    class="opacity-0 p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font space-y-1"
                     :class="{
                       'opacity-100': !!getPermutationNode(permutationKey, permutationValue, state),
                     }"
                   >
-                    {{ getPermutationNode(permutationKey, permutationValue, state)?.props?.[permutationKey] }}
+                    <div class="flex gap-1 items-center color-$figma-color-text-component mt-0.5">
+                      <svg
+                        class="fill-current"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 12 12"
+                      >
+                        <path
+                          fill-opacity="1"
+                          fill-rule="nonzero"
+                          stroke="none"
+                          d="M1.207 6 6 1.207 10.793 6 6 10.793 1.207 6z"
+                        />
+                      </svg>
+
+                      <span class="font-normal">Variant</span>
+                    </div>
+
+                    <table class="border-separate border-spacing-x-1 text-left my-font -mx-1">
+                      <tr
+                        v-for="(value, key) in getPermutationNode(permutationKey, permutationValue, state)?.props"
+                        :key="key"
+                      >
+                        <th class="color-$figma-color-text-secondary">
+                          {{ key }}
+                        </th>
+                        <td class="color-$figma-color-text">
+                          {{ value }}
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </template>
             </tbody>
           </table>
-
-          <ol class="flex gap-4">
-            <li
-              v-for="selectedNode in selectedNodes"
-              :key="selectedNode.id"
-              class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
-            >
-              <ul v-if="selectedNode.props">
-                <li v-for="(value, key) in selectedNode.props" :key="key">
-                  {{ key }}: {{ value }}
-                </li>
-              </ul>
-            </li>
-          </ol>
         </div>
       </div>
 
