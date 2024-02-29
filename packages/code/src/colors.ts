@@ -312,6 +312,12 @@ const colors: TailwindColors = {
   },
 }
 
+/**
+ * Maps colors to their corresponding names.
+ *
+ * @param {TailwindColors} colors - The colors object to be mapped.
+ * @return {Record<HEX, string>} - The resulting object that maps HEX colors to their corresponding names.
+ */
 function mapColorsToNames(colors: TailwindColors): Record<HEX, string> {
   console.log('CALCULATED!')
   const result: Record<HEX, string> = {}
@@ -328,7 +334,13 @@ export const colorMap: TailwindColorMap = mapColorsToNames(colors)
 
 const nearestColorCache = new Map<string, string>()
 
-export function findNearestColor(rgb: RGB) {
+/**
+ * Finds the nearest color in the colorMap based on the RGB value provided.
+ *
+ * @param {RGB} rgb - The RGB value to find the nearest color for.
+ * @return {string} The closest color in the colorMap represented as a hexadecimal value.
+ */
+export function findNearestColor(rgb: RGB): string {
   const cacheKey = getRGBCacheKey(rgb)
 
   if (nearestColorCache.has(cacheKey))
@@ -376,16 +388,18 @@ function getRGBCacheKey(rgb: RGB) {
  *   The array contains three values: the red (r), green (g), and blue (b) components of the color.
  */
 function hex2Dec(hex: string): [number, number, number] {
-  let r = 0; let g = 0; let b = 0
+  let r = 0
+  let g = 0
+  let b = 0
 
   // 3 digits
-  if (hex.length == 4) {
+  if (hex.length === 4) {
     r = Number.parseInt(hex.charAt(1) + hex.charAt(1), 16)
     g = Number.parseInt(hex.charAt(2) + hex.charAt(2), 16)
     b = Number.parseInt(hex.charAt(3) + hex.charAt(3), 16)
   }
   // 6 digits
-  else if (hex.length == 7) {
+  else if (hex.length === 7) {
     r = Number.parseInt(hex.slice(1, 3), 16)
     g = Number.parseInt(hex.slice(3, 5), 16)
     b = Number.parseInt(hex.slice(5, 7), 16)
