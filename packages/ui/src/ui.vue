@@ -4,7 +4,8 @@ import type { ComponentProps, Mode, ModeChangedPluginMessage, PluginMessageEvent
 import Layout from './layout.vue'
 import Code from './code.vue'
 import Select from './select.vue'
-import type { SelectOption } from '@/select.vue'
+import Switch from './switch.vue'
+import type { SelectOption } from './select.vue'
 
 const hasSelection = ref(false)
 
@@ -95,6 +96,8 @@ const options: SelectOption[] = [
     label: 'Variables',
   },
 ]
+
+const nearestColor = ref(true)
 </script>
 
 <template>
@@ -106,10 +109,18 @@ const options: SelectOption[] = [
 
       <div class="mb-4">
         <h2 class="my-font font-semibold color-$figma-color-text">
-          Configuration
+          Mode
         </h2>
 
         <Select v-model="model" :options="options" />
+      </div>
+
+      <div class="mb-4">
+        <h2 class="my-font font-semibold color-$figma-color-text">
+          Nearest Color
+        </h2>
+
+        <Switch v-model="nearestColor" />
       </div>
 
       <div v-show="hasSelection" class="divide-y divide-$figma-color-border">
