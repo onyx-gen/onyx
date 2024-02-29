@@ -1,4 +1,6 @@
+import type { PluginMessage } from '@onyx/types'
 import generate from './generate'
+import config from './config'
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 figma.skipInvisibleInstanceChildren = true
@@ -19,6 +21,10 @@ generate()
 // Generate HTML code when the selection changes
 figma.on('selectionchange', generate)
 
-figma.ui.onmessage = (message) => {
-  console.log('got this from the UI', message)
+figma.ui.onmessage = async (message: PluginMessage) => {
+  if (message.event === 'mode-changed') {
+    console.log('Mode changed:', message.data.mode)
+    config.mode = message.data.mode
+    await generate()
+  }
 }

@@ -64,3 +64,4 @@ export type PluginMessage =
   | HtmlPluginMessage
   | UnselectedPluginMessage
   | SelectedPluginMessage
+  | ModeChangedPluginMessage

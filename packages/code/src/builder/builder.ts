@@ -1,3 +1,4 @@
+import config from '../config'
 import { rgbToHex } from './utils'
 import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
 
@@ -5,6 +6,8 @@ class Builder {
   private attributes: Set<string> = new Set()
 
   public build(node: SceneNode) {
+    console.log('building with mode', config)
+
     if (Builder.isMinimalFillsMixin(node))
       this.buildMinimalFillsMixin(node as SceneNode & MinimalFillsMixin)
 
