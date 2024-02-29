@@ -2,6 +2,7 @@ import config from '../config'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
 import { findNearestColor } from '../colors'
+import { findNearestDimension } from '../dimensionMap'
 import { rgbToHex } from './utils'
 import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
 
@@ -54,7 +55,7 @@ class Builder {
 
     if (cornerRadius !== figma.mixed) {
       if (cornerRadius !== 0)
-        this.attributes.add(`rounded-${this.translateUtilityValue(this.getNearestDimension(cornerRadius))}`)
+        this.attributes.add(`rounded-${this.translateUtilityValue(this.getInferredDimension(cornerRadius))}`)
     }
     else if (Builder.isRectangleCornerMixin(node)) {
       const {
@@ -91,7 +92,7 @@ class Builder {
       && rectCorners.bottomLeft === rectCorners.bottomRight
 
     if (allCornersEqual) {
-      this.attributes.add(`${attributePrefix}-${this.translateUtilityValue(this.getNearestDimension(rectCorners.topLeft!))}`)
+      this.attributes.add(`${attributePrefix}-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topLeft!))}`)
       return
     }
 
@@ -105,25 +106,25 @@ class Builder {
       && rectCorners.topRight === rectCorners.bottomRight
 
     if (hasTopCornersEqual)
-      this.attributes.add(`${attributePrefix}-t-${this.translateUtilityValue(this.getNearestDimension(rectCorners.topLeft!))}`)
+      this.attributes.add(`${attributePrefix}-t-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topLeft!))}`)
     if (hasBottomCornersEqual)
-      this.attributes.add(`${attributePrefix}-b-${this.translateUtilityValue(this.getNearestDimension(rectCorners.bottomLeft!))}`)
+      this.attributes.add(`${attributePrefix}-b-${this.translateUtilityValue(this.getInferredDimension(rectCorners.bottomLeft!))}`)
     if (hasLeftCornersEqual)
-      this.attributes.add(`${attributePrefix}-l-${this.translateUtilityValue(this.getNearestDimension(rectCorners.topLeft!))}`)
+      this.attributes.add(`${attributePrefix}-l-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topLeft!))}`)
     if (hasRightCornersEqual)
-      this.attributes.add(`${attributePrefix}-r-${this.translateUtilityValue(this.getNearestDimension(rectCorners.topRight!))}`)
+      this.attributes.add(`${attributePrefix}-r-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topRight!))}`)
 
     if (hasTopCornersEqual && hasBottomCornersEqual && hasLeftCornersEqual && hasRightCornersEqual)
       return
 
     if (rectCorners.topLeft !== null && !hasTopCornersEqual && !hasLeftCornersEqual)
-      this.attributes.add(`${attributePrefix}-tl-${this.translateUtilityValue(this.getNearestDimension(rectCorners.topLeft))}`)
+      this.attributes.add(`${attributePrefix}-tl-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topLeft))}`)
     if (rectCorners.topRight !== null && !hasTopCornersEqual && !hasRightCornersEqual)
-      this.attributes.add(`${attributePrefix}-tr-${this.translateUtilityValue(this.getNearestDimension(rectCorners.topRight))}`)
+      this.attributes.add(`${attributePrefix}-tr-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topRight))}`)
     if (rectCorners.bottomLeft !== null && !hasBottomCornersEqual && !hasLeftCornersEqual)
-      this.attributes.add(`${attributePrefix}-bl-${this.translateUtilityValue(this.getNearestDimension(rectCorners.bottomLeft))}`)
+      this.attributes.add(`${attributePrefix}-bl-${this.translateUtilityValue(this.getInferredDimension(rectCorners.bottomLeft))}`)
     if (rectCorners.bottomRight !== null && !hasBottomCornersEqual && !hasRightCornersEqual)
-      this.attributes.add(`${attributePrefix}-br-${this.translateUtilityValue(this.getNearestDimension(rectCorners.bottomRight))}`)
+      this.attributes.add(`${attributePrefix}-br-${this.translateUtilityValue(this.getInferredDimension(rectCorners.bottomRight))}`)
   }
 
   private buildDimensionAndPositionMixin(node: SceneNode & DimensionAndPositionMixin) {
@@ -136,24 +137,45 @@ class Builder {
       maxHeight,
     } = node
 
-    this.attributes.add(`w-${this.translateUtilityValue(this.getNearestDimension(width))}`)
-    this.attributes.add(`h-${this.translateUtilityValue(this.getNearestDimension(height))}`)
+    this.attributes.add(`w-${this.translateUtilityValue(this.getInferredDimension(width))}`)
+    this.attributes.add(`h-${this.translateUtilityValue(this.getInferredDimension(height))}`)
 
     if (minWidth)
-      this.attributes.add(`min-w-${this.translateUtilityValue(this.getNearestDimension(minWidth))}`)
+      this.attributes.add(`min-w-${this.translateUtilityValue(this.getInferredDimension(minWidth))}`)
 
     if (minHeight)
-      this.attributes.add(`min-h-${this.translateUtilityValue(this.getNearestDimension(minHeight))}`)
+      this.attributes.add(`min-h-${this.translateUtilityValue(this.getInferredDimension(minHeight))}`)
 
     if (maxWidth)
-      this.attributes.add(`max-w-${this.translateUtilityValue(this.getNearestDimension(maxWidth))}`)
+      this.attributes.add(`max-w-${this.translateUtilityValue(this.getInferredDimension(maxWidth))}`)
 
     if (maxHeight)
-      this.attributes.add(`max-h-${this.translateUtilityValue(this.getNearestDimension(maxHeight))}`)
+      this.attributes.add(`max-h-${this.translateUtilityValue(this.getInferredDimension(maxHeight))}`)
   }
 
-  private getNearestDimension(widthOrHeight: number): GenericUtilityValue {
-    console.error('[Builder] Nearest widthOrHeight is not yet implemented.', widthOrHeight)
+  /**
+   * Gets the inferred dimension based on the provided width or height value.
+   * @param {number} widthOrHeight - The width or height value.
+   * @return {GenericUtilityValue} - The inferred dimension object.
+   */
+  private getInferredDimension(widthOrHeight: number): GenericUtilityValue {
+    const tailwindDimension: string | undefined = config.tailwind.dimensionMap[widthOrHeight]
+    if (tailwindDimension) {
+      return {
+        mode: 'inferred',
+        type: 'generic',
+        value: tailwindDimension,
+      }
+    }
+
+    if (config.inference.nearest) {
+      const nearestDimension = findNearestDimension(widthOrHeight)
+      return {
+        mode: 'inferred',
+        type: 'generic',
+        value: nearestDimension,
+      }
+    }
 
     return {
       mode: 'arbitrary',
@@ -199,7 +221,7 @@ class Builder {
       }
 
       if (strokeWeight !== figma.mixed) {
-        this.attributes.add(`border-${this.translateUtilityValue(this.getNearestDimension(strokeWeight))}`)
+        this.attributes.add(`border-${this.translateUtilityValue(this.getInferredDimension(strokeWeight))}`)
       }
       else {
         const {
@@ -235,7 +257,7 @@ class Builder {
       && rectSides.left === rectSides.right
 
     if (allSidesEqual) {
-      this.attributes.add(`${attributePrefix}-${this.translateUtilityValue(this.getNearestDimension(rectSides.top!))}`)
+      this.attributes.add(`${attributePrefix}-${this.translateUtilityValue(this.getInferredDimension(rectSides.top!))}`)
       return
     }
 
@@ -244,22 +266,22 @@ class Builder {
     const axisYEqual = rectSides.top !== null && rectSides.top === rectSides.bottom
 
     if (axisXEqual)
-      this.attributes.add(`${attributePrefix}-x-${this.translateUtilityValue(this.getNearestDimension(rectSides.left!))}`)
+      this.attributes.add(`${attributePrefix}-x-${this.translateUtilityValue(this.getInferredDimension(rectSides.left!))}`)
     if (axisYEqual)
-      this.attributes.add(`${attributePrefix}-y-${this.translateUtilityValue(this.getNearestDimension(rectSides.top!))}`)
+      this.attributes.add(`${attributePrefix}-y-${this.translateUtilityValue(this.getInferredDimension(rectSides.top!))}`)
 
     if (axisXEqual && axisYEqual)
       return
 
     // Individual sides
     if (rectSides.top !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-t-${this.translateUtilityValue(this.getNearestDimension(rectSides.top))}`)
+      this.attributes.add(`${attributePrefix}-t-${this.translateUtilityValue(this.getInferredDimension(rectSides.top))}`)
     if (rectSides.right !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-r-${this.translateUtilityValue(this.getNearestDimension(rectSides.right))}`)
+      this.attributes.add(`${attributePrefix}-r-${this.translateUtilityValue(this.getInferredDimension(rectSides.right))}`)
     if (rectSides.bottom !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-b-${this.translateUtilityValue(this.getNearestDimension(rectSides.bottom))}`)
+      this.attributes.add(`${attributePrefix}-b-${this.translateUtilityValue(this.getInferredDimension(rectSides.bottom))}`)
     if (rectSides.left !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-l-${this.translateUtilityValue(this.getNearestDimension(rectSides.left))}`)
+      this.attributes.add(`${attributePrefix}-l-${this.translateUtilityValue(this.getInferredDimension(rectSides.left))}`)
   }
 
   private buildMinimalFillsMixin(node: SceneNode & MinimalFillsMixin) {
@@ -347,7 +369,7 @@ class Builder {
       }
     }
 
-    if (config.inference.nearestColor) {
+    if (config.inference.nearest) {
       const closestColor = findNearestColor(paint.color)
       return {
         mode: 'inferred',

@@ -376,7 +376,7 @@ export function findNearestColor(rgb: RGB): string {
  * @param {RGB} rgb - The RGB object.
  * @returns {string} The cache key.
  */
-function getRGBCacheKey(rgb: RGB) {
+function getRGBCacheKey(rgb: RGB): string {
   return `${rgb.r},${rgb.g},${rgb.b}`
 }
 

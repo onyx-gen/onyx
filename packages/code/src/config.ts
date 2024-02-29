@@ -1,24 +1,28 @@
 import type { Mode } from '@onyx/types'
 import type { TailwindColorMap } from './colors'
 import { colorMap } from './colors'
+import type { TailwindDimensionMap } from './dimensionMap'
+import { dimensionMap } from './dimensionMap'
 
 interface OnyxConfiguration {
   mode: Mode
   inference: {
-    nearestColor: boolean
+    nearest: boolean
   }
   tailwind: {
     colorMap: TailwindColorMap
+    dimensionMap: TailwindDimensionMap
   }
 }
 
 const config: OnyxConfiguration = {
   mode: 'variables',
   inference: {
-    nearestColor: true,
+    nearest: true,
   },
   tailwind: {
     colorMap,
+    dimensionMap,
   },
 }
 

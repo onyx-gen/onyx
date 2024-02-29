@@ -4,7 +4,7 @@ import type {
   ComponentProps,
   Mode,
   ModeChangedPluginMessage,
-  NearestColorChangedPluginMessage,
+  NearestChangedPluginMessage,
   PluginMessageEvent,
   SelectedNode,
 } from '@onyx/types'
@@ -100,12 +100,12 @@ const options: SelectOption[] = [
   },
 ]
 
-const nearestColor = ref(true)
-watch(nearestColor, sendNearestColorChangedMessage)
+const nearestInference = ref(true)
+watch(nearestInference, sendNearestChangedMessage)
 
-function sendNearestColorChangedMessage(nearestColor: boolean) {
-  const pluginMessage: NearestColorChangedPluginMessage = {
-    event: 'nearest-color-changed',
+function sendNearestChangedMessage(nearestColor: boolean) {
+  const pluginMessage: NearestChangedPluginMessage = {
+    event: 'nearest-changed',
     data: {
       nearestColor,
     },
@@ -131,10 +131,10 @@ function sendNearestColorChangedMessage(nearestColor: boolean) {
 
       <div class="mb-4">
         <h2 class="my-font font-semibold color-$figma-color-text">
-          Nearest Color
+          Nearest Inference
         </h2>
 
-        <Switch v-model="nearestColor" />
+        <Switch v-model="nearestInference" />
       </div>
 
       <div v-show="hasSelection" class="divide-y divide-$figma-color-border">
