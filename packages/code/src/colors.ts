@@ -326,7 +326,14 @@ function mapColorsToNames(colors: TailwindColors): Record<HEX, string> {
 
 export const colorMap: TailwindColorMap = mapColorsToNames(colors)
 
+const nearestColorCache = new Map<string, string>()
+
 export function findNearestColor(rgb: RGB) {
+  const cacheKey = getRGBCacheKey(rgb)
+
+  if (nearestColorCache.has(cacheKey))
+    return colorMap[nearestColorCache.get(cacheKey)!]
+
   const { r: r1, g: g1, b: b1 } = rgb
 
   let minDistance = Number.POSITIVE_INFINITY
@@ -346,7 +353,19 @@ export function findNearestColor(rgb: RGB) {
     }
   }
 
+  nearestColorCache.set(cacheKey, closestColorHEX)
+
   return colorMap[closestColorHEX]
+}
+
+/**
+ * Returns the cache key for the given RGB object.
+ *
+ * @param {RGB} rgb - The RGB object.
+ * @returns {string} The cache key.
+ */
+function getRGBCacheKey(rgb: RGB) {
+  return `${rgb.r},${rgb.g},${rgb.b}`
 }
 
 /**
