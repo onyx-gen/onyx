@@ -9,6 +9,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@headlessui/vue": "^1.7.19",
+    "@heroicons/vue": "^2.1.1",
     "@onyx/events": "workspace:^",
     "@onyx/tsconfig": "workspace:^",
     "@unocss/reset": "^0.58.5",

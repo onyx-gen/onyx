@@ -88,6 +88,12 @@ importers:
 
   packages/ui:
     dependencies:
+      '@headlessui/vue':
+        specifier: ^1.7.19
+        version: 1.7.19(vue@3.4.19)
+      '@heroicons/vue':
+        specifier: ^2.1.1
+        version: 2.1.1(vue@3.4.19)
       '@onyx/events':
         specifier: workspace:^
         version: link:../events
@@ -817,6 +823,24 @@ packages:
     resolution: {integrity: sha512-n/dZtw4G5J91mgi+OHZ8MpKkeFd5oRwIVZ8/Ju0BN+/LTcvj9lOPPDuCFBplS0lMBpcBYKn5eQxFuBpQv5t2lw==}
     dev: true
 
+  /@headlessui/vue@1.7.19(vue@3.4.19):
+    resolution: {integrity: sha512-VFjKPybogux/5/QYGSq4zgG/x3RcxId15W8uguAJAjPBxelI23dwjOjTx/mIiMkM/Hd3rzFxcf2aIp56eEWRcA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      vue: ^3.2.0
+    dependencies:
+      '@tanstack/vue-virtual': 3.1.3(vue@3.4.19)
+      vue: 3.4.19(typescript@5.3.3)
+    dev: false
+
+  /@heroicons/vue@2.1.1(vue@3.4.19):
+    resolution: {integrity: sha512-Yi5nh/89L193ALgHyJUQUdNLsKXPrrE3yj5yiR8WAlo7nZyXGxGauQcEAmBsa2XJGMhBMuEdoOiuZ8wEwTBxVQ==}
+    peerDependencies:
+      vue: '>= 3'
+    dependencies:
+      vue: 3.4.19(typescript@5.3.3)
+    dev: false
+
   /@humanwhocodes/config-array@0.11.14:
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
     engines: {node: '>=10.10.0'}
@@ -1186,6 +1210,19 @@ packages:
       - supports-color
       - typescript
     dev: true
+
+  /@tanstack/virtual-core@3.1.3:
+    resolution: {integrity: sha512-Y5B4EYyv1j9V8LzeAoOVeTg0LI7Fo5InYKgAjkY1Pu9GjtUwX/EKxNcU7ng3sKr99WEf+bPTcktAeybyMOYo+g==}
+    dev: false
+
+  /@tanstack/vue-virtual@3.1.3(vue@3.4.19):
+    resolution: {integrity: sha512-OoRCSgp8Bc85Te3pg4OHFUukbWZeB25/O5rNd7MgMtrYIfJjNOaicZeJcvwqK6lDVTMpzohWUMVK/loqR1H8ig==}
+    peerDependencies:
+      vue: ^2.7.0 || ^3.0.0
+    dependencies:
+      '@tanstack/virtual-core': 3.1.3
+      vue: 3.4.19(typescript@5.3.3)
+    dev: false
 
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}

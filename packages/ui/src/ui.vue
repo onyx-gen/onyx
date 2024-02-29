@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import type { ComponentProps, PluginMessageEvent, SelectedNode } from '@onyx/events'
 import Layout from './layout.vue'
 import Code from './code.vue'
+import Select from './select.vue'
 
 const hasSelection = ref(false)
 
@@ -65,6 +66,14 @@ const permutationMapping = computed(() => {
 function getPermutationNode(permutationKey: string, permutationValue: string, state: string) {
   return selectedNodes.value.find(node => node.props?.state === state && node.props?.[permutationKey] === permutationValue)
 }
+
+const model = ref({
+  name: 'Onyx',
+})
+
+watch(model, (val) => {
+  console.log('model value changed', val)
+})
 </script>
 
 <template>
@@ -73,6 +82,12 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
       <h1 class="text-2xl font-bold mb-4">
         Onyx
       </h1>
+
+      <div>
+        <h2>Configuration</h2>
+
+        <Select v-model="model" />
+      </div>
 
       <div v-show="hasSelection" class="divide-y divide-$figma-color-border">
         <div
