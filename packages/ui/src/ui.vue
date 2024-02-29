@@ -1,6 +1,13 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import type { ComponentProps, Mode, ModeChangedPluginMessage, PluginMessageEvent, SelectedNode } from '@onyx/types'
+import type {
+  ComponentProps,
+  Mode,
+  ModeChangedPluginMessage,
+  NearestColorChangedPluginMessage,
+  PluginMessageEvent,
+  SelectedNode,
+} from '@onyx/types'
 import Layout from './layout.vue'
 import Code from './code.vue'
 import Select from './select.vue'
@@ -70,11 +77,7 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
 }
 
 const model = ref<Mode>('variables')
-
-watch(model, (val) => {
-  console.log('model value changed', val)
-  sendModeChangedMessage(val)
-})
+watch(model, sendModeChangedMessage)
 
 function sendModeChangedMessage(mode: Mode) {
   const pluginMessage: ModeChangedPluginMessage = {
@@ -98,6 +101,17 @@ const options: SelectOption[] = [
 ]
 
 const nearestColor = ref(true)
+watch(nearestColor, sendNearestColorChangedMessage)
+
+function sendNearestColorChangedMessage(nearestColor: boolean) {
+  const pluginMessage: NearestColorChangedPluginMessage = {
+    event: 'nearest-color-changed',
+    data: {
+      nearestColor,
+    },
+  }
+  parent.postMessage({ pluginMessage }, '*')
+}
 </script>
 
 <template>

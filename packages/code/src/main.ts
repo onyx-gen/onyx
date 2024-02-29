@@ -27,4 +27,9 @@ figma.ui.onmessage = async (message: PluginMessage) => {
     config.mode = message.data.mode
     await generate()
   }
+  else if (message.event === 'nearest-color-changed') {
+    console.log('Nearest color changed:', message.data.nearestColor)
+    config.inference.nearestColor = message.data.nearestColor
+    await generate()
+  }
 }

@@ -35,6 +35,13 @@ export interface ModeChangedPluginMessage extends BasePluginMessage {
   }
 }
 
+export interface NearestColorChangedPluginMessage extends BasePluginMessage {
+  event: 'nearest-color-changed'
+  data: {
+    nearestColor: boolean
+  }
+}
+
 /**
  * Interface representing a plugin message emitted
  * when the user unselects all nodes.
@@ -65,3 +72,4 @@ export type PluginMessage =
   | UnselectedPluginMessage
   | SelectedPluginMessage
   | ModeChangedPluginMessage
+  | NearestColorChangedPluginMessage
