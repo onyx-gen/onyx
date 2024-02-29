@@ -68,7 +68,7 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
 }
 
 const model = ref({
-  name: 'Onyx',
+  name: 'Wade Cooper',
 })
 
 watch(model, (val) => {
@@ -83,8 +83,10 @@ watch(model, (val) => {
         Onyx
       </h1>
 
-      <div>
-        <h2>Configuration</h2>
+      <div class="mb-4">
+        <h2 class="my-font font-semibold color-$figma-color-text">
+          Configuration
+        </h2>
 
         <Select v-model="model" />
       </div>

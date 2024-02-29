@@ -19,6 +19,8 @@
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.87.0",
+    "@onyx/icons": "workspace:^",
+    "@unocss/transformer-variant-group": "^0.58.5",
     "@vitejs/plugin-vue": "^5.0.4",
     "shiki": "^1.1.7",
     "typescript": "^5.3.3",

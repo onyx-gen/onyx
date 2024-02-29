@@ -5,7 +5,7 @@ import {
   ListboxOption,
   ListboxOptions,
 } from '@headlessui/vue'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
+import { CheckIcon } from '@heroicons/vue/20/solid'
 
 const people = [
   { name: 'Wade Cooper' },
@@ -24,19 +24,28 @@ const model = defineModel<Person>()
 </script>
 
 <template>
-  <Listbox v-model="model">
+  <Listbox v-model="model" by="name">
     <div class="relative mt-1">
       <ListboxButton
-        class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm"
+        class="
+          relative
+          cursor-default
+          rounded-sm
+          flex items-center gap-1
+          py-1
+          px-2
+          -ml-2
+          text-left
+          focus:outline-none
+          border border-1 border-transparent
+          hover:border-color-$figma-color-border
+        "
       >
-        <span class="block truncate">{{ model.name }}</span>
+        <span class="inline-block truncate color-$figma-color-text my-font">{{ model?.name }}</span>
         <span
-          class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+          class="pointer-events-none flex items-center"
         >
-          <ChevronUpDownIcon
-            class="h-5 w-5 text-gray-400"
-            aria-hidden="true"
-          />
+          <i class="i-onyx-chevron-down h-2 w-2 color-$figma-color-icon" aria-hidden="true" />
         </span>
       </ListboxButton>
 
@@ -46,7 +55,7 @@ const model = defineModel<Person>()
         leave-to-class="opacity-0"
       >
         <ListboxOptions
-          class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
+          class="absolute mt-1 max-h-60 overflow-auto rounded-sm bg-[rgb(30,30,30)] py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
         >
           <ListboxOption
             v-for="person in people"
@@ -56,20 +65,17 @@ const model = defineModel<Person>()
             as="template"
           >
             <li
-              class="relative cursor-default select-none py-2 pl-10 pr-4" :class="[
-                active ? 'bg-amber-100 text-amber-900' : 'text-gray-900',
-              ]"
+              class="relative cursor-default select-none pl-7 pr-3 py-0.5"
+              :class="{
+                'bg-$figma-color-bg-success': active,
+              }"
             >
-              <span
-                class="block truncate" :class="[
-                  selected ? 'font-medium' : 'font-normal',
-                ]"
-              >{{ person.name }}</span>
+              <span class="block truncate my-font color-$figma-color-text">{{ person.name }}</span>
               <span
                 v-if="selected"
-                class="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600"
+                class="absolute inset-y-0 left-0 flex items-center pl-2"
               >
-                <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                <CheckIcon class="h-3 w-3 color-$figma-color-text" aria-hidden="true" />
               </span>
             </li>
           </ListboxOption>
@@ -78,3 +84,12 @@ const model = defineModel<Person>()
     </div>
   </Listbox>
 </template>
+
+<style scoped>
+.my-font {
+  font-weight: 400;
+  font-family: Inter, sans-serif;
+  font-size: 11px;
+  font-feature-settings: "liga", "calt";
+}
+</style>
