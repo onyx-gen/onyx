@@ -1,7 +1,7 @@
 import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, TreeNode } from '../interfaces'
-import { UnocssBuilder } from '../builder/unocss-builder'
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
+import Builder from '../builder/builder'
 
 /**
  * Class to generate a abstract tree structure from a Figma node.
@@ -56,8 +56,9 @@ class FigmaNodeParser {
       const mainComponent = await node.getMainComponentAsync()
       const iconName = mainComponent?.name
 
-      const builder = new UnocssBuilder(node)
-      const css = builder.build()
+      // const builder = new UnocssBuilder(node)
+      const builder = new Builder()
+      const css = builder.build(node)
 
       if (!iconName)
         console.warn('No icon name found for node', node)
@@ -105,8 +106,9 @@ class FigmaNodeParser {
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
   private async parseNode(node: SceneNode): Promise<TreeNode | null> {
-    const builder = new UnocssBuilder(node)
-    const css = builder.build()
+    // const builder = new UnocssBuilder(node)
+    const builder = new Builder()
+    const css = builder.build(node)
 
     const hasChildren = 'children' in node && node.children.length > 0
 

@@ -13,6 +13,13 @@ export interface RectSides {
   right: string | null
 }
 
+export interface RectSidesNew {
+  top: number | null
+  bottom: number | null
+  left: number | null
+  right: number | null
+}
+
 /**
  * Represents the corners of a rectangle.
  *
@@ -27,4 +34,11 @@ export interface RectCorners {
   topRight: string | null
   bottomLeft: string | null
   bottomRight: string | null
+}
+
+export interface RectCornersNew {
+  topLeft: number | null
+  topRight: number | null
+  bottomLeft: number | null
+  bottomRight: number | null
 }
