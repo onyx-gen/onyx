@@ -1,4 +1,6 @@
 import config from '../config'
+import { getAppliedTokens } from '../tokens/tokens'
+import { Properties } from '../tokens/properties'
 import { rgbToHex } from './utils'
 import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
 
@@ -259,7 +261,24 @@ class Builder {
       if (fills.length === 1) {
         const fill = fills[0]
         if (fill.type === 'SOLID') {
-          const value = this.translateUtilityValue(this.getNearestSolidColor(fill))
+          let utilityValue: ColorUtilityValue | null = null
+
+          if (config.mode === 'variables') {
+            const token = this.getTokenByType(node, Properties.fill)
+
+            if (token) {
+              utilityValue = {
+                mode: 'variable',
+                type: 'color',
+                value: token,
+              }
+            }
+          }
+
+          if (!utilityValue)
+            utilityValue = this.getNearestSolidColor(fill)
+
+          const value = this.translateUtilityValue(utilityValue)
           this.attributes.add(`bg-${value}`)
         }
         else { console.error('[Builder] Only solid fills are supported yet.') }
@@ -270,19 +289,29 @@ class Builder {
     }
   }
 
+  /**
+   * Retrieves the token value of a given type for a specified scene node.
+   *
+   * @param {SceneNode} node - The scene node from which to retrieve the token value.
+   * @param {Properties} type - The type of token to retrieve.
+   * @return {string|null} - The token value of the specified type if found, otherwise null.
+   */
+  private getTokenByType(node: SceneNode, type: Properties): string | null {
+    const tokens = getAppliedTokens(node)
+    return tokens.get(type) || null
+  }
+
   private translateUtilityValue(utilityValue: UtilityValue): string {
     let value = ''
     switch (utilityValue.mode) {
       case 'inferred':
-        console.error('[Builder] Inferred utility values are not yet implemented.', utilityValue)
         value = utilityValue.value
         break
       case 'arbitrary':
         value = `[${utilityValue.value}]`
         break
       case 'variable':
-        console.error('[Builder] Variable utility values are not yet implemented.', utilityValue)
-        value = utilityValue.value
+        value = `$${utilityValue.value}`
         break
     }
 
