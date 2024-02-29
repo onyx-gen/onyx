@@ -9,11 +9,12 @@ import type {
   SelectedNode,
   VariantGroupChangedPluginMessage,
 } from '@onyx/types'
-import Layout from './layout.vue'
+import MainLayout from './main-layout.vue'
 import Code from './code.vue'
 import Select from './select.vue'
 import Switch from './switch.vue'
 import type { SelectOption } from './select.vue'
+import Layout from './layout.vue'
 
 const hasSelection = ref(false)
 
@@ -129,144 +130,152 @@ function sendVariantGroupChangedMessage(variantGroup: boolean) {
 </script>
 
 <template>
-  <Layout>
+  <MainLayout>
     <div>
-      <h1 class="text-2xl font-bold mb-4">
-        Onyx
-      </h1>
+      <Layout>
+        <h1 class="text-2xl font-bold mb-4">
+          Onyx
+        </h1>
+      </Layout>
 
-      <div class="mb-4 flex gap-4">
-        <div>
-          <h2 class="my-font font-semibold color-$figma-color-text">
-            Mode
-          </h2>
+      <div class="border-b border-color-$figma-color-border mb-4">
+        <Layout class="mb-4 flex gap-4">
+          <div>
+            <h2 class="my-font font-semibold color-$figma-color-text">
+              Mode
+            </h2>
 
-          <Select v-model="model" :options="options" />
-        </div>
+            <Select v-model="model" :options="options" />
+          </div>
 
-        <div>
-          <h2 class="my-font font-semibold color-$figma-color-text">
-            Nearest Inference
-          </h2>
+          <div>
+            <h2 class="my-font font-semibold color-$figma-color-text">
+              Nearest Inference
+            </h2>
 
-          <Switch v-model="nearestInference" class="mt-2" />
-        </div>
+            <Switch v-model="nearestInference" class="mt-2" />
+          </div>
 
-        <div>
-          <h2 class="my-font font-semibold color-$figma-color-text">
-            Variant Group
-          </h2>
+          <div>
+            <h2 class="my-font font-semibold color-$figma-color-text">
+              Variant Group
+            </h2>
 
-          <Switch v-model="variantGroup" class="mt-2" />
-        </div>
+            <Switch v-model="variantGroup" class="mt-2" />
+          </div>
+        </Layout>
       </div>
 
       <div v-show="hasSelection" class="divide-y divide-$figma-color-border">
-        <div
-          class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-[rgba(0, 0, 0, 0.898)] rounded-sm overflow-hidden"
-        >
-          <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
-            Generated Code
+        <Layout>
+          <div
+            class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-[rgba(0, 0, 0, 0.898)] rounded-sm overflow-hidden"
+          >
+            <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
+              Generated Code
+            </div>
+
+            <div class="px-3 py-2 overflow-scroll">
+              <Code />
+            </div>
           </div>
+        </Layout>
 
-          <div class="px-3 py-2 overflow-scroll">
-            <Code />
-          </div>
-        </div>
+        <Layout class="mt-4">
+          <div class="pt-4 space-y-4">
+            <div class="my-font font-semibold color-$figma-color-text">
+              Selected Nodes
+            </div>
 
-        <div class="mt-4 pt-4 space-y-4">
-          <div class="my-font font-semibold color-$figma-color-text">
-            Selected Nodes
-          </div>
-
-          <table class="border-separate border-spacing-2">
-            <thead>
-              <tr>
-                <th class="opacity-0" />
-                <th
-                  v-for="state in states"
-                  :key="state"
-                  class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
-                >
-                  {{ state }}
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <template
-                v-for="permutationKey in permutationKeys"
-                :key="permutationKey"
-              >
-                <tr
-                  v-for="(permutationValue, idx) in permutationMapping[permutationKey]"
-                  :key="permutationValue"
-                >
+            <table class="border-separate border-spacing-2">
+              <thead>
+                <tr>
+                  <th class="opacity-0" />
                   <th
-                    v-if="idx === 0"
-                    class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
-                    :rowspan="permutationMapping[permutationKey].size"
-                  >
-                    {{ permutationKey }}
-                  </th>
-                  <td
                     v-for="state in states"
                     :key="state"
-                    class="opacity-0 p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font space-y-1"
-                    :class="{
-                      'opacity-100': !!getPermutationNode(permutationKey, permutationValue, state),
-                    }"
+                    class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
                   >
-                    <div class="flex gap-1 items-center color-$figma-color-text-component mt-0.5">
-                      <svg
-                        class="fill-current"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 12 12"
-                      >
-                        <path
-                          fill-opacity="1"
-                          fill-rule="nonzero"
-                          stroke="none"
-                          d="M1.207 6 6 1.207 10.793 6 6 10.793 1.207 6z"
-                        />
-                      </svg>
-
-                      <span class="font-normal">Variant</span>
-                    </div>
-
-                    <table class="border-separate border-spacing-x-1 text-left my-font -mx-1">
-                      <tr
-                        v-for="(value, key) in getPermutationNode(permutationKey, permutationValue, state)?.props"
-                        :key="key"
-                      >
-                        <th class="color-$figma-color-text-secondary">
-                          {{ key }}
-                        </th>
-                        <td class="color-$figma-color-text">
-                          {{ value }}
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
+                    {{ state }}
+                  </th>
                 </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
+              </thead>
+
+              <tbody>
+                <template
+                  v-for="permutationKey in permutationKeys"
+                  :key="permutationKey"
+                >
+                  <tr
+                    v-for="(permutationValue, idx) in permutationMapping[permutationKey]"
+                    :key="permutationValue"
+                  >
+                    <th
+                      v-if="idx === 0"
+                      class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
+                      :rowspan="permutationMapping[permutationKey].size"
+                    >
+                      {{ permutationKey }}
+                    </th>
+                    <td
+                      v-for="state in states"
+                      :key="state"
+                      class="opacity-0 p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font space-y-1"
+                      :class="{
+                        'opacity-100': !!getPermutationNode(permutationKey, permutationValue, state),
+                      }"
+                    >
+                      <div class="flex gap-1 items-center color-$figma-color-text-component mt-0.5">
+                        <svg
+                          class="fill-current"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="12"
+                          height="12"
+                          viewBox="0 0 12 12"
+                        >
+                          <path
+                            fill-opacity="1"
+                            fill-rule="nonzero"
+                            stroke="none"
+                            d="M1.207 6 6 1.207 10.793 6 6 10.793 1.207 6z"
+                          />
+                        </svg>
+
+                        <span class="font-normal">Variant</span>
+                      </div>
+
+                      <table class="border-separate border-spacing-x-1 text-left my-font -mx-1">
+                        <tr
+                          v-for="(value, key) in getPermutationNode(permutationKey, permutationValue, state)?.props"
+                          :key="key"
+                        >
+                          <th class="color-$figma-color-text-secondary">
+                            {{ key }}
+                          </th>
+                          <td class="color-$figma-color-text">
+                            {{ value }}
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </Layout>
       </div>
 
-      <div
+      <Layout
         v-show="!hasSelection"
         class="bg-$figma-color-bg-secondary w-max divide-y divide-[#4c4c4c] rounded-sm overflow-hidden"
       >
         <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
           Please select a node!
         </div>
-      </div>
+      </Layout>
     </div>
-  </Layout>
+  </MainLayout>
 </template>
 
 <style>
