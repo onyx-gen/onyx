@@ -169,7 +169,7 @@ function sendVariantGroupChangedMessage(variantGroup: boolean) {
       <div v-show="hasSelection" class="divide-y divide-$figma-color-border">
         <Layout>
           <div
-            class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-[rgba(0, 0, 0, 0.898)] rounded-sm overflow-hidden"
+            class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-$divider-color-code rounded-sm overflow-hidden"
           >
             <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
               Generated Code
@@ -279,6 +279,14 @@ function sendVariantGroupChangedMessage(variantGroup: boolean) {
 </template>
 
 <style>
+.figma-dark {
+  --divider-color-code: rgb(76, 76, 76);
+}
+
+.figma-light {
+  --divider-color-code: rgba(0, 0, 0, 0.898);
+}
+
 .my-font {
   font-weight: 500;
   font-family: Inter, sans-serif;
