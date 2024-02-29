@@ -35,13 +35,6 @@ class Builder {
     return 'strokes' in node
   }
 
-  private static isIndividualStrokesMixin(node: SceneNode) {
-    return 'strokeTopWeight' in node
-      && 'strokeBottomWeight' in node
-      && 'strokeLeftWeight' in node
-      && 'strokeRightWeight' in node
-  }
-
   private static isCornerMixin(node: SceneNode) {
     return 'cornerRadius' in node
   }
