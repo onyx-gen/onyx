@@ -20,12 +20,6 @@ importers:
 
   packages/code:
     dependencies:
-      '@onyx/events':
-        specifier: workspace:^
-        version: link:../events
-      '@onyx/tsconfig':
-        specifier: workspace:^
-        version: link:../tsconfig
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -33,6 +27,12 @@ importers:
       '@figma/plugin-typings':
         specifier: ^1.87.0
         version: 1.87.0
+      '@onyx/tsconfig':
+        specifier: workspace:^
+        version: link:../tsconfig
+      '@onyx/types':
+        specifier: workspace:^
+        version: link:../types
       '@rollup/plugin-commonjs':
         specifier: ^25.0.7
         version: 25.0.7(rollup@4.12.0)
@@ -73,6 +73,9 @@ importers:
       '@figma/plugin-typings':
         specifier: ^1.87.0
         version: 1.87.0
+      '@onyx/types':
+        specifier: workspace:^
+        version: link:../types
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
@@ -107,6 +110,16 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1
 
+  packages/types:
+    dependencies:
+      '@onyx/tsconfig':
+        specifier: workspace:^
+        version: link:../tsconfig
+    devDependencies:
+      '@figma/plugin-typings':
+        specifier: ^1.87.0
+        version: 1.87.0
+
   packages/ui:
     dependencies:
       '@headlessui/vue':
@@ -115,12 +128,6 @@ importers:
       '@heroicons/vue':
         specifier: ^2.1.1
         version: 2.1.1(vue@3.4.19)
-      '@onyx/events':
-        specifier: workspace:^
-        version: link:../events
-      '@onyx/tsconfig':
-        specifier: workspace:^
-        version: link:../tsconfig
       '@unocss/reset':
         specifier: ^0.58.5
         version: 0.58.5
@@ -137,6 +144,12 @@ importers:
       '@onyx/icons':
         specifier: workspace:^
         version: link:../icons
+      '@onyx/tsconfig':
+        specifier: workspace:^
+        version: link:../tsconfig
+      '@onyx/types':
+        specifier: workspace:^
+        version: link:../types
       '@unocss/transformer-variant-group':
         specifier: ^0.58.5
         version: 0.58.5

@@ -18,3 +18,7 @@ generate()
 
 // Generate HTML code when the selection changes
 figma.on('selectionchange', generate)
+
+figma.ui.onmessage = (message) => {
+  console.log('got this from the UI', message)
+}

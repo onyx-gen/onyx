@@ -1,4 +1,4 @@
-import type { ComponentProps } from '@onyx/events'
+import type { ComponentProps } from '@onyx/types'
 import type { ComponentCollection, GroupedComponentCollection } from './types'
 import { removeNonAlphanumericChars, replaceComponentPropValue } from './replacer'
 

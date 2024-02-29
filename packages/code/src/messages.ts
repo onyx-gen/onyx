@@ -3,11 +3,11 @@ import type {
   SelectedNode,
   SelectedPluginMessage,
   UnselectedPluginMessage,
-} from '@onyx/events'
+} from '@onyx/types'
 
 /**
  * This function sends a message to the Figma UI when no node is selected.
- * The message is of type UnselectedPluginMessage, which is defined in '@onyx/events'.
+ * The message is of type UnselectedPluginMessage, which is defined in '@onyx/types'.
  * The event property of the message is set to 'unselected'.
  */
 export function sendUnselectedMessage() {

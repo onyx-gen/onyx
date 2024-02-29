@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import type { ComponentProps, PluginMessageEvent, SelectedNode } from '@onyx/events'
+import type { ComponentProps, Mode, ModeChangedPluginMessage, PluginMessageEvent, SelectedNode } from '@onyx/types'
 import Layout from './layout.vue'
 import Code from './code.vue'
 import Select from './select.vue'
@@ -68,13 +68,22 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
   return selectedNodes.value.find(node => node.props?.state === state && node.props?.[permutationKey] === permutationValue)
 }
 
-type Mode = 'inferred' | 'variables'
-
 const model = ref<Mode>('variables')
 
 watch(model, (val) => {
   console.log('model value changed', val)
+  sendModeChangedMessage(val)
 })
+
+function sendModeChangedMessage(mode: Mode) {
+  const pluginMessage: ModeChangedPluginMessage = {
+    event: 'mode-changed',
+    data: {
+      mode,
+    },
+  }
+  parent.postMessage({ pluginMessage }, '*')
+}
 
 const options: SelectOption[] = [
   {

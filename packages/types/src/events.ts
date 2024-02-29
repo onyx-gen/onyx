@@ -1,8 +1,6 @@
-export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
+import type { ComponentProps, Mode } from './types'
 
-export interface ComponentProps {
-  [key: string]: string
-}
+export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
 
 /**
  * Represents a base plugin message.
@@ -27,6 +25,13 @@ export interface HtmlPluginMessage extends BasePluginMessage {
   event: 'html'
   data: {
     html: string
+  }
+}
+
+export interface ModeChangedPluginMessage extends BasePluginMessage {
+  event: 'mode-changed'
+  data: {
+    mode: Mode
   }
 }
 

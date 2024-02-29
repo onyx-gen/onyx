@@ -1,15 +1,17 @@
 {
-  "name": "@onyx/events",
+  "name": "@onyx/types",
   "type": "module",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "main": "src/index.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@onyx/tsconfig": "workspace:^"
   },
   "devDependencies": {
-    "@figma/plugin-typings": "^1.87.0",
-    "tslib": "^2.6.2",
-    "typescript": "^5.3.3"
+    "@figma/plugin-typings": "^1.87.0"
   }
 }

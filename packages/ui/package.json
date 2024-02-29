@@ -11,8 +11,6 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.19",
     "@heroicons/vue": "^2.1.1",
-    "@onyx/events": "workspace:^",
-    "@onyx/tsconfig": "workspace:^",
     "@unocss/reset": "^0.58.5",
     "@vueuse/core": "^10.8.0",
     "vue": "^3.4.19"
@@ -20,6 +18,8 @@
   "devDependencies": {
     "@figma/plugin-typings": "^1.87.0",
     "@onyx/icons": "workspace:^",
+    "@onyx/tsconfig": "workspace:^",
+    "@onyx/types": "workspace:^",
     "@unocss/transformer-variant-group": "^0.58.5",
     "@vitejs/plugin-vue": "^5.0.4",
     "shiki": "^1.1.7",

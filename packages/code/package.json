@@ -10,12 +10,12 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@onyx/events": "workspace:^",
-    "@onyx/tsconfig": "workspace:^",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.87.0",
+    "@onyx/tsconfig": "workspace:^",
+    "@onyx/types": "workspace:^",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",

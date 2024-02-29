@@ -1,4 +1,4 @@
-import type { ComponentProps } from '@onyx/events'
+import type { ComponentProps } from '@onyx/types'
 import type { TreeNode } from '../interfaces'
 
 export interface GroupedComponentCollection<T extends ComponentProps> {
