@@ -346,7 +346,10 @@ export function findNearestColor(rgb: RGB): string {
   if (nearestColorCache.has(cacheKey))
     return colorMap[nearestColorCache.get(cacheKey)!]
 
-  const { r: r1, g: g1, b: b1 } = rgb
+  const { r, g, b } = rgb
+  const r1 = Math.floor(r * 256)
+  const g1 = Math.floor(g * 256)
+  const b1 = Math.floor(b * 256)
 
   let minDistance = Number.POSITIVE_INFINITY
   let closestColorHEX = ''
