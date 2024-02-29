@@ -1,6 +1,7 @@
 import config from '../config'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
+import { findNearestColor } from '../colors'
 import { rgbToHex } from './utils'
 import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
 
@@ -342,6 +343,16 @@ class Builder {
         mode: 'inferred',
         type: 'color',
         value: tailwindColor,
+        opacity,
+      }
+    }
+
+    if (config.inference.nearestColor) {
+      const closestColor = findNearestColor(paint.color)
+      return {
+        mode: 'inferred',
+        type: 'color',
+        value: closestColor,
         opacity,
       }
     }

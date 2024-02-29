@@ -4,6 +4,9 @@ import { colorMap } from './colors'
 
 interface OnyxConfiguration {
   mode: Mode
+  inference: {
+    nearestColor: boolean
+  }
   tailwind: {
     colorMap: TailwindColorMap
   }
@@ -11,6 +14,9 @@ interface OnyxConfiguration {
 
 const config: OnyxConfiguration = {
   mode: 'variables',
+  inference: {
+    nearestColor: true,
+  },
   tailwind: {
     colorMap,
   },
