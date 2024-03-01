@@ -287,7 +287,7 @@ function sendVariantGroupChangedMessage(variantGroup: boolean) {
 }
 
 .figma-light {
-  --divider-color-code: rgba(0, 0, 0, 0.898);
+  --divider-color-code: rgb(220, 220, 220);
 }
 
 .my-font {
