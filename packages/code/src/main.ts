@@ -1,6 +1,6 @@
-import type { PluginMessage } from '@onyx/types'
 import generate from './generate'
 import config from './config'
+import { PluginMessages } from './messages'
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 figma.skipInvisibleInstanceChildren = true
@@ -21,23 +21,24 @@ generate()
 // Generate HTML code when the selection changes
 figma.on('selectionchange', generate)
 
-figma.ui.onmessage = async (message: PluginMessage) => {
-  if (message.event === 'mode-changed') {
-    console.log('Mode changed:', message.data.mode)
-    config.mode = message.data.mode
-    await generate()
-  }
-  else if (message.event === 'nearest-changed') {
-    console.log('Nearest color changed:', message.data.nearestColor)
-    config.inference.nearest = message.data.nearestColor
-    await generate()
-  }
-  else if (message.event === 'variant-group-changed') {
-    console.log('Variant group changed:', message.data.variantGroup)
-    config.tailwind.variantGroup = message.data.variantGroup
-    await generate()
-  }
-  else if (message.event === 'notification') {
-    figma.notify(message.data.message)
-  }
-}
+PluginMessages.on('mode-changed', async ({ mode }) => {
+  console.log('Mode changed:', mode)
+  config.mode = mode
+  await generate()
+})
+
+PluginMessages.on('nearest-changed', async ({ nearestColor }) => {
+  console.log('Nearest color changed:', nearestColor)
+  config.inference.nearest = nearestColor
+  await generate()
+})
+
+PluginMessages.on('variant-group-changed', async ({ variantGroup }) => {
+  console.log('Variant group changed:', variantGroup)
+  config.tailwind.variantGroup = variantGroup
+  await generate()
+})
+
+PluginMessages.on('notification', ({ message }) => {
+  figma.notify(message)
+})

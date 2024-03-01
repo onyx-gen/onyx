@@ -15,44 +15,44 @@ interface BasePluginMessage<E, T> {
   data: T
 }
 
-type HtmlPluginMessage = BasePluginMessage<'html', HtmlPluginMessageData>
+export type HtmlPluginMessage = BasePluginMessage<'html', HtmlPluginMessageData>
 
 interface HtmlPluginMessageData {
   html: string
 }
 
-type ModeChangedPluginMessage = BasePluginMessage<'mode-changed', ModeChangedPluginMessageData>
+export type ModeChangedPluginMessage = BasePluginMessage<'mode-changed', ModeChangedPluginMessageData>
 
 interface ModeChangedPluginMessageData {
   mode: Mode
 }
 
-type NearestChangedPluginMessage = BasePluginMessage<'nearest-changed', NearestChangedPluginMessageData>
+export type NearestChangedPluginMessage = BasePluginMessage<'nearest-changed', NearestChangedPluginMessageData>
 
 interface NearestChangedPluginMessageData {
   nearestColor: boolean
 }
 
-type VariantGroupChangedPluginMessage = BasePluginMessage<'variant-group-changed', VariantGroupChangedPluginMessageData>
+export type VariantGroupChangedPluginMessage = BasePluginMessage<'variant-group-changed', VariantGroupChangedPluginMessageData>
 
 interface VariantGroupChangedPluginMessageData {
   variantGroup: boolean
 }
 
-type NotificationPluginMessage = BasePluginMessage<'notification', NotificationPluginMessageData>
+export type NotificationPluginMessage = BasePluginMessage<'notification', NotificationPluginMessageData>
 
 interface NotificationPluginMessageData {
   message: string
 }
 
-type UnselectedPluginMessage = BasePluginMessage<'unselected', any>
+export type UnselectedPluginMessage = BasePluginMessage<'unselected', any>
 
 export interface SelectedNode {
   id: string
   props?: ComponentProps
 }
 
-type SelectedPluginMessage = BasePluginMessage<'selected', SelectedPluginMessageData>
+export type SelectedPluginMessage = BasePluginMessage<'selected', SelectedPluginMessageData>
 
 interface SelectedPluginMessageData {
   nodes: SelectedNode[]
