@@ -38,7 +38,7 @@ function onCopy() {
 
 <template>
   <div
-    class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-$divider-color-code rounded-sm overflow-hidden"
+    class="code-container flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-$divider-color-code rounded-sm overflow-hidden"
   >
     <div class="flex justify-between items-center px-3 py-2 color-$figma-color-text-secondary">
       <span class="my-font">
@@ -50,8 +50,10 @@ function onCopy() {
       </button>
     </div>
 
-    <div class="px-3 py-2 overflow-scroll">
-      <div class="w-full max-h-full overflow-hidden" v-html="html" />
+    <div class="code-copy">
+      <div class="px-3 py-2 overflow-scroll">
+        <div class="w-full max-h-full overflow-hidden" v-html="html" />
+      </div>
     </div>
   </div>
 </template>
@@ -62,6 +64,13 @@ code {
   font-family: "Roboto Mono", Monaco, "Courier New", monospace !important;
   font-size: 11px !important;
   font-feature-settings: "liga", "calt" !important;
+}
+
+.code-container:has(button:hover) {
+  .code-copy {
+    background-color: var(--figma-color-bg-selected-tertiary);
+    box-shadow: 0 0 0 1px var(--figma-color-border-selected) inset;
+  }
 }
 
 .shiki {
