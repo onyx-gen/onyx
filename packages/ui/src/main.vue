@@ -1,35 +1,25 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue'
-import type {
-  ComponentProps,
-  Mode,
-  ModeChangedPluginMessage,
-  NearestChangedPluginMessage,
-  PluginMessageEvent,
-  SelectedNode,
-  VariantGroupChangedPluginMessage,
-} from '@onyx/types'
+import { computed, ref, watch } from 'vue'
+import type { ComponentProps, Mode, SelectedNode } from '@onyx/types'
 import MainLayout from './components/main-layout.vue'
 import Code from './components/code.vue'
 import Select from './components/select.vue'
 import Switch from './components/switch.vue'
 import type { SelectOption } from './components/select.vue'
 import Layout from './components/layout.vue'
-
-const hasSelection = ref(false)
+import { usePluginMessage } from './stores/usePluginMessage'
 
 const selectedNodes = ref<SelectedNode[]>([])
+const hasSelection = computed(() => selectedNodes.value.length > 0)
 
-onMounted(async () => {
-  window.addEventListener('message', (m: PluginMessageEvent) => {
-    hasSelection.value = m.data.pluginMessage.event !== 'unselected'
+const { onPluginMessage, emitPluginMessage } = usePluginMessage()
 
-    if (m.data.pluginMessage.event === 'unselected')
-      selectedNodes.value = []
+onPluginMessage('unselected', () => {
+  selectedNodes.value = []
+})
 
-    if (m.data.pluginMessage.event === 'selected')
-      selectedNodes.value = m.data.pluginMessage.data.nodes
-  })
+onPluginMessage('selected', ({ nodes }) => {
+  selectedNodes.value = nodes
 })
 
 const selectedNodeProps = computed(() => {
@@ -79,17 +69,7 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
 }
 
 const model = ref<Mode>('variables')
-watch(model, sendModeChangedMessage)
-
-function sendModeChangedMessage(mode: Mode) {
-  const pluginMessage: ModeChangedPluginMessage = {
-    event: 'mode-changed',
-    data: {
-      mode,
-    },
-  }
-  parent.postMessage({ pluginMessage }, '*')
-}
+watch(model, (mode: Mode) => emitPluginMessage('mode-changed', { mode }))
 
 const options: SelectOption[] = [
   {
@@ -103,30 +83,10 @@ const options: SelectOption[] = [
 ]
 
 const nearestInference = ref(true)
-watch(nearestInference, sendNearestChangedMessage)
-
-function sendNearestChangedMessage(nearestColor: boolean) {
-  const pluginMessage: NearestChangedPluginMessage = {
-    event: 'nearest-changed',
-    data: {
-      nearestColor,
-    },
-  }
-  parent.postMessage({ pluginMessage }, '*')
-}
+watch(nearestInference, (nearestColor: boolean) => emitPluginMessage('nearest-changed', { nearestColor }))
 
 const variantGroup = ref(true)
-watch(variantGroup, sendVariantGroupChangedMessage)
-
-function sendVariantGroupChangedMessage(variantGroup: boolean) {
-  const pluginMessage: VariantGroupChangedPluginMessage = {
-    event: 'variant-group-changed',
-    data: {
-      variantGroup,
-    },
-  }
-  parent.postMessage({ pluginMessage }, '*')
-}
+watch(variantGroup, (variantGroup: boolean) => emitPluginMessage('variant-group-changed', { variantGroup }))
 </script>
 
 <template>

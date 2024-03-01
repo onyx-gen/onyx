@@ -10,75 +10,52 @@ export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
  *
  * @interface
  */
-interface BasePluginMessage {
-  event: string
+interface BasePluginMessage<E, T> {
+  event: E
+  data: T
 }
 
-/**
- * Represents a message sent when HTML code is
- * generated for the selected nodes.
- *
- * @interface
- * @extends BasePluginMessage
- */
-export interface HtmlPluginMessage extends BasePluginMessage {
-  event: 'html'
-  data: {
-    html: string
-  }
+type HtmlPluginMessage = BasePluginMessage<'html', HtmlPluginMessageData>
+
+interface HtmlPluginMessageData {
+  html: string
 }
 
-export interface ModeChangedPluginMessage extends BasePluginMessage {
-  event: 'mode-changed'
-  data: {
-    mode: Mode
-  }
+type ModeChangedPluginMessage = BasePluginMessage<'mode-changed', ModeChangedPluginMessageData>
+
+interface ModeChangedPluginMessageData {
+  mode: Mode
 }
 
-export interface NearestChangedPluginMessage extends BasePluginMessage {
-  event: 'nearest-changed'
-  data: {
-    nearestColor: boolean
-  }
+type NearestChangedPluginMessage = BasePluginMessage<'nearest-changed', NearestChangedPluginMessageData>
+
+interface NearestChangedPluginMessageData {
+  nearestColor: boolean
 }
 
-export interface VariantGroupChangedPluginMessage extends BasePluginMessage {
-  event: 'variant-group-changed'
-  data: {
-    variantGroup: boolean
-  }
+type VariantGroupChangedPluginMessage = BasePluginMessage<'variant-group-changed', VariantGroupChangedPluginMessageData>
+
+interface VariantGroupChangedPluginMessageData {
+  variantGroup: boolean
 }
 
-export interface NotificationPluginMessage extends BasePluginMessage {
-  event: 'notification'
-  data: {
-    message: string
-  }
+type NotificationPluginMessage = BasePluginMessage<'notification', NotificationPluginMessageData>
+
+interface NotificationPluginMessageData {
+  message: string
 }
 
-/**
- * Interface representing a plugin message emitted
- * when the user unselects all nodes.
- */
-export interface UnselectedPluginMessage extends BasePluginMessage {
-  event: 'unselected'
-}
+type UnselectedPluginMessage = BasePluginMessage<'unselected', any>
 
 export interface SelectedNode {
   id: string
   props?: ComponentProps
 }
 
-/**
- * Represents a message sent when the user selects nodes.
- * @interface
- * @extends BasePluginMessage
- */
-export interface SelectedPluginMessage extends BasePluginMessage {
-  event: 'selected'
-  data: {
-    nodes: SelectedNode[]
-  }
+type SelectedPluginMessage = BasePluginMessage<'selected', SelectedPluginMessageData>
+
+interface SelectedPluginMessageData {
+  nodes: SelectedNode[]
 }
 
 export type PluginMessage =

@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { codeToHtml } from 'shiki'
-import type { PluginMessageEvent } from '@onyx/types'
 import { computedAsync, useClipboard } from '@vueuse/core'
 import { useTheme } from '../composables/useTheme'
 import { useNotification } from '../composables/useNotification'
+import { usePluginMessage } from '../stores/usePluginMessage'
 
 const code = ref('')
 
-onMounted(async () => {
-  window.addEventListener('message', (m: PluginMessageEvent) => {
-    const pluginMessage = m.data.pluginMessage
+const { onPluginMessage } = usePluginMessage()
 
-    if (pluginMessage.event === 'html')
-      code.value = pluginMessage.data.html
-  })
+onPluginMessage('html', ({ html }) => {
+  code.value = html
 })
 
 const { theme } = useTheme()
