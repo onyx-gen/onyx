@@ -11,7 +11,7 @@
     "./*": "./dist/*"
   },
   "scripts": {
-    "build": "tsx build.ts"
+    "codegen": "tsx codegen.ts"
   },
   "devDependencies": {
     "@iconify/tools": "^4.0.2",
