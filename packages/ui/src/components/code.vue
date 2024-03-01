@@ -3,8 +3,8 @@ import { onMounted, ref } from 'vue'
 import { codeToHtml } from 'shiki'
 import type { PluginMessageEvent } from '@onyx/types'
 import { computedAsync, useClipboard } from '@vueuse/core'
-import { useTheme } from './useTheme'
-import { useNotification } from './composables/useNotification'
+import { useTheme } from '../composables/useTheme'
+import { useNotification } from '../composables/useNotification'
 
 const code = ref('')
 

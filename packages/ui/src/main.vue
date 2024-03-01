@@ -9,12 +9,12 @@ import type {
   SelectedNode,
   VariantGroupChangedPluginMessage,
 } from '@onyx/types'
-import MainLayout from './main-layout.vue'
-import Code from './code.vue'
-import Select from './select.vue'
-import Switch from './switch.vue'
-import type { SelectOption } from './select.vue'
-import Layout from './layout.vue'
+import MainLayout from './components/main-layout.vue'
+import Code from './components/code.vue'
+import Select from './components/select.vue'
+import Switch from './components/switch.vue'
+import type { SelectOption } from './components/select.vue'
+import Layout from './components/layout.vue'
 
 const hasSelection = ref(false)
 
