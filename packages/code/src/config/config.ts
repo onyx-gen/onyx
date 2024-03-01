@@ -1,8 +1,8 @@
 import type { Mode } from '@onyx/types'
-import type { TailwindColorMap } from './colors'
+import type { InferenceColorMap } from './colors'
 import { colorMap } from './colors'
-import type { TailwindDimensionMap } from './dimension-map'
 import { dimensionMap } from './dimension-map'
+import type { InferenceDimensionMap } from './dimension-map'
 
 interface OnyxConfiguration {
   mode: Mode
@@ -10,8 +10,8 @@ interface OnyxConfiguration {
     nearest: boolean
   }
   tailwind: {
-    colorMap: TailwindColorMap
-    dimensionMap: TailwindDimensionMap
+    colorMap: InferenceColorMap
+    dimensionMap: InferenceDimensionMap
     variantGroup: boolean
   }
 }

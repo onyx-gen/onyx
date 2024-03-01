@@ -3,7 +3,7 @@ import type { NodeCSSData, VariantCSS } from './interfaces'
 import { difference } from './set/utils'
 import type { VariantKey } from './set/types'
 import { entries } from './utils'
-import config from './config'
+import config from './config/config'
 
 /**
  * Translates a VariantCSS object into a string representation.

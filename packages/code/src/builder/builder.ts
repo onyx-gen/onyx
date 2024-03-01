@@ -1,17 +1,15 @@
-import config from '../config'
+import config from '../config/config'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
-import { findNearestColor } from '../colors'
-import { findNearestDimension } from '../dimension-map'
 import { rgbToHex } from './utils'
 import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
+import { findNearestDimension } from './inference/dimension'
+import { findNearestColor } from './inference/color'
 
 class Builder {
   private attributes: Set<string> = new Set()
 
   public build(node: SceneNode) {
-    console.log('building with mode', config)
-
     if (Builder.isMinimalFillsMixin(node))
       this.buildMinimalFillsMixin(node as SceneNode & MinimalFillsMixin)
 
@@ -169,7 +167,7 @@ class Builder {
     }
 
     if (config.inference.nearest) {
-      const nearestDimension = findNearestDimension(widthOrHeight)
+      const nearestDimension = findNearestDimension(widthOrHeight, config.tailwind.dimensionMap)
       return {
         mode: 'inferred',
         type: 'generic',
@@ -370,7 +368,7 @@ class Builder {
     }
 
     if (config.inference.nearest) {
-      const closestColor = findNearestColor(paint.color)
+      const closestColor = findNearestColor(paint.color, config.tailwind.colorMap)
       return {
         mode: 'inferred',
         type: 'color',

@@ -4,7 +4,7 @@ import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
-import config from '../config'
+import config from '../config/config'
 import { simplifyConditionalString, transformPropKey } from './utils'
 import type {
   Attributes,

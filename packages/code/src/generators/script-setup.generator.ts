@@ -10,6 +10,8 @@ class ScriptSetupGenerator {
    * Constructs a ScriptSetupGenerator instance with specified variant permutations.
    *
    * @param permutations - An array of variant permutations, where each permutation is represented by a key-value pair indicating the variant's name and value, respectively.
+   * @param computedProperties - An object representing the computed properties for the component, organized by permutation key and value.
+   * @param types - An object mapping each permutation key to its corresponding TypeScript union type.
    */
   constructor(
     permutations: VariantPermutation[],

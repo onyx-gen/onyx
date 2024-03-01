@@ -1,5 +1,5 @@
 import generate from './generate'
-import config from './config'
+import config from './config/config'
 import { PluginMessages } from './messages'
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
