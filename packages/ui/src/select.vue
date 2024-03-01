@@ -66,12 +66,12 @@ const model = defineModel<string>()
                 'bg-$figma-color-bg-success': active,
               }"
             >
-              <span class="block truncate my-font color-$figma-color-text">{{ option.label }}</span>
+              <span class="block truncate my-font color-$figma-color-text-oncomponent">{{ option.label }}</span>
               <span
                 v-if="selected"
                 class="absolute inset-y-0 left-0 flex items-center pl-2"
               >
-                <CheckIcon class="h-3 w-3 color-$figma-color-text" aria-hidden="true" />
+                <CheckIcon class="h-3 w-3 color-$figma-color-text-oncomponent" aria-hidden="true" />
               </span>
             </li>
           </ListboxOption>
