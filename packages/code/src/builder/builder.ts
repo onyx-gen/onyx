@@ -2,7 +2,7 @@ import config from '../config'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
 import { findNearestColor } from '../colors'
-import { findNearestDimension } from '../dimensionMap'
+import { findNearestDimension } from '../dimension-map'
 import { rgbToHex } from './utils'
 import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
 
