@@ -49,6 +49,13 @@ export interface VariantGroupChangedPluginMessage extends BasePluginMessage {
   }
 }
 
+export interface NotificationPluginMessage extends BasePluginMessage {
+  event: 'notification'
+  data: {
+    message: string
+  }
+}
+
 /**
  * Interface representing a plugin message emitted
  * when the user unselects all nodes.
@@ -81,3 +88,4 @@ export type PluginMessage =
   | ModeChangedPluginMessage
   | NearestChangedPluginMessage
   | VariantGroupChangedPluginMessage
+  | NotificationPluginMessage

@@ -37,4 +37,7 @@ figma.ui.onmessage = async (message: PluginMessage) => {
     config.tailwind.variantGroup = message.data.variantGroup
     await generate()
   }
+  else if (message.event === 'notification') {
+    figma.notify(message.data.message)
+  }
 }

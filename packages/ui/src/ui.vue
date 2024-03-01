@@ -9,12 +9,14 @@ import type {
   SelectedNode,
   VariantGroupChangedPluginMessage,
 } from '@onyx/types'
+import { useClipboard } from '@vueuse/core'
 import MainLayout from './main-layout.vue'
 import Code from './code.vue'
 import Select from './select.vue'
 import Switch from './switch.vue'
 import type { SelectOption } from './select.vue'
 import Layout from './layout.vue'
+import { useNotification } from './composables/useNotification'
 
 const hasSelection = ref(false)
 
@@ -127,6 +129,15 @@ function sendVariantGroupChangedMessage(variantGroup: boolean) {
   }
   parent.postMessage({ pluginMessage }, '*')
 }
+
+const code = ref('')
+const { copy } = useClipboard({ source: code })
+const { notify } = useNotification()
+
+function onCopy() {
+  copy(code.value)
+  notify('Copied to clipboard!')
+}
 </script>
 
 <template>
@@ -173,8 +184,14 @@ function sendVariantGroupChangedMessage(variantGroup: boolean) {
           <div
             class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-$divider-color-code rounded-sm overflow-hidden"
           >
-            <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
-              Generated Code
+            <div class="flex justify-between items-center px-3 py-2 color-$figma-color-text-secondary">
+              <span class="my-font">
+                Generated Code
+              </span>
+
+              <button @click="onCopy">
+                <i class="i-onyx-copy w-4 h-4" />
+              </button>
             </div>
 
             <div class="px-3 py-2 overflow-scroll">
