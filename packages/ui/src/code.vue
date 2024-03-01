@@ -2,8 +2,9 @@
 import { onMounted, ref } from 'vue'
 import { codeToHtml } from 'shiki'
 import type { PluginMessageEvent } from '@onyx/types'
-import { computedAsync } from '@vueuse/core'
+import { computedAsync, useClipboard } from '@vueuse/core'
 import { useTheme } from './useTheme'
+import { useNotification } from './composables/useNotification'
 
 const code = ref('')
 
@@ -25,10 +26,34 @@ const html = computedAsync(
   }),
   '',
 )
+
+const { copy } = useClipboard({ source: code, legacy: true })
+const { notify } = useNotification()
+
+function onCopy() {
+  copy(code.value)
+  notify('Copied to clipboard!')
+}
 </script>
 
 <template>
-  <div class="w-full max-h-full overflow-hidden" v-html="html" />
+  <div
+    class="flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-$divider-color-code rounded-sm overflow-hidden"
+  >
+    <div class="flex justify-between items-center px-3 py-2 color-$figma-color-text-secondary">
+      <span class="my-font">
+        Generated Code
+      </span>
+
+      <button @click="onCopy">
+        <i class="i-onyx-copy w-4 h-4" />
+      </button>
+    </div>
+
+    <div class="px-3 py-2 overflow-scroll">
+      <div class="w-full max-h-full overflow-hidden" v-html="html" />
+    </div>
+  </div>
 </template>
 
 <style>
