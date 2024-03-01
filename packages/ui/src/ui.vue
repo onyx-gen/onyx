@@ -132,11 +132,13 @@ function sendVariantGroupChangedMessage(variantGroup: boolean) {
 <template>
   <MainLayout>
     <div>
-      <Layout>
-        <h1 class="text-2xl font-bold mb-4">
-          Onyx
-        </h1>
-      </Layout>
+      <div class="border-b border-color-$figma-color-border mb-4">
+        <Layout>
+          <h1 class="text-2xl font-bold mb-4">
+            Onyx
+          </h1>
+        </Layout>
+      </div>
 
       <div class="border-b border-color-$figma-color-border mb-4">
         <Layout class="mb-4 flex gap-4">
