@@ -268,12 +268,13 @@ function sendVariantGroupChangedMessage(variantGroup: boolean) {
         </Layout>
       </div>
 
-      <Layout
-        v-show="!hasSelection"
-        class="bg-$figma-color-bg-secondary w-max divide-y divide-[#4c4c4c] rounded-sm overflow-hidden"
-      >
-        <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
-          Please select a node!
+      <Layout v-show="!hasSelection">
+        <div
+          class="bg-$figma-color-bg-secondary w-max divide-y divide-[#4c4c4c] rounded-sm overflow-hidden"
+        >
+          <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
+            Please select a node!
+          </div>
         </div>
       </Layout>
     </div>
