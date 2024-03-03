@@ -1,19 +1,22 @@
-import type { InferenceColorMap } from '../../config/colors'
+import type { InferenceColorMap } from '../../config/color'
 
 const nearestColorCache = new Map<string, string>()
 
 /**
- * Finds the nearest color in the colorMap based on the RGB value provided.
+ * Finds the nearest color in the colors based on the RGB value provided.
  *
  * @param {RGB} rgb - The RGB value to find the nearest color for.
  * @param {InferenceColorMap} colorMap - The color map to search for the nearest color.
- * @return {string} The closest color in the colorMap represented as a hexadecimal value.
+ * @return {string} The closest color in the colors represented as a hexadecimal value.
  */
-export function findNearestColor(rgb: RGB, colorMap: InferenceColorMap): string {
+export function findNearestColor(
+  rgb: RGB,
+  colorMap: InferenceColorMap,
+): string {
   const cacheKey = getRGBCacheKey(rgb)
 
   if (nearestColorCache.has(cacheKey))
-    return colorMap[nearestColorCache.get(cacheKey)!]
+    return colorMap[nearestColorCache.get(cacheKey)!][0]
 
   const { r, g, b } = rgb
   const r1 = Math.floor(r * 256)
@@ -39,7 +42,7 @@ export function findNearestColor(rgb: RGB, colorMap: InferenceColorMap): string 
 
   nearestColorCache.set(cacheKey, closestColorHEX)
 
-  return colorMap[closestColorHEX]
+  return colorMap[closestColorHEX][0]
 }
 
 /**

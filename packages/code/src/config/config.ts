@@ -1,30 +1,54 @@
-import type { Mode } from '@onyx/types'
-import type { InferenceColorMap } from './colors'
-import { colorMap } from './colors'
-import { dimensionMap } from './dimension-map'
-import type { InferenceDimensionMap } from './dimension-map'
+import { theme } from '@unocss/preset-mini'
+import { defu } from 'defu'
+import type { Configuration } from './types'
+import type { InferenceColorMap } from './color'
+import { createColorLookup } from './color'
+import type { InferenceDimensionMap } from './dimension'
+import { createDimensionLookup } from './dimension'
 
-interface OnyxConfiguration {
-  mode: Mode
-  inference: {
-    nearest: boolean
-  }
-  tailwind: {
-    colorMap: InferenceColorMap
-    dimensionMap: InferenceDimensionMap
-    variantGroup: boolean
-  }
+const defaultConfig: Configuration = {
+  mode: 'variables',
+  unit: 'px',
+  variantGroup: true,
+  nearestInference: true,
+  theme,
 }
 
-const config: OnyxConfiguration = {
-  mode: 'variables',
-  inference: {
-    nearest: true,
+function defineConfig(config: Partial<Configuration>): Configuration {
+  return defu(config, defaultConfig)
+}
+
+const config = defineConfig({})
+
+interface LookupCache {
+  color: InferenceColorMap | null
+  dimensions: InferenceDimensionMap | null
+}
+
+const lookupCache: LookupCache = {
+  color: null,
+  dimensions: null,
+}
+
+export const lookups = {
+  get colors() {
+    if (lookupCache.color)
+      return lookupCache.color
+
+    const lookup = createColorLookup(config.theme.colors || {})
+    lookupCache.color = lookup
+
+    return lookup
   },
-  tailwind: {
-    colorMap,
-    dimensionMap,
-    variantGroup: true,
+
+  get dimensions() {
+    if (lookupCache.dimensions)
+      return lookupCache.dimensions
+
+    const lookup = createDimensionLookup(config.theme.spacing || {})
+    lookupCache.dimensions = lookup
+
+    return lookup
   },
 }
 

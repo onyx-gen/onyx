@@ -91,3 +91,10 @@ export function printObject(obj: any): any {
     return obj
   }
 }
+
+export function round(n: number) {
+  return n
+    .toFixed(10)
+    .replace(/\.0+$/, '')
+    .replace(/(\.\d+?)0+$/, '$1')
+}

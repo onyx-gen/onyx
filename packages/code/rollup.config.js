@@ -3,6 +3,7 @@ import typescript from '@rollup/plugin-typescript'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import terser from '@rollup/plugin-terser'
+import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -23,6 +24,9 @@ const config = {
     commonjs(),
     resolve({
       browser: true,
+    }),
+    getBabelOutputPlugin({
+      presets: ['@babel/preset-env'],
     }),
     production && terser(),
   ],

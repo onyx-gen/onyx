@@ -29,13 +29,13 @@ PluginMessages.on('mode-changed', async ({ mode }) => {
 
 PluginMessages.on('nearest-changed', async ({ nearestColor }) => {
   console.log('Nearest color changed:', nearestColor)
-  config.inference.nearest = nearestColor
+  config.nearestInference = nearestColor
   await generate()
 })
 
 PluginMessages.on('variant-group-changed', async ({ variantGroup }) => {
   console.log('Variant group changed:', variantGroup)
-  config.tailwind.variantGroup = variantGroup
+  config.variantGroup = variantGroup
   await generate()
 })
 

@@ -1,4 +1,4 @@
-import config from '../config/config'
+import config, { lookups } from '../config/config'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
 import { rgbToHex } from './utils'
@@ -157,7 +157,7 @@ class Builder {
    * @return {GenericUtilityValue} - The inferred dimension object.
    */
   private getInferredDimension(widthOrHeight: number): GenericUtilityValue {
-    const tailwindDimension: string | undefined = config.tailwind.dimensionMap[widthOrHeight]
+    const tailwindDimension: string | undefined = lookups.dimensions[widthOrHeight]?.[0]
     if (tailwindDimension) {
       return {
         mode: 'inferred',
@@ -166,8 +166,8 @@ class Builder {
       }
     }
 
-    if (config.inference.nearest) {
-      const nearestDimension = findNearestDimension(widthOrHeight, config.tailwind.dimensionMap)
+    if (config.nearestInference) {
+      const nearestDimension = findNearestDimension(widthOrHeight, lookups.dimensions)
       return {
         mode: 'inferred',
         type: 'generic',
@@ -357,7 +357,7 @@ class Builder {
 
     const opacity = paint.opacity ? paint.opacity * 100 : undefined
 
-    const tailwindColor: string | undefined = config.tailwind.colorMap[color]
+    const tailwindColor: string | undefined = lookups.colors[color]?.[0]
     if (tailwindColor) {
       return {
         mode: 'inferred',
@@ -367,8 +367,8 @@ class Builder {
       }
     }
 
-    if (config.inference.nearest) {
-      const closestColor = findNearestColor(paint.color, config.tailwind.colorMap)
+    if (config.nearestInference) {
+      const closestColor = findNearestColor(paint.color, lookups.colors)
       return {
         mode: 'inferred',
         type: 'color',

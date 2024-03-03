@@ -63,7 +63,7 @@ export function translateContainerNodeCSSData(data: NodeCSSData): Record<Variant
     entries(data)
       .filter(([, variantCSS]) => variantCSS.css.length > 0)
       .map(([variant, variantCSS]) => {
-        return [variant, translateVariantCSS(variantCSS, config.tailwind.variantGroup)]
+        return [variant, translateVariantCSS(variantCSS, config.variantGroup)]
       }),
   )
 }

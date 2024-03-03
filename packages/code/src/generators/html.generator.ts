@@ -93,7 +93,7 @@ class HTMLGenerator {
       const defaultVariantCSS: VariantCSS | undefined = Object.values(tree.data.css)[0]
 
       if (defaultVariantCSS)
-        attrs.static = translateVariantCSS(defaultVariantCSS, config.tailwind.variantGroup)
+        attrs.static = translateVariantCSS(defaultVariantCSS, config.variantGroup)
 
       // Remove empty top-level variant CSS entries
       // TODO: Optimization is incomplete as it does not remove recursively empty variant CSS entries
