@@ -4,7 +4,7 @@ import type { Configuration } from './types'
 import type { InferenceColorMap } from './color'
 import { createColorLookup } from './color'
 import type { InferenceDimensionMap } from './dimension'
-import { createDimensionLookup } from './dimension'
+import { createDimensionLookup, createDimensionLookupPx } from './dimension'
 
 const defaultConfig: Configuration = {
   mode: 'variables',
@@ -23,11 +23,13 @@ const config = defineConfig({})
 interface LookupCache {
   color: InferenceColorMap | null
   dimensions: InferenceDimensionMap | null
+  borderDimensions: InferenceDimensionMap | null
 }
 
 const lookupCache: LookupCache = {
   color: null,
   dimensions: null,
+  borderDimensions: null,
 }
 
 export const lookups = {
@@ -47,6 +49,16 @@ export const lookups = {
 
     const lookup = createDimensionLookup(config.theme.spacing || {})
     lookupCache.dimensions = lookup
+
+    return lookup
+  },
+
+  get borderDimensions() {
+    if (lookupCache.borderDimensions)
+      return lookupCache.borderDimensions
+
+    const lookup = createDimensionLookupPx()
+    lookupCache.borderDimensions = lookup
 
     return lookup
   },

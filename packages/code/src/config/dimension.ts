@@ -56,6 +56,16 @@ function createComputedDimensions() {
   return result
 }
 
+export function createDimensionLookupPx(): InferenceDimensionMap {
+  // iterate from 0 to 10
+  const result: Record<number, string[]> = {}
+
+  for (let i = 0; i <= 10; i++)
+    result[i] = [`${i}`]
+
+  return result
+}
+
 export function createDimensionLookup(
   _dimensions: Record<string, string>,
 ): InferenceDimensionMap {

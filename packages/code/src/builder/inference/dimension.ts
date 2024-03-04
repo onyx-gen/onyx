@@ -4,13 +4,18 @@ import type { GenericUtilityValue } from '../types'
 
 const nearestDimensionCache = new Map<number, string>()
 
+export function createDimensionHandler(dimensionMap: InferenceDimensionMap): (widthOrHeight: number) => GenericUtilityValue {
+  return (widthOrHeight: number) => getInferredDimension(widthOrHeight, dimensionMap)
+}
+
 /**
  * Gets the inferred dimension based on the provided width or height value.
  * @param {number} widthOrHeight - The width or height value.
+ * @param dimensionMap
  * @return {GenericUtilityValue} - The inferred dimension object.
  */
-export function getInferredDimension(widthOrHeight: number): GenericUtilityValue {
-  const themeDimension: string | undefined = lookups.dimensions[widthOrHeight]?.[0]
+export function getInferredDimension(widthOrHeight: number, dimensionMap = lookups.dimensions): GenericUtilityValue {
+  const themeDimension: string | undefined = dimensionMap[widthOrHeight]?.[0]
   if (themeDimension) {
     return {
       mode: 'inferred',
@@ -20,7 +25,7 @@ export function getInferredDimension(widthOrHeight: number): GenericUtilityValue
   }
 
   if (config.nearestInference) {
-    const nearestDimension = findNearestDimension(widthOrHeight, lookups.dimensions)
+    const nearestDimension = findNearestDimension(widthOrHeight, dimensionMap)
     return {
       mode: 'inferred',
       type: 'generic',

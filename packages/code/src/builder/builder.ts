@@ -1,10 +1,12 @@
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
+import { lookups } from '../config/config'
+import type { InferenceDimensionMap } from '../config/dimension'
 import type { RectCornersNew, RectSidesNew } from './types'
 import { getInferredSolidColor } from './inference/color'
 import AutoLayoutBuilder from './auto-layout-builder'
 import { getUtilityClass, translateUtilityValue } from './inference/utility'
-import { getInferredDimension } from './inference/dimension'
+import { createDimensionHandler, getInferredDimension } from './inference/dimension'
 
 class Builder {
   private attributes: Set<string> = new Set()
@@ -202,7 +204,16 @@ class Builder {
       }
 
       if (strokeWeight !== figma.mixed) {
-        this.attributes.add(`border-${translateUtilityValue(getInferredDimension(strokeWeight))}`)
+        const utilityClass = getUtilityClass(
+          node,
+          'generic',
+          Properties.borderWidth,
+          'border',
+          strokeWeight,
+          createDimensionHandler(lookups.borderDimensions),
+        )
+
+        this.attributes.add(utilityClass)
       }
       else {
         const {
@@ -219,7 +230,7 @@ class Builder {
           right: strokeRightWeight || null,
         }
 
-        this.handleRectSidesAttribute(rectSides, 'border')
+        this.handleRectSidesAttribute(rectSides, 'border', lookups.borderDimensions)
       }
     }
   }
@@ -229,8 +240,9 @@ class Builder {
    * It generates CSS classes based on the uniformity and equality of the rectangular sides.
    * @param rectSides The object containing values for each side of the rectangle.
    * @param attributePrefix The prefix to use for the CSS class.
+   * @param inferenceDimensionMap The dimension map to use for inferring the dimension.
    */
-  private handleRectSidesAttribute(rectSides: RectSidesNew, attributePrefix: string) {
+  private handleRectSidesAttribute(rectSides: RectSidesNew, attributePrefix: string, inferenceDimensionMap: InferenceDimensionMap) {
     // Check if all sides are the same
     const allSidesEqual = rectSides.top !== null
       && rectSides.top === rectSides.bottom
@@ -238,7 +250,7 @@ class Builder {
       && rectSides.left === rectSides.right
 
     if (allSidesEqual) {
-      this.attributes.add(`${attributePrefix}-${translateUtilityValue(getInferredDimension(rectSides.top!))}`)
+      this.attributes.add(`${attributePrefix}-${translateUtilityValue(getInferredDimension(rectSides.top!, inferenceDimensionMap))}`)
       return
     }
 
@@ -247,22 +259,22 @@ class Builder {
     const axisYEqual = rectSides.top !== null && rectSides.top === rectSides.bottom
 
     if (axisXEqual)
-      this.attributes.add(`${attributePrefix}-x-${translateUtilityValue(getInferredDimension(rectSides.left!))}`)
+      this.attributes.add(`${attributePrefix}-x-${translateUtilityValue(getInferredDimension(rectSides.left!, inferenceDimensionMap))}`)
     if (axisYEqual)
-      this.attributes.add(`${attributePrefix}-y-${translateUtilityValue(getInferredDimension(rectSides.top!))}`)
+      this.attributes.add(`${attributePrefix}-y-${translateUtilityValue(getInferredDimension(rectSides.top!, inferenceDimensionMap))}`)
 
     if (axisXEqual && axisYEqual)
       return
 
     // Individual sides
     if (rectSides.top !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-t-${translateUtilityValue(getInferredDimension(rectSides.top))}`)
+      this.attributes.add(`${attributePrefix}-t-${translateUtilityValue(getInferredDimension(rectSides.top, inferenceDimensionMap))}`)
     if (rectSides.right !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-r-${translateUtilityValue(getInferredDimension(rectSides.right))}`)
+      this.attributes.add(`${attributePrefix}-r-${translateUtilityValue(getInferredDimension(rectSides.right, inferenceDimensionMap))}`)
     if (rectSides.bottom !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(getInferredDimension(rectSides.bottom))}`)
+      this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(getInferredDimension(rectSides.bottom, inferenceDimensionMap))}`)
     if (rectSides.left !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(getInferredDimension(rectSides.left))}`)
+      this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(getInferredDimension(rectSides.left, inferenceDimensionMap))}`)
   }
 
   private buildMinimalFillsMixin(node: SceneNode & MinimalFillsMixin) {
