@@ -17,7 +17,7 @@ class AutoLayoutBuilder {
    */
   constructor(
     private readonly node: SceneNode,
-    private readonly autoLayout: InferredAutoLayoutResult,
+    private readonly autoLayout: AutoLayoutMixin,
     private readonly tokens: DesignTokens,
   ) {}
 

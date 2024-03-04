@@ -5,39 +5,64 @@ import { rgbToHex } from './utils'
 import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
 import { findNearestDimension } from './inference/dimension'
 import { findNearestColor } from './inference/color'
+import AutoLayoutBuilder from './auto-layout-builder'
 
 class Builder {
   private attributes: Set<string> = new Set()
 
   public build(node: SceneNode) {
     if (Builder.isMinimalFillsMixin(node))
-      this.buildMinimalFillsMixin(node as SceneNode & MinimalFillsMixin)
+      this.buildMinimalFillsMixin(node)
 
     if (Builder.isMinimalStrokesMixin(node))
-      this.buildMinimalStrokesMixin(node as SceneNode & MinimalStrokesMixin)
+      this.buildMinimalStrokesMixin(node)
 
     if (Builder.isDimensionAndPositionMixin(node))
-      this.buildDimensionAndPositionMixin(node as SceneNode & DimensionAndPositionMixin)
+      this.buildDimensionAndPositionMixin(node)
 
     if (Builder.isCornerMixin(node))
-      this.buildCornerMixin(node as SceneNode & CornerMixin)
+      this.buildCornerMixin(node)
+
+    if (Builder.isAutoLayoutMixin(node))
+      this.buildAutoLayout(node)
 
     return this.attributes
   }
 
-  private static isDimensionAndPositionMixin(node: SceneNode) {
+  private buildAutoLayout(node: SceneNode & AutoLayoutMixin) {
+    let autoLayoutBuilder: AutoLayoutBuilder | null = null
+
+    const tokens = getAppliedTokens(node)
+
+    if (node.layoutMode !== 'NONE')
+      autoLayoutBuilder = new AutoLayoutBuilder(node, node, tokens)
+
+    // User has not explicitly set auto-layout, but Figma has inferred auto-layout
+    // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
+    else if ('inferredAutoLayout' in node && node.inferredAutoLayout !== null)
+      autoLayoutBuilder = new AutoLayoutBuilder(node, node.inferredAutoLayout, tokens)
+
+    if (autoLayoutBuilder)
+      autoLayoutBuilder.build().forEach(css => this.attributes.add(css))
+  }
+
+  private static isAutoLayoutMixin(node: SceneNode): node is SceneNode & AutoLayoutMixin {
+    return 'layoutMode' in node
+  }
+
+  private static isDimensionAndPositionMixin(node: SceneNode): node is SceneNode & DimensionAndPositionMixin {
     return 'width' in node && 'height' in node && 'x' in node && 'y' in node
   }
 
-  private static isMinimalFillsMixin(node: SceneNode) {
+  private static isMinimalFillsMixin(node: SceneNode): node is SceneNode & MinimalFillsMixin {
     return 'fills' in node
   }
 
-  private static isMinimalStrokesMixin(node: SceneNode) {
+  private static isMinimalStrokesMixin(node: SceneNode): node is SceneNode & MinimalStrokesMixin {
     return 'strokes' in node
   }
 
-  private static isCornerMixin(node: SceneNode) {
+  private static isCornerMixin(node: SceneNode): node is SceneNode & CornerMixin {
     return 'cornerRadius' in node
   }
 
