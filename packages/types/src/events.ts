@@ -1,4 +1,4 @@
-import type { ComponentProps, Mode } from './types'
+import type { ComponentProps, Mode, Unit } from './types'
 
 export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
 
@@ -25,6 +25,12 @@ export type ModeChangedPluginMessage = BasePluginMessage<'mode-changed', ModeCha
 
 interface ModeChangedPluginMessageData {
   mode: Mode
+}
+
+export type UnitChangedPluginMessage = BasePluginMessage<'unit-changed', UnitChangedPluginMessageData>
+
+interface UnitChangedPluginMessageData {
+  unit: Unit
 }
 
 export type NearestChangedPluginMessage = BasePluginMessage<'nearest-changed', NearestChangedPluginMessageData>
@@ -66,3 +72,4 @@ export type PluginMessage =
   | NearestChangedPluginMessage
   | VariantGroupChangedPluginMessage
   | NotificationPluginMessage
+  | UnitChangedPluginMessage

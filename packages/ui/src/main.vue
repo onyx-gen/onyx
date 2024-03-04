@@ -87,6 +87,9 @@ watch(nearestInference, (nearestColor: boolean) => emitPluginMessage('nearest-ch
 
 const variantGroup = ref(true)
 watch(variantGroup, (variantGroup: boolean) => emitPluginMessage('variant-group-changed', { variantGroup }))
+
+const isRem = ref(false)
+watch(isRem, isRem => emitPluginMessage('unit-changed', { unit: isRem ? 'rem' : 'px' }))
 </script>
 
 <template>
@@ -124,6 +127,14 @@ watch(variantGroup, (variantGroup: boolean) => emitPluginMessage('variant-group-
             </h2>
 
             <Switch v-model="variantGroup" class="mt-2" />
+          </div>
+
+          <div>
+            <h2 class="my-font font-semibold color-$figma-color-text">
+              Unit (rem/px)
+            </h2>
+
+            <Switch v-model="isRem" class="mt-2" />
           </div>
         </Layout>
       </div>

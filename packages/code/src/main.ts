@@ -39,6 +39,12 @@ PluginMessages.on('variant-group-changed', async ({ variantGroup }) => {
   await generate()
 })
 
+PluginMessages.on('unit-changed', async ({ unit }) => {
+  console.log('Unit changed:', unit)
+  config.unit = unit
+  await generate()
+})
+
 PluginMessages.on('notification', ({ message }) => {
   figma.notify(message)
 })

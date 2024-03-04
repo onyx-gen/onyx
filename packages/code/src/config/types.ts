@@ -1,7 +1,5 @@
-import type { Mode } from '@onyx/types'
+import type { Mode, Unit } from '@onyx/types'
 import type { Theme } from '@unocss/preset-mini'
-
-type Unit = 'px' | 'rem'
 
 export interface Configuration {
   mode: Mode

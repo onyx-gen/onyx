@@ -36,10 +36,19 @@ export function getInferredDimension(widthOrHeight: number): GenericUtilityValue
     }
   }
 
-  return {
-    mode: 'arbitrary',
-    type: 'generic',
-    value: `${widthOrHeight}px`,
+  if (config.unit === 'rem') {
+    return {
+      mode: 'arbitrary',
+      type: 'generic',
+      value: `${widthOrHeight / 16}rem`,
+    }
+  }
+  else {
+    return {
+      mode: 'arbitrary',
+      type: 'generic',
+      value: `${widthOrHeight}px`,
+    }
   }
 }
 
