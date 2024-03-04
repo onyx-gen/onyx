@@ -69,7 +69,11 @@ export default async function generate(): Promise<string | void> {
   }
   else {
     const componentNodes = nodes.filter(node => node.type === 'COMPONENT') as ComponentNode[]
-    sendSelectedMessage(componentNodes.map(node => ({ id: node.id, props: getComponentProperties(node) })))
+
+    if (componentNodes.length > 0)
+      sendSelectedMessage(componentNodes.map(node => ({ id: node.id, props: getComponentProperties(node) })))
+    else
+      sendSelectedMessage(null)
   }
 
   // only send message if html is not empty

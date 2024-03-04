@@ -27,7 +27,7 @@ export function sendUnselectedMessage() {
  *
  * @return {void}
  */
-export function sendSelectedMessage(nodes: SelectedNode[]): void {
+export function sendSelectedMessage(nodes: SelectedNode[] | null): void {
   const pluginMessage: SelectedPluginMessage = { event: 'selected', data: { nodes } }
   figma.ui.postMessage(pluginMessage)
 }

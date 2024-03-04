@@ -61,7 +61,7 @@ export interface SelectedNode {
 export type SelectedPluginMessage = BasePluginMessage<'selected', SelectedPluginMessageData>
 
 interface SelectedPluginMessageData {
-  nodes: SelectedNode[]
+  nodes: SelectedNode[] | null
 }
 
 export type PluginMessage =
