@@ -1,3 +1,6 @@
+import { getAppliedTokens } from '../tokens/tokens'
+import type { Properties } from '../tokens/properties'
+
 /**
  * Converts an RGB color value to HEX format.
  *
@@ -18,4 +21,16 @@ export function rgbToHex(r: number, g: number, b: number): string {
 
   // Convert the components to hexadecimal and return the formatted string
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`
+}
+
+/**
+ * Retrieves the token value of a given type for a specified scene node.
+ *
+ * @param {SceneNode} node - The scene node from which to retrieve the token value.
+ * @param {Properties} type - The type of token to retrieve.
+ * @return {string|null} - The token value of the specified type if found, otherwise null.
+ */
+export function getToken(node: SceneNode, type: Properties): string | null {
+  const tokens = getAppliedTokens(node)
+  return tokens.get(type) || null
 }

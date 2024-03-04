@@ -1,10 +1,10 @@
 import config, { lookups } from '../config/config'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
-import { rgbToHex } from './utils'
+import { getToken } from './utils'
 import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
 import { findNearestDimension } from './inference/dimension'
-import { findNearestColor } from './inference/color'
+import { getInferredSolidColor } from './inference/color'
 import AutoLayoutBuilder from './auto-layout-builder'
 
 class Builder {
@@ -220,7 +220,7 @@ class Builder {
           let utilityValue: ColorUtilityValue | null = null
 
           if (config.mode === 'variables') {
-            const token = this.getTokenByType(node, Properties.borderColor)
+            const token = getToken(node, Properties.borderColor)
 
             if (token) {
               utilityValue = {
@@ -232,7 +232,7 @@ class Builder {
           }
 
           if (!utilityValue)
-            utilityValue = this.getInferredSolidColor(stroke)
+            utilityValue = getInferredSolidColor(stroke)
 
           const value = this.translateUtilityValue(utilityValue)
           this.attributes.add(`border-color-${value}`)
@@ -316,7 +316,7 @@ class Builder {
           let utilityValue: ColorUtilityValue | null = null
 
           if (config.mode === 'variables') {
-            const token = this.getTokenByType(node, Properties.fill)
+            const token = getToken(node, Properties.fill)
 
             if (token) {
               utilityValue = {
@@ -328,7 +328,7 @@ class Builder {
           }
 
           if (!utilityValue)
-            utilityValue = this.getInferredSolidColor(fill)
+            utilityValue = getInferredSolidColor(fill)
 
           const value = this.translateUtilityValue(utilityValue)
           this.attributes.add(`bg-${value}`)
@@ -339,18 +339,6 @@ class Builder {
         console.error('[Builder] Multiple fills are not supported yet.')
       }
     }
-  }
-
-  /**
-   * Retrieves the token value of a given type for a specified scene node.
-   *
-   * @param {SceneNode} node - The scene node from which to retrieve the token value.
-   * @param {Properties} type - The type of token to retrieve.
-   * @return {string|null} - The token value of the specified type if found, otherwise null.
-   */
-  private getTokenByType(node: SceneNode, type: Properties): string | null {
-    const tokens = getAppliedTokens(node)
-    return tokens.get(type) || null
   }
 
   private translateUtilityValue(utilityValue: UtilityValue): string {
@@ -371,43 +359,6 @@ class Builder {
       value += `/${utilityValue.opacity}`
 
     return value
-  }
-
-  private getInferredSolidColor(paint: SolidPaint): ColorUtilityValue {
-    const color = rgbToHex(
-      Math.floor(paint.color.r * 256),
-      Math.floor(paint.color.g * 256),
-      Math.floor(paint.color.b * 256),
-    ).toLowerCase()
-
-    const opacity = paint.opacity ? paint.opacity * 100 : undefined
-
-    const tailwindColor: string | undefined = lookups.colors[color]?.[0]
-    if (tailwindColor) {
-      return {
-        mode: 'inferred',
-        type: 'color',
-        value: tailwindColor,
-        opacity,
-      }
-    }
-
-    if (config.nearestInference) {
-      const closestColor = findNearestColor(paint.color, lookups.colors)
-      return {
-        mode: 'inferred',
-        type: 'color',
-        value: closestColor,
-        opacity,
-      }
-    }
-
-    return {
-      mode: 'arbitrary',
-      type: 'color',
-      value: color,
-      opacity,
-    }
   }
 }
 
