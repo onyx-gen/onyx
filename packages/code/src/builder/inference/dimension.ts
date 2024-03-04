@@ -68,8 +68,6 @@ export function findNearestDimension(
   if (nearestDimensionCache.has(cacheKey))
     return nearestDimensionCache.get(cacheKey)!
 
-  const dimension = addDimensionToUnit(dimensionWithoutUnit)
-
   const keys = Object.keys(dimensions).map(Number)
   const nearest = keys.reduce((prev, curr) => Math.abs(curr - dimensionWithoutUnit) < Math.abs(prev - dimensionWithoutUnit) ? curr : prev)
 
