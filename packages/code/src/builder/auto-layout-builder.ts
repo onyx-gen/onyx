@@ -1,5 +1,7 @@
 import type { DesignTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
+import { getInferredDimension } from './inference/dimension'
+import { getUtilityClass } from './inference/utility'
 
 /**
  * The AutoLayoutBuilder class is responsible for constructing a string of CSS class names
@@ -74,14 +76,8 @@ class AutoLayoutBuilder {
   private getGap(): string {
     const hasGap = this.autoLayout.itemSpacing > 0 && this.autoLayout.primaryAxisAlignItems !== 'SPACE_BETWEEN'
 
-    if (hasGap) {
-      const tokenValue = this.tokens.get(Properties.itemSpacing)
-      if (tokenValue === undefined) {
-        console.error('You\'re using the gap property, but you haven\'t set the itemSpacing token.')
-        return `gap-[${this.autoLayout.itemSpacing}px]`
-      }
-      else { return `gap-$${tokenValue}` }
-    }
+    if (hasGap)
+      return getUtilityClass(this.node, Properties.itemSpacing, 'gap', this.autoLayout.itemSpacing, getInferredDimension)
 
     return ''
   }
@@ -94,14 +90,8 @@ class AutoLayoutBuilder {
   private getHorizontalPadding(): string {
     const hasHorizontalPadding = this.autoLayout.horizontalPadding > 0
 
-    if (hasHorizontalPadding) {
-      const tokenValue = this.tokens.get(Properties.horizontalPadding)
-      if (tokenValue === undefined) {
-        console.error('You\'re using the horizontalPadding property, but you haven\'t set the horizontalPadding token.')
-        return `px-[${this.autoLayout.horizontalPadding}px]`
-      }
-      else { return `px-$${tokenValue}` }
-    }
+    if (hasHorizontalPadding)
+      return getUtilityClass(this.node, Properties.horizontalPadding, 'px', this.autoLayout.horizontalPadding, getInferredDimension)
 
     return ''
   }
@@ -114,14 +104,8 @@ class AutoLayoutBuilder {
   private getVerticalPadding(): string {
     const hasVerticalPadding = this.autoLayout.verticalPadding > 0
 
-    if (hasVerticalPadding) {
-      const tokenValue = this.tokens.get(Properties.verticalPadding)
-      if (tokenValue === undefined) {
-        console.error('You\'re using the verticalPadding property, but you haven\'t set the verticalPadding token.')
-        return `py-[${this.autoLayout.verticalPadding}px]`
-      }
-      else { return `py-$${tokenValue}` }
-    }
+    if (hasVerticalPadding)
+      return getUtilityClass(this.node, Properties.verticalPadding, 'py', this.autoLayout.verticalPadding, getInferredDimension)
 
     return ''
   }
