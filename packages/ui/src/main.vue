@@ -14,11 +14,9 @@ const hasSelection = computed(() => selectedNodes.value !== null)
 const { onPluginMessage } = usePluginMessage()
 
 onPluginMessage('unselected', () => {
-  console.log('unselected')
   selectedNodes.value = null
 })
 onPluginMessage('selected', ({ nodes }) => {
-  console.log('selected', nodes)
   selectedNodes.value = nodes
 })
 </script>
