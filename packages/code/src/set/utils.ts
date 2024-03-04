@@ -20,6 +20,9 @@ import { removeNonAlphanumericChars, replaceComponentPropValue } from './replace
 export function getComponentProperties(
   component: ComponentNode,
 ): ComponentProps {
+  if (!hasComponentProperties(component))
+    return {}
+
   return Object.fromEntries(
     component.name
       // Split the component name into pairs by ', '.
@@ -34,6 +37,10 @@ export function getComponentProperties(
         return [key, value]
       }),
   )
+}
+
+function hasComponentProperties(component: ComponentNode): boolean {
+  return component.name.includes('=') && component.name.includes(',')
 }
 
 /**
