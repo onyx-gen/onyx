@@ -1,16 +1,8 @@
 import type { InferenceDimensionMap } from '../../config/dimension'
 import config, { lookups } from '../../config/config'
-import { round } from '../../utils'
 import type { GenericUtilityValue } from '../types'
 
 const nearestDimensionCache = new Map<number, string>()
-
-function addDimensionToUnit(dimensionWithoutUnit: number): string {
-  if (config.unit === 'rem')
-    return `${round(dimensionWithoutUnit / 16)}rem`
-
-  return `${dimensionWithoutUnit}px`
-}
 
 /**
  * Gets the inferred dimension based on the provided width or height value.

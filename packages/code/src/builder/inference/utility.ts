@@ -1,9 +1,10 @@
-import type { GenericUtilityValue, UtilityValue } from '../types'
+import type { BaseUtilityValue } from '../types'
+import { isColorUtility } from '../types'
 import type { Properties } from '../../tokens/properties'
 import config from '../../config/config'
 import { getToken } from '../utils'
 
-export function translateUtilityValue(utilityValue: UtilityValue): string {
+export function translateUtilityValue(utilityValue: BaseUtilityValue): string {
   let value = ''
   switch (utilityValue.mode) {
     case 'inferred':
@@ -17,20 +18,21 @@ export function translateUtilityValue(utilityValue: UtilityValue): string {
       break
   }
 
-  if (utilityValue.type === 'color' && utilityValue.opacity && utilityValue.opacity < 100)
+  if (isColorUtility(utilityValue) && utilityValue.opacity && utilityValue.opacity < 100)
     value += `/${utilityValue.opacity}`
 
   return value
 }
 
-export function getUtilityClass(
+export function getUtilityClass<T extends BaseUtilityValue, V>(
   node: SceneNode,
+  type: T['type'],
   property: Properties,
   utilityClassPrefix: string,
-  figmaValue: number,
-  handler: (unitlessValue: number) => GenericUtilityValue,
+  figmaValue: V,
+  handler: (val: V) => T,
 ): string {
-  let utilityValue: GenericUtilityValue | null = null
+  let utilityValue: BaseUtilityValue | null = null
 
   if (config.mode === 'variables') {
     const token = getToken(node, property)
@@ -38,7 +40,7 @@ export function getUtilityClass(
     if (token) {
       utilityValue = {
         mode: 'variable',
-        type: 'generic',
+        type,
         value: token,
       }
     }

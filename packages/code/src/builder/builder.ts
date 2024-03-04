@@ -5,7 +5,7 @@ import { getToken } from './utils'
 import type { ColorUtilityValue, RectCornersNew, RectSidesNew } from './types'
 import { getInferredSolidColor } from './inference/color'
 import AutoLayoutBuilder from './auto-layout-builder'
-import { translateUtilityValue } from './inference/utility'
+import { getUtilityClass, translateUtilityValue } from './inference/utility'
 import { getInferredDimension } from './inference/dimension'
 
 class Builder {
@@ -185,27 +185,17 @@ class Builder {
 
     if (Array.isArray(strokes) && strokes.length > 0) {
       if (strokes.length === 1) {
-        const stroke = strokes[0]
+        const stroke: Paint = strokes[0]
         if (stroke.type === 'SOLID') {
-          let utilityValue: ColorUtilityValue | null = null
-
-          if (config.mode === 'variables') {
-            const token = getToken(node, Properties.borderColor)
-
-            if (token) {
-              utilityValue = {
-                mode: 'variable',
-                type: 'color',
-                value: token,
-              }
-            }
-          }
-
-          if (!utilityValue)
-            utilityValue = getInferredSolidColor(stroke)
-
-          const value = translateUtilityValue(utilityValue)
-          this.attributes.add(`border-color-${value}`)
+          const utilityClass = getUtilityClass(
+            node,
+            'color',
+            Properties.borderColor,
+            'border-color',
+            stroke,
+            getInferredSolidColor,
+          )
+          this.attributes.add(utilityClass)
         }
         else { console.error('[Builder] Only solid strokes are supported yet.') }
       }

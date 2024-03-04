@@ -76,8 +76,16 @@ class AutoLayoutBuilder {
   private getGap(): string {
     const hasGap = this.autoLayout.itemSpacing > 0 && this.autoLayout.primaryAxisAlignItems !== 'SPACE_BETWEEN'
 
-    if (hasGap)
-      return getUtilityClass(this.node, Properties.itemSpacing, 'gap', this.autoLayout.itemSpacing, getInferredDimension)
+    if (hasGap) {
+      return getUtilityClass(
+        this.node,
+        'generic',
+        Properties.itemSpacing,
+        'gap',
+        this.autoLayout.itemSpacing,
+        getInferredDimension,
+      )
+    }
 
     return ''
   }
@@ -90,8 +98,16 @@ class AutoLayoutBuilder {
   private getHorizontalPadding(): string {
     const hasHorizontalPadding = this.autoLayout.horizontalPadding > 0
 
-    if (hasHorizontalPadding)
-      return getUtilityClass(this.node, Properties.horizontalPadding, 'px', this.autoLayout.horizontalPadding, getInferredDimension)
+    if (hasHorizontalPadding) {
+      return getUtilityClass(
+        this.node,
+        'generic',
+        Properties.horizontalPadding,
+        'px',
+        this.autoLayout.horizontalPadding,
+        getInferredDimension,
+      )
+    }
 
     return ''
   }
@@ -104,8 +120,16 @@ class AutoLayoutBuilder {
   private getVerticalPadding(): string {
     const hasVerticalPadding = this.autoLayout.verticalPadding > 0
 
-    if (hasVerticalPadding)
-      return getUtilityClass(this.node, Properties.verticalPadding, 'py', this.autoLayout.verticalPadding, getInferredDimension)
+    if (hasVerticalPadding) {
+      return getUtilityClass(
+        this.node,
+        'generic',
+        Properties.verticalPadding,
+        'py',
+        this.autoLayout.verticalPadding,
+        getInferredDimension,
+      )
+    }
 
     return ''
   }

@@ -43,10 +43,14 @@ export interface RectCornersNew {
   bottomRight: number | null
 }
 
-interface BaseUtilityValue {
+export interface BaseUtilityValue {
   mode: 'inferred' | 'arbitrary' | 'variable'
   type: string
   value: string
+}
+
+export function isColorUtility(utility: BaseUtilityValue): utility is ColorUtilityValue {
+  return utility.type === 'color'
 }
 
 export interface ColorUtilityValue extends BaseUtilityValue {
@@ -57,7 +61,3 @@ export interface ColorUtilityValue extends BaseUtilityValue {
 export interface GenericUtilityValue extends BaseUtilityValue {
   type: 'generic'
 }
-
-export type UtilityValue =
-  | GenericUtilityValue
-  | ColorUtilityValue
