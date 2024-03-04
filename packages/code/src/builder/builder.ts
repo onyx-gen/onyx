@@ -1,8 +1,6 @@
-import config from '../config/config'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
-import { getToken } from './utils'
-import type { ColorUtilityValue, RectCornersNew, RectSidesNew } from './types'
+import type { RectCornersNew, RectSidesNew } from './types'
 import { getInferredSolidColor } from './inference/color'
 import AutoLayoutBuilder from './auto-layout-builder'
 import { getUtilityClass, translateUtilityValue } from './inference/utility'
@@ -273,25 +271,8 @@ class Builder {
       if (fills.length === 1) {
         const fill = fills[0]
         if (fill.type === 'SOLID') {
-          let utilityValue: ColorUtilityValue | null = null
-
-          if (config.mode === 'variables') {
-            const token = getToken(node, Properties.fill)
-
-            if (token) {
-              utilityValue = {
-                mode: 'variable',
-                type: 'color',
-                value: token,
-              }
-            }
-          }
-
-          if (!utilityValue)
-            utilityValue = getInferredSolidColor(fill)
-
-          const value = translateUtilityValue(utilityValue)
-          this.attributes.add(`bg-${value}`)
+          const utilityClass = getUtilityClass(node, 'color', Properties.fill, 'bg', fill, getInferredSolidColor)
+          this.attributes.add(utilityClass)
         }
         else { console.error('[Builder] Only solid fills are supported yet.') }
       }
