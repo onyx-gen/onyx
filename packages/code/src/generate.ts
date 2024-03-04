@@ -73,7 +73,7 @@ export default async function generate(): Promise<string | void> {
     if (componentNodes.length > 0)
       sendSelectedMessage(componentNodes.map(node => ({ id: node.id, props: getComponentProperties(node) })))
     else
-      sendSelectedMessage(null)
+      sendSelectedMessage([])
   }
 
   // only send message if html is not empty

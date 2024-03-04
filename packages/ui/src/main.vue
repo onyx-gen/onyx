@@ -13,8 +13,14 @@ const hasSelection = computed(() => selectedNodes.value !== null)
 
 const { onPluginMessage } = usePluginMessage()
 
-onPluginMessage('unselected', () => selectedNodes.value = null)
-onPluginMessage('selected', ({ nodes }) => selectedNodes.value = nodes)
+onPluginMessage('unselected', () => {
+  console.log('unselected')
+  selectedNodes.value = null
+})
+onPluginMessage('selected', ({ nodes }) => {
+  console.log('selected', nodes)
+  selectedNodes.value = nodes
+})
 </script>
 
 <template>
@@ -39,8 +45,8 @@ onPluginMessage('selected', ({ nodes }) => selectedNodes.value = nodes)
           <Code />
         </Layout>
 
-        <Layout class="mt-4">
-          <SelectedNodes v-if="hasSelection" :nodes="selectedNodes" />
+        <Layout v-if="hasSelection && selectedNodes?.length" class="mt-4">
+          <SelectedNodes :nodes="selectedNodes" />
         </Layout>
       </div>
 
