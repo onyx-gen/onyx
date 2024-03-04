@@ -22,25 +22,21 @@ generate()
 figma.on('selectionchange', generate)
 
 PluginMessages.on('mode-changed', async ({ mode }) => {
-  console.log('Mode changed:', mode)
   config.mode = mode
   await generate()
 })
 
 PluginMessages.on('nearest-changed', async ({ nearestColor }) => {
-  console.log('Nearest color changed:', nearestColor)
   config.nearestInference = nearestColor
   await generate()
 })
 
 PluginMessages.on('variant-group-changed', async ({ variantGroup }) => {
-  console.log('Variant group changed:', variantGroup)
   config.variantGroup = variantGroup
   await generate()
 })
 
 PluginMessages.on('unit-changed', async ({ unit }) => {
-  console.log('Unit changed:', unit)
   config.unit = unit
   await generate()
 })
