@@ -2,10 +2,11 @@ import config, { lookups } from '../config/config'
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
 import { getToken } from './utils'
-import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew, UtilityValue } from './types'
+import type { ColorUtilityValue, GenericUtilityValue, RectCornersNew, RectSidesNew } from './types'
 import { findNearestDimension } from './inference/dimension'
 import { getInferredSolidColor } from './inference/color'
 import AutoLayoutBuilder from './auto-layout-builder'
+import { translateUtilityValue } from './inference/utility'
 
 class Builder {
   private attributes: Set<string> = new Set()
@@ -78,7 +79,7 @@ class Builder {
 
     if (cornerRadius !== figma.mixed) {
       if (cornerRadius !== 0)
-        this.attributes.add(`rounded-${this.translateUtilityValue(this.getInferredDimension(cornerRadius))}`)
+        this.attributes.add(`rounded-${translateUtilityValue(this.getInferredDimension(cornerRadius))}`)
     }
     else if (Builder.isRectangleCornerMixin(node)) {
       const {
@@ -115,7 +116,7 @@ class Builder {
       && rectCorners.bottomLeft === rectCorners.bottomRight
 
     if (allCornersEqual) {
-      this.attributes.add(`${attributePrefix}-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topLeft!))}`)
+      this.attributes.add(`${attributePrefix}-${translateUtilityValue(this.getInferredDimension(rectCorners.topLeft!))}`)
       return
     }
 
@@ -129,25 +130,25 @@ class Builder {
       && rectCorners.topRight === rectCorners.bottomRight
 
     if (hasTopCornersEqual)
-      this.attributes.add(`${attributePrefix}-t-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topLeft!))}`)
+      this.attributes.add(`${attributePrefix}-t-${translateUtilityValue(this.getInferredDimension(rectCorners.topLeft!))}`)
     if (hasBottomCornersEqual)
-      this.attributes.add(`${attributePrefix}-b-${this.translateUtilityValue(this.getInferredDimension(rectCorners.bottomLeft!))}`)
+      this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(this.getInferredDimension(rectCorners.bottomLeft!))}`)
     if (hasLeftCornersEqual)
-      this.attributes.add(`${attributePrefix}-l-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topLeft!))}`)
+      this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(this.getInferredDimension(rectCorners.topLeft!))}`)
     if (hasRightCornersEqual)
-      this.attributes.add(`${attributePrefix}-r-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topRight!))}`)
+      this.attributes.add(`${attributePrefix}-r-${translateUtilityValue(this.getInferredDimension(rectCorners.topRight!))}`)
 
     if (hasTopCornersEqual && hasBottomCornersEqual && hasLeftCornersEqual && hasRightCornersEqual)
       return
 
     if (rectCorners.topLeft !== null && !hasTopCornersEqual && !hasLeftCornersEqual)
-      this.attributes.add(`${attributePrefix}-tl-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topLeft))}`)
+      this.attributes.add(`${attributePrefix}-tl-${translateUtilityValue(this.getInferredDimension(rectCorners.topLeft))}`)
     if (rectCorners.topRight !== null && !hasTopCornersEqual && !hasRightCornersEqual)
-      this.attributes.add(`${attributePrefix}-tr-${this.translateUtilityValue(this.getInferredDimension(rectCorners.topRight))}`)
+      this.attributes.add(`${attributePrefix}-tr-${translateUtilityValue(this.getInferredDimension(rectCorners.topRight))}`)
     if (rectCorners.bottomLeft !== null && !hasBottomCornersEqual && !hasLeftCornersEqual)
-      this.attributes.add(`${attributePrefix}-bl-${this.translateUtilityValue(this.getInferredDimension(rectCorners.bottomLeft))}`)
+      this.attributes.add(`${attributePrefix}-bl-${translateUtilityValue(this.getInferredDimension(rectCorners.bottomLeft))}`)
     if (rectCorners.bottomRight !== null && !hasBottomCornersEqual && !hasRightCornersEqual)
-      this.attributes.add(`${attributePrefix}-br-${this.translateUtilityValue(this.getInferredDimension(rectCorners.bottomRight))}`)
+      this.attributes.add(`${attributePrefix}-br-${translateUtilityValue(this.getInferredDimension(rectCorners.bottomRight))}`)
   }
 
   private buildDimensionAndPositionMixin(node: SceneNode & DimensionAndPositionMixin) {
@@ -160,20 +161,20 @@ class Builder {
       maxHeight,
     } = node
 
-    this.attributes.add(`w-${this.translateUtilityValue(this.getInferredDimension(width))}`)
-    this.attributes.add(`h-${this.translateUtilityValue(this.getInferredDimension(height))}`)
+    this.attributes.add(`w-${translateUtilityValue(this.getInferredDimension(width))}`)
+    this.attributes.add(`h-${translateUtilityValue(this.getInferredDimension(height))}`)
 
     if (minWidth)
-      this.attributes.add(`min-w-${this.translateUtilityValue(this.getInferredDimension(minWidth))}`)
+      this.attributes.add(`min-w-${translateUtilityValue(this.getInferredDimension(minWidth))}`)
 
     if (minHeight)
-      this.attributes.add(`min-h-${this.translateUtilityValue(this.getInferredDimension(minHeight))}`)
+      this.attributes.add(`min-h-${translateUtilityValue(this.getInferredDimension(minHeight))}`)
 
     if (maxWidth)
-      this.attributes.add(`max-w-${this.translateUtilityValue(this.getInferredDimension(maxWidth))}`)
+      this.attributes.add(`max-w-${translateUtilityValue(this.getInferredDimension(maxWidth))}`)
 
     if (maxHeight)
-      this.attributes.add(`max-h-${this.translateUtilityValue(this.getInferredDimension(maxHeight))}`)
+      this.attributes.add(`max-h-${translateUtilityValue(this.getInferredDimension(maxHeight))}`)
   }
 
   /**
@@ -234,7 +235,7 @@ class Builder {
           if (!utilityValue)
             utilityValue = getInferredSolidColor(stroke)
 
-          const value = this.translateUtilityValue(utilityValue)
+          const value = translateUtilityValue(utilityValue)
           this.attributes.add(`border-color-${value}`)
         }
         else { console.error('[Builder] Only solid strokes are supported yet.') }
@@ -244,7 +245,7 @@ class Builder {
       }
 
       if (strokeWeight !== figma.mixed) {
-        this.attributes.add(`border-${this.translateUtilityValue(this.getInferredDimension(strokeWeight))}`)
+        this.attributes.add(`border-${translateUtilityValue(this.getInferredDimension(strokeWeight))}`)
       }
       else {
         const {
@@ -280,7 +281,7 @@ class Builder {
       && rectSides.left === rectSides.right
 
     if (allSidesEqual) {
-      this.attributes.add(`${attributePrefix}-${this.translateUtilityValue(this.getInferredDimension(rectSides.top!))}`)
+      this.attributes.add(`${attributePrefix}-${translateUtilityValue(this.getInferredDimension(rectSides.top!))}`)
       return
     }
 
@@ -289,22 +290,22 @@ class Builder {
     const axisYEqual = rectSides.top !== null && rectSides.top === rectSides.bottom
 
     if (axisXEqual)
-      this.attributes.add(`${attributePrefix}-x-${this.translateUtilityValue(this.getInferredDimension(rectSides.left!))}`)
+      this.attributes.add(`${attributePrefix}-x-${translateUtilityValue(this.getInferredDimension(rectSides.left!))}`)
     if (axisYEqual)
-      this.attributes.add(`${attributePrefix}-y-${this.translateUtilityValue(this.getInferredDimension(rectSides.top!))}`)
+      this.attributes.add(`${attributePrefix}-y-${translateUtilityValue(this.getInferredDimension(rectSides.top!))}`)
 
     if (axisXEqual && axisYEqual)
       return
 
     // Individual sides
     if (rectSides.top !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-t-${this.translateUtilityValue(this.getInferredDimension(rectSides.top))}`)
+      this.attributes.add(`${attributePrefix}-t-${translateUtilityValue(this.getInferredDimension(rectSides.top))}`)
     if (rectSides.right !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-r-${this.translateUtilityValue(this.getInferredDimension(rectSides.right))}`)
+      this.attributes.add(`${attributePrefix}-r-${translateUtilityValue(this.getInferredDimension(rectSides.right))}`)
     if (rectSides.bottom !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-b-${this.translateUtilityValue(this.getInferredDimension(rectSides.bottom))}`)
+      this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(this.getInferredDimension(rectSides.bottom))}`)
     if (rectSides.left !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-l-${this.translateUtilityValue(this.getInferredDimension(rectSides.left))}`)
+      this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(this.getInferredDimension(rectSides.left))}`)
   }
 
   private buildMinimalFillsMixin(node: SceneNode & MinimalFillsMixin) {
@@ -330,7 +331,7 @@ class Builder {
           if (!utilityValue)
             utilityValue = getInferredSolidColor(fill)
 
-          const value = this.translateUtilityValue(utilityValue)
+          const value = translateUtilityValue(utilityValue)
           this.attributes.add(`bg-${value}`)
         }
         else { console.error('[Builder] Only solid fills are supported yet.') }
@@ -339,26 +340,6 @@ class Builder {
         console.error('[Builder] Multiple fills are not supported yet.')
       }
     }
-  }
-
-  private translateUtilityValue(utilityValue: UtilityValue): string {
-    let value = ''
-    switch (utilityValue.mode) {
-      case 'inferred':
-        value = utilityValue.value
-        break
-      case 'arbitrary':
-        value = `[${utilityValue.value}]`
-        break
-      case 'variable':
-        value = `$${utilityValue.value}`
-        break
-    }
-
-    if (utilityValue.type === 'color' && utilityValue.opacity && utilityValue.opacity < 100)
-      value += `/${utilityValue.opacity}`
-
-    return value
   }
 }
 
