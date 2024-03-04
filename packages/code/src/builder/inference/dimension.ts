@@ -1,6 +1,7 @@
 import type { InferenceDimensionMap } from '../../config/dimension'
-import config from '../../config/config'
+import config, { lookups } from '../../config/config'
 import { round } from '../../utils'
+import type { GenericUtilityValue } from '../types'
 
 const nearestDimensionCache = new Map<number, string>()
 
@@ -9,6 +10,37 @@ function addDimensionToUnit(dimensionWithoutUnit: number): string {
     return `${round(dimensionWithoutUnit / 16)}rem`
 
   return `${dimensionWithoutUnit}px`
+}
+
+/**
+ * Gets the inferred dimension based on the provided width or height value.
+ * @param {number} widthOrHeight - The width or height value.
+ * @return {GenericUtilityValue} - The inferred dimension object.
+ */
+export function getInferredDimension(widthOrHeight: number): GenericUtilityValue {
+  const themeDimension: string | undefined = lookups.dimensions[widthOrHeight]?.[0]
+  if (themeDimension) {
+    return {
+      mode: 'inferred',
+      type: 'generic',
+      value: themeDimension,
+    }
+  }
+
+  if (config.nearestInference) {
+    const nearestDimension = findNearestDimension(widthOrHeight, lookups.dimensions)
+    return {
+      mode: 'inferred',
+      type: 'generic',
+      value: nearestDimension,
+    }
+  }
+
+  return {
+    mode: 'arbitrary',
+    type: 'generic',
+    value: `${widthOrHeight}px`,
+  }
 }
 
 /**
