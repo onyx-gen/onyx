@@ -29,7 +29,7 @@ function onCopy() {
 
 <template>
   <div
-    class="code-container flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-$divider-color-code rounded-sm overflow-hidden"
+    class="code-container flex flex-col w-full bg-$figma-color-bg-secondary divide-y divide-$divider-color-code rounded-sm overflow-hidden"
   >
     <div class="flex justify-between items-center px-3 py-2 color-$figma-color-text-secondary">
       <span class="font-sans text-xs font-medium">
@@ -41,9 +41,9 @@ function onCopy() {
       </button>
     </div>
 
-    <div class="code-copy">
-      <div class="px-3 py-2 overflow-scroll">
-        <div class="w-full max-h-full overflow-hidden" v-html="html" />
+    <div class="code-copy max-h-82 overflow-scroll">
+      <div class="px-3 py-2">
+        <div class="w-full" v-html="html" />
       </div>
     </div>
   </div>
