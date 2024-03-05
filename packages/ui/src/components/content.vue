@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toRefs } from 'vue'
 import { useCode } from '../stores/useCode'
-import Layout from './layout.vue'
+import Layout from './layout/layout.vue'
 import SelectedNodes from './selection.vue'
 import Configuration from './configuration.vue'
 import Code from './code.vue'

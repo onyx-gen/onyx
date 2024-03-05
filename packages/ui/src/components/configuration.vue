@@ -2,9 +2,9 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useConfiguration } from '../stores/useConfiguration'
-import Switch from './switch.vue'
-import Select from './select.vue'
-import type { SelectOption } from './select.vue'
+import Switch from './inputs/switch.vue'
+import Select from './inputs/select.vue'
+import type { SelectOption } from './inputs/select.vue'
 
 const { configuration } = storeToRefs(useConfiguration())
 

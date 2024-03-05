@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia'
-import MainLayout from './components/main-layout.vue'
+import MainLayout from './components/layout/main-layout.vue'
 import { useConfiguration } from './stores/useConfiguration'
 import { useCode } from './stores/useCode'
 import LoadingSpinner from './components/loading-spinner.vue'
