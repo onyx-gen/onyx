@@ -21,20 +21,3 @@ const { isReady } = storeToRefs(useConfiguration())
     <LoadingSpinner v-else />
   </MainLayout>
 </template>
-
-<style>
-.figma-dark {
-  --divider-color-code: rgb(76, 76, 76);
-}
-
-.figma-light {
-  --divider-color-code: rgb(220, 220, 220);
-}
-
-.my-font {
-  font-weight: 500;
-  font-family: Inter, sans-serif;
-  font-size: 11px;
-  font-feature-settings: "liga", "calt";
-}
-</style>

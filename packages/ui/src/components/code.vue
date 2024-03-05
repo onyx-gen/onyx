@@ -50,6 +50,14 @@ function onCopy() {
 </template>
 
 <style>
+.figma-dark {
+  --divider-color-code: rgb(76, 76, 76);
+}
+
+.figma-light {
+  --divider-color-code: rgb(220, 220, 220);
+}
+
 code {
   font-weight: 500 !important;
   font-family: "Roboto Mono", Monaco, "Courier New", monospace !important;

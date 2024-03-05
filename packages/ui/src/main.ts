@@ -6,6 +6,8 @@ import ui from './main.vue'
 import '@unocss/reset/tailwind.css'
 import 'virtual:uno.css'
 
+import './main.css'
+
 const pinia = createPinia()
 const app = createApp(ui)
 

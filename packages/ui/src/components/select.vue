@@ -80,12 +80,3 @@ const model = defineModel<string>()
     </div>
   </Listbox>
 </template>
-
-<style scoped>
-.my-font {
-  font-weight: 400;
-  font-family: Inter, sans-serif;
-  font-size: 11px;
-  font-feature-settings: "liga", "calt";
-}
-</style>
