@@ -24,5 +24,8 @@ export default defineConfig({
     fontFamily: {
       sans: ['Inter', 'sans-serif'],
     },
+    fontSize: {
+      xs: ['0.6875rem', '1rem'],
+    },
   },
 })
