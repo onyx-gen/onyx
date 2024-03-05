@@ -1,9 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { findNearestColor } from '../src/builder/inference/color'
 import { findNearestDimension } from '../src/builder/inference/dimension'
-import { lookups } from '../src/config/config'
+import { loadConfig, lookups } from '../src/config/config'
 
 describe('colors', () => {
+  beforeAll(async () => {
+    await loadConfig(false)
+  })
+
   describe('findNearestColor', () => {
     it('should return closest color in the colorMap for provided RGB', () => {
       const result = findNearestColor({ r: 227, g: 233, b: 239 }, lookups.colors) // A color that is not in the map

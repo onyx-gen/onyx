@@ -16,8 +16,8 @@ const defaultConfig: Configuration = {
 
 let config!: Configuration
 
-export async function loadConfig(): Promise<Configuration> {
-  const savedConfig: Partial<Configuration> | undefined = await figma.clientStorage.getAsync('config')
+export async function loadConfig(loadFromClientStorage = true): Promise<Configuration> {
+  const savedConfig: Partial<Configuration> | undefined = loadFromClientStorage ? await figma.clientStorage.getAsync('config') : undefined
   config = defu({}, savedConfig, defaultConfig) // Adjust as necessary
   return config
 }

@@ -109,7 +109,7 @@ class HTMLGenerator {
       if (length > 1) {
         const clonedCSS = cloneDeep(tree.data.css)
         delete clonedCSS.default // TODO: We have a symbol for that
-        const translatedCSSData = translateContainerNodeCSSData(clonedCSS)
+        const translatedCSSData = translateContainerNodeCSSData(clonedCSS, config.variantGroup)
         attrs.dynamic = Object.fromEntries(
           Object.entries(translatedCSSData).map(([key, value]) => {
             const permutation: VariantPermutation | undefined = this.permutationMap[key]

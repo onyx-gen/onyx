@@ -3,7 +3,6 @@ import type { NodeCSSData, VariantCSS } from './interfaces'
 import { difference } from './set/utils'
 import type { VariantKey } from './set/types'
 import { entries } from './utils'
-import config from './config/config'
 
 /**
  * Translates a VariantCSS object into a string representation.
@@ -53,17 +52,18 @@ export function translateVariantCSS(
  * @param data - The ContainerNodeCSSData to be translated. It is an object where each key is a
  *               VariantKey and each value is a VariantCSS object. This structure represents the
  *               CSS data associated with a container node, with support for various variants.
+ * @param variantGroup - If true, generate variant groups. If false, no group.
  * @returns A record (object) where each key is a VariantKey and each value is a string
  *          representation of the corresponding VariantCSS object. This record is a flat
  *          representation of the input CSS data, with each variant's CSS stringified and
  *          appropriately formatted.
  */
-export function translateContainerNodeCSSData(data: NodeCSSData): Record<VariantKey, string> {
+export function translateContainerNodeCSSData(data: NodeCSSData, variantGroup: boolean): Record<VariantKey, string> {
   return Object.fromEntries(
     entries(data)
       .filter(([, variantCSS]) => variantCSS.css.length > 0)
       .map(([variant, variantCSS]) => {
-        return [variant, translateVariantCSS(variantCSS, config.variantGroup)]
+        return [variant, translateVariantCSS(variantCSS, variantGroup)]
       }),
   )
 }
