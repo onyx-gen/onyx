@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import type { Mode } from '@onyx/types'
-import { usePluginMessage } from '../stores/usePluginMessage'
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useConfiguration } from '../stores/useConfiguration'
 import Switch from './switch.vue'
 import Select from './select.vue'
 import type { SelectOption } from './select.vue'
 
-const { emitPluginMessage } = usePluginMessage()
+const { configuration } = storeToRefs(useConfiguration())
 
-const nearestInference = ref(true)
-watch(nearestInference, (nearestColor: boolean) => emitPluginMessage('nearest-changed', { nearestColor }))
-
-const variantGroup = ref(true)
-watch(variantGroup, (variantGroup: boolean) => emitPluginMessage('variant-group-changed', { variantGroup }))
-
-const isRem = ref(false)
-watch(isRem, isRem => emitPluginMessage('unit-changed', { unit: isRem ? 'rem' : 'px' }))
-
-const model = ref<Mode>('variables')
-watch(model, (mode: Mode) => emitPluginMessage('mode-changed', { mode }))
+const isRem = computed({
+  get: () => configuration.value.unit === 'rem',
+  set: (isRem) => {
+    configuration.value.unit = isRem ? 'rem' : 'px'
+  },
+})
 
 const options: SelectOption[] = [
   {
@@ -38,7 +33,7 @@ const options: SelectOption[] = [
       Mode
     </h2>
 
-    <Select v-model="model" :options="options" />
+    <Select v-model="configuration.mode" :options="options" />
   </div>
 
   <div>
@@ -46,7 +41,7 @@ const options: SelectOption[] = [
       Nearest Inference
     </h2>
 
-    <Switch v-model="nearestInference" class="mt-2" />
+    <Switch v-model="configuration.nearestInference" class="mt-2" />
   </div>
 
   <div>
@@ -54,7 +49,7 @@ const options: SelectOption[] = [
       Variant Group
     </h2>
 
-    <Switch v-model="variantGroup" class="mt-2" />
+    <Switch v-model="configuration.variantGroup" class="mt-2" />
   </div>
 
   <div>

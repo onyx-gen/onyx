@@ -1,63 +1,24 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
-import type { SelectedNode } from '@onyx/types'
+import { storeToRefs } from 'pinia'
 import MainLayout from './components/main-layout.vue'
-import Code from './components/code.vue'
-import Layout from './components/layout.vue'
-import { usePluginMessage } from './stores/usePluginMessage'
-import SelectedNodes from './components/selection.vue'
-import Configuration from './components/configuration.vue'
+import { useConfiguration } from './stores/useConfiguration'
+import { useCode } from './stores/useCode'
+import LoadingSpinner from './components/loading-spinner.vue'
+import Content from './components/content.vue'
 
-const selectedNodes = ref<SelectedNode[] | null>(null)
-const hasSelection = computed(() => selectedNodes.value !== null)
+const { listen } = useCode()
+listen()
 
-const { onPluginMessage } = usePluginMessage()
+const { init } = useConfiguration()
+init()
 
-onPluginMessage('unselected', () => {
-  selectedNodes.value = null
-})
-onPluginMessage('selected', ({ nodes }) => {
-  selectedNodes.value = nodes
-})
+const { isReady } = storeToRefs(useConfiguration())
 </script>
 
 <template>
   <MainLayout>
-    <div>
-      <div class="border-b border-color-$figma-color-border mb-4">
-        <Layout>
-          <h1 class="text-2xl font-bold mb-4">
-            Onyx
-          </h1>
-        </Layout>
-      </div>
-
-      <div class="border-b border-color-$figma-color-border mb-4">
-        <Layout class="mb-4 flex gap-4">
-          <Configuration />
-        </Layout>
-      </div>
-
-      <div v-show="hasSelection" class="divide-y divide-$figma-color-border">
-        <Layout>
-          <Code />
-        </Layout>
-
-        <Layout v-if="hasSelection && selectedNodes?.length" class="mt-4">
-          <SelectedNodes :nodes="selectedNodes" />
-        </Layout>
-      </div>
-
-      <Layout v-show="!hasSelection">
-        <div
-          class="bg-$figma-color-bg-secondary w-max divide-y divide-[#4c4c4c] rounded-sm overflow-hidden"
-        >
-          <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
-            Please select a node!
-          </div>
-        </div>
-      </Layout>
-    </div>
+    <Content v-if="isReady" />
+    <LoadingSpinner v-else />
   </MainLayout>
 </template>
 

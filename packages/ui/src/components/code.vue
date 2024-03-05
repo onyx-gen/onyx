@@ -1,18 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { toRefs } from 'vue'
 import { codeToHtml } from 'shiki'
 import { computedAsync, useClipboard } from '@vueuse/core'
 import { useTheme } from '../composables/useTheme'
 import { useNotification } from '../composables/useNotification'
-import { usePluginMessage } from '../stores/usePluginMessage'
+import { useCode } from '../stores/useCode'
 
-const code = ref('')
-
-const { onPluginMessage } = usePluginMessage()
-
-onPluginMessage('html', ({ html }) => {
-  code.value = html
-})
+const { code } = toRefs(useCode())
 
 const { theme } = useTheme()
 

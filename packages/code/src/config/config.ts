@@ -1,6 +1,6 @@
 import { theme } from '@unocss/preset-mini'
 import { defu } from 'defu'
-import type { Configuration } from './types'
+import type { Configuration } from '@onyx/types'
 import type { InferenceColorMap } from './color'
 import { createColorLookup } from './color'
 import type { InferenceDimensionMap } from './dimension'
@@ -14,11 +14,18 @@ const defaultConfig: Configuration = {
   theme,
 }
 
-function defineConfig(config: Partial<Configuration>): Configuration {
-  return defu(config, defaultConfig)
+let config!: Configuration
+
+export async function loadConfig(): Promise<Configuration> {
+  const savedConfig: Partial<Configuration> | undefined = await figma.clientStorage.getAsync('config')
+  config = defu({}, savedConfig, defaultConfig) // Adjust as necessary
+  return config
 }
 
-const config = defineConfig({})
+export async function updateConfig(newConfig: Partial<Configuration>): Promise<void> {
+  config = defu(newConfig, config)
+  await figma.clientStorage.setAsync('config', config)
+}
 
 interface LookupCache {
   color: InferenceColorMap | null

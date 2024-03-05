@@ -115,6 +115,9 @@ importers:
       '@figma/plugin-typings':
         specifier: ^1.87.0
         version: 1.87.0
+      '@unocss/preset-mini':
+        specifier: ^0.58.5
+        version: 0.58.5
 
   packages/ui:
     dependencies:
@@ -1130,7 +1133,7 @@ packages:
     dependencies:
       '@babel/core': 7.23.9
       '@babel/helper-module-transforms': 7.23.3(@babel/core@7.23.9)
-      '@babel/helper-plugin-utils': 7.22.5
+      '@babel/helper-plugin-utils': 7.24.0
       '@babel/helper-simple-access': 7.22.5
     dev: true
 

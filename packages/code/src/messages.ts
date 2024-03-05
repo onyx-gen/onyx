@@ -1,4 +1,5 @@
 import type {
+  ConfigurationPluginMessage,
   HtmlPluginMessage,
   PluginMessage,
   SelectedNode,
@@ -6,6 +7,7 @@ import type {
   UnselectedPluginMessage,
 } from '@onyx/types'
 import EventBus from './event-bus'
+import type { Configuration } from './config/types'
 
 /**
  * This function sends a message to the Figma UI when no node is selected.
@@ -41,6 +43,11 @@ export function sendSelectedMessage(nodes: SelectedNode[] | null): void {
  */
 export function sendHtmlMessage(html: string): void {
   const pluginMessage: HtmlPluginMessage = { event: 'html', data: { html } }
+  figma.ui.postMessage(pluginMessage)
+}
+
+export function sendConfigurationMessage(configuration: Configuration) {
+  const pluginMessage: ConfigurationPluginMessage = { event: 'configuration', data: { configuration } }
   figma.ui.postMessage(pluginMessage)
 }
 

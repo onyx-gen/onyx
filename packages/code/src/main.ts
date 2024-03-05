@@ -1,6 +1,6 @@
 import generate from './generate'
-import config from './config/config'
-import { PluginMessages } from './messages'
+import { PluginMessages, sendConfigurationMessage } from './messages'
+import { loadConfig, updateConfig } from './config/config'
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 figma.skipInvisibleInstanceChildren = true
@@ -15,30 +15,36 @@ figma.skipInvisibleInstanceChildren = true
  */
 figma.showUI(__html__, { themeColors: true })
 
-// Generate HTML code when the plugin is opened
-generate()
+loadConfig()
+  .then(async (loadedConfig) => {
+    console.log('[Code] Config loaded from figma client storage', loadedConfig)
 
-// Generate HTML code when the selection changes
-figma.on('selectionchange', generate)
+    sendConfigurationMessage(loadedConfig)
+
+    // Generate HTML code when the plugin is opened
+    await generate()
+
+    // Generate HTML code when the selection changes
+    figma.on('selectionchange', generate)
+  })
+  .catch((error) => {
+    console.error('error loading config', error)
+  })
 
 PluginMessages.on('mode-changed', async ({ mode }) => {
-  config.mode = mode
-  await generate()
+  updateConfig({ mode }).then(generate)
 })
 
 PluginMessages.on('nearest-changed', async ({ nearestColor }) => {
-  config.nearestInference = nearestColor
-  await generate()
+  updateConfig({ nearestInference: nearestColor }).then(generate)
 })
 
 PluginMessages.on('variant-group-changed', async ({ variantGroup }) => {
-  config.variantGroup = variantGroup
-  await generate()
+  updateConfig({ variantGroup }).then(generate)
 })
 
 PluginMessages.on('unit-changed', async ({ unit }) => {
-  config.unit = unit
-  await generate()
+  updateConfig({ unit }).then(generate)
 })
 
 PluginMessages.on('notification', ({ message }) => {
