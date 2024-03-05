@@ -20,4 +20,9 @@ export default defineConfig({
   transformers: [
     transformerVariantGroup(),
   ],
+  theme: {
+    fontFamily: {
+      sans: ['Inter', 'sans-serif'],
+    },
+  },
 })

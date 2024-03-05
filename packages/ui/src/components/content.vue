@@ -20,7 +20,7 @@ const { selectedNodes, hasSelection } = toRefs(useCode())
     </div>
 
     <div class="border-b border-color-$figma-color-border mb-4">
-      <Layout class="mb-4 flex gap-4">
+      <Layout class="mb-4">
         <Configuration />
       </Layout>
     </div>
@@ -39,7 +39,7 @@ const { selectedNodes, hasSelection } = toRefs(useCode())
       <div
         class="bg-$figma-color-bg-secondary w-max divide-y divide-[#4c4c4c] rounded-sm overflow-hidden"
       >
-        <div class="px-3 py-2 color-$figma-color-text-secondary my-font">
+        <div class="px-3 py-2 color-$figma-color-text-secondary font-sans text-xs font-medium">
           Please select a node!
         </div>
       </div>

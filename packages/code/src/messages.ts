@@ -1,4 +1,5 @@
 import type {
+  Configuration,
   ConfigurationPluginMessage,
   HtmlPluginMessage,
   PluginMessage,
@@ -7,7 +8,6 @@ import type {
   UnselectedPluginMessage,
 } from '@onyx/types'
 import EventBus from './event-bus'
-import type { Configuration } from './config/types'
 
 /**
  * This function sends a message to the Figma UI when no node is selected.

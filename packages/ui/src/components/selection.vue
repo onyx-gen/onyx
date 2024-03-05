@@ -58,7 +58,7 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
 
 <template>
   <div class="pt-4 space-y-4">
-    <div class="my-font font-semibold color-$figma-color-text">
+    <div class="font-sans text-xs font-semibold color-$figma-color-text">
       Selected Nodes
     </div>
 
@@ -69,7 +69,7 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
           <th
             v-for="state in states"
             :key="state"
-            class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
+            class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary font-sans text-xs font-medium"
           >
             {{ state }}
           </th>
@@ -87,7 +87,7 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
           >
             <th
               v-if="idx === 0"
-              class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font"
+              class="p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary font-sans text-xs font-medium"
               :rowspan="permutationMapping[permutationKey].size"
             >
               {{ permutationKey }}
@@ -95,7 +95,7 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
             <td
               v-for="state in states"
               :key="state"
-              class="opacity-0 p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary my-font space-y-1"
+              class="opacity-0 p-2 rounded-sm bg-$figma-color-bg-secondary color-$figma-color-text-secondary font-sans text-xs font-medium space-y-1"
               :class="{
                 'opacity-100': !!getPermutationNode(permutationKey, permutationValue, state),
               }"
@@ -119,7 +119,7 @@ function getPermutationNode(permutationKey: string, permutationValue: string, st
                 <span class="font-normal">Variant</span>
               </div>
 
-              <table class="border-separate border-spacing-x-1 text-left my-font -mx-1">
+              <table class="border-separate border-spacing-x-1 text-left font-sans text-xs font-medium -mx-1">
                 <tr
                   v-for="(value, key) in getPermutationNode(permutationKey, permutationValue, state)?.props"
                   :key="key"

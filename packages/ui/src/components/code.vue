@@ -32,7 +32,7 @@ function onCopy() {
     class="code-container flex flex-col w-full max-h-full bg-$figma-color-bg-secondary divide-y divide-$divider-color-code rounded-sm overflow-hidden"
   >
     <div class="flex justify-between items-center px-3 py-2 color-$figma-color-text-secondary">
-      <span class="my-font">
+      <span class="font-sans text-xs font-medium">
         Generated Code
       </span>
 

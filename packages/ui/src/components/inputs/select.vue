@@ -37,7 +37,7 @@ const model = defineModel<string>()
           hover:border-color-$figma-color-border
         "
       >
-        <span class="inline-block truncate color-$figma-color-text my-font">{{ options.find(option => option.value === model)?.label }}</span>
+        <span class="inline-block truncate color-$figma-color-text font-sans font-400 text-xs">{{ options.find(option => option.value === model)?.label }}</span>
         <span
           class="pointer-events-none flex items-center"
         >
@@ -66,7 +66,7 @@ const model = defineModel<string>()
                 'bg-$figma-color-bg-success': active,
               }"
             >
-              <span class="block truncate my-font color-$figma-color-text-oncomponent">{{ option.label }}</span>
+              <span class="block truncate font-sans text-xs font-400 color-$figma-color-text-oncomponent">{{ option.label }}</span>
               <span
                 v-if="selected"
                 class="absolute inset-y-0 left-0 flex items-center pl-2"

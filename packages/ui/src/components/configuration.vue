@@ -28,39 +28,37 @@ const options: SelectOption[] = [
 </script>
 
 <template>
-  <div>
-    <h2 class="my-font font-semibold color-$figma-color-text">
-      Mode
-    </h2>
+  <div class="font-sans text-xs font-semibold color-$figma-color-text flex gap-4">
+    <div>
+      <h2>
+        Mode
+      </h2>
 
-    <Select v-model="configuration.mode" :options="options" />
-  </div>
+      <Select v-model="configuration.mode" :options="options" />
+    </div>
 
-  <div>
-    <h2 class="my-font font-semibold color-$figma-color-text">
-      Nearest Inference
-    </h2>
+    <div>
+      <h2>
+        Nearest Inference
+      </h2>
 
-    <Switch v-model="configuration.nearestInference" class="mt-2" />
-  </div>
+      <Switch v-model="configuration.nearestInference" class="mt-2" />
+    </div>
 
-  <div>
-    <h2 class="my-font font-semibold color-$figma-color-text">
-      Variant Group
-    </h2>
+    <div>
+      <h2>
+        Variant Group
+      </h2>
 
-    <Switch v-model="configuration.variantGroup" class="mt-2" />
-  </div>
+      <Switch v-model="configuration.variantGroup" class="mt-2" />
+    </div>
 
-  <div>
-    <h2 class="my-font font-semibold color-$figma-color-text">
-      Unit (rem/px)
-    </h2>
+    <div>
+      <h2>
+        Unit (rem/px)
+      </h2>
 
-    <Switch v-model="isRem" class="mt-2" />
+      <Switch v-model="isRem" class="mt-2" />
+    </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>
