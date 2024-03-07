@@ -130,7 +130,6 @@ class FigmaNodeParser {
    * @returns {TreeNode} The generated tree node for the text.
    */
   private createTextNode(node: TextNode, css: Set<string>): TreeNode {
-    console.log('Creating text node', node.characters, css)
     const parentNodeData: ContainerNodeData = {
       type: 'container',
       css: { [this.variant]: { css: [css] } },
