@@ -28,6 +28,9 @@ class Builder {
     if (Builder.isAutoLayoutMixin(node))
       this.buildAutoLayout(node)
 
+    if (Builder.isNonResizableTextMixin(node))
+      this.buildNonResizableTextMixin(node)
+
     return this.attributes
   }
 
@@ -62,6 +65,10 @@ class Builder {
 
   private static isMinimalStrokesMixin(node: SceneNode): node is SceneNode & MinimalStrokesMixin {
     return 'strokes' in node
+  }
+
+  private static isNonResizableTextMixin(node: SceneNode): node is SceneNode & NonResizableTextMixin {
+    return 'fontName' in node && 'fontSize' in node && 'letterSpacing' in node && 'lineHeight' in node
   }
 
   private static isCornerMixin(node: SceneNode): node is SceneNode & CornerMixin {
@@ -289,6 +296,88 @@ class Builder {
       this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(dimensionHandler(rectSides.bottom))}`)
     if (rectSides.left !== null && !axisXEqual)
       this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(dimensionHandler(rectSides.left))}`)
+  }
+
+  private buildNonResizableTextMixin(node: SceneNode & NonResizableTextMixin) {
+    const {
+      fontName,
+      fontSize,
+      letterSpacing,
+      lineHeight,
+    } = node
+
+    if (fontName === figma.mixed) {
+      console.error('[Builder] Mixed font names are not supported yet.')
+    }
+    else {
+      // TODO
+    }
+
+    if (fontSize === figma.mixed) {
+      console.error('[Builder] Mixed font sizes are not supported yet.')
+    }
+    else {
+      console.log('this.config.nearestInference', this.config.nearestInference)
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.fontSizes,
+        'text',
+        fontSize,
+        createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
+        this.config.mode,
+      )
+
+      this.attributes.add(utilityClass)
+    }
+
+    if (letterSpacing === figma.mixed) {
+      console.error('[Builder] Mixed letter spacings are not supported yet.')
+    }
+    else {
+      if (letterSpacing.unit === 'PIXELS') {
+        const space = letterSpacing.value
+
+        const utilityClass = getUtilityClass(
+          node,
+          'generic',
+          Properties.letterSpacing,
+          'tracking',
+          space,
+          createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
+          this.config.mode,
+        )
+
+        this.attributes.add(utilityClass)
+      }
+      else {
+        console.error('[Builder] Only pixel letter spacings are supported yet.')
+      }
+    }
+
+    if (lineHeight === figma.mixed) {
+      console.error('[Builder] Mixed line heights are not supported yet.')
+    }
+    else {
+      if (lineHeight.unit === 'PIXELS') {
+        const value = lineHeight.value
+
+        const utilityClass = getUtilityClass(
+          node,
+          'generic',
+          Properties.letterSpacing,
+          'leading',
+          value,
+          createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
+          this.config.mode,
+        )
+
+        this.attributes.add(utilityClass)
+      }
+      else {
+        console.error('[Builder] Only pixel line heights are supported yet.')
+      }
+    }
   }
 
   private buildMinimalFillsMixin(node: SceneNode & MinimalFillsMixin) {
