@@ -10,7 +10,7 @@ export interface ComponentProps {
 
 export type HEX = string
 
-export interface Configuration {
+export interface IConfiguration {
   mode: Mode
   unit: Unit
   variantGroup: boolean

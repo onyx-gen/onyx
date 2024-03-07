@@ -2,13 +2,17 @@ import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, T
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
 import Builder from '../builder/builder'
+import type { Configuration } from '../config/config'
 
 /**
  * Class to generate a abstract tree structure from a Figma node.
  * The tree structure is used to generate HTML code.
  */
 class FigmaNodeParser {
-  constructor(private readonly variantPermutation: VariantPermutation = { default: 'default' }) {}
+  constructor(
+    private readonly variantPermutation: VariantPermutation = { default: 'default' },
+    private readonly config: Configuration,
+  ) {}
 
   /**
    * Returns the unique variant key based on the current permutation.
@@ -56,8 +60,7 @@ class FigmaNodeParser {
       const mainComponent = await node.getMainComponentAsync()
       const iconName = mainComponent?.name
 
-      // const builder = new UnocssBuilder(node)
-      const builder = new Builder()
+      const builder = new Builder(this.config)
       const css = builder.build(node)
 
       if (!iconName)
@@ -106,8 +109,7 @@ class FigmaNodeParser {
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
   private async parseNode(node: SceneNode): Promise<TreeNode | null> {
-    // const builder = new UnocssBuilder(node)
-    const builder = new Builder()
+    const builder = new Builder(this.config)
     const css = builder.build(node)
 
     const hasChildren = 'children' in node && node.children.length > 0
@@ -128,6 +130,7 @@ class FigmaNodeParser {
    * @returns {TreeNode} The generated tree node for the text.
    */
   private createTextNode(node: TextNode, css: Set<string>): TreeNode {
+    console.log('Creating text node', node.characters, css)
     const parentNodeData: ContainerNodeData = {
       type: 'container',
       css: { [this.variant]: { css: [css] } },

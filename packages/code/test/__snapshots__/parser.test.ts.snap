@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`parsers > should parse a file 1`] = `
+{
+  "children": [],
+  "data": {
+    "css": {
+      "default-default": {
+        "css": [
+          Set {
+            "bg-light-50",
+          },
+        ],
+      },
+    },
+    "type": "container",
+  },
+}
+`;

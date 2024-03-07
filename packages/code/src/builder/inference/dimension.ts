@@ -1,20 +1,31 @@
+import type { Unit } from '@onyx/types'
 import type { InferenceDimensionMap } from '../../config/dimension'
-import config, { lookups } from '../../config/config'
 import type { GenericUtilityValue } from '../types'
 
 const nearestDimensionCache = new Map<number, string>()
 
-export function createDimensionHandler(dimensionMap: InferenceDimensionMap): (widthOrHeight: number) => GenericUtilityValue {
-  return (widthOrHeight: number) => getInferredDimension(widthOrHeight, dimensionMap)
+export function createDimensionHandler(
+  dimensionMap: InferenceDimensionMap,
+  nearestInference: boolean,
+  unit: Unit,
+): (widthOrHeight: number) => GenericUtilityValue {
+  return (widthOrHeight: number) => getInferredDimension(widthOrHeight, dimensionMap, nearestInference, unit)
 }
 
 /**
  * Gets the inferred dimension based on the provided width or height value.
  * @param {number} widthOrHeight - The width or height value.
- * @param dimensionMap
+ * @param {InferenceDimensionMap} dimensionMap - The dimension map to use for inference.
+ * @param {boolean} nearestInference - Whether to use the nearest inference or not.
+ * @param {Unit} unit - The unit to use for the inferred dimension.
  * @return {GenericUtilityValue} - The inferred dimension object.
  */
-export function getInferredDimension(widthOrHeight: number, dimensionMap = lookups.dimensions): GenericUtilityValue {
+export function getInferredDimension(
+  widthOrHeight: number,
+  dimensionMap: InferenceDimensionMap,
+  nearestInference: boolean,
+  unit: Unit,
+): GenericUtilityValue {
   const themeDimension: string | undefined = dimensionMap[widthOrHeight]?.[0]
   if (themeDimension) {
     return {
@@ -24,7 +35,7 @@ export function getInferredDimension(widthOrHeight: number, dimensionMap = looku
     }
   }
 
-  if (config.nearestInference) {
+  if (nearestInference) {
     const nearestDimension = findNearestDimension(widthOrHeight, dimensionMap)
     return {
       mode: 'inferred',
@@ -33,7 +44,7 @@ export function getInferredDimension(widthOrHeight: number, dimensionMap = looku
     }
   }
 
-  if (config.unit === 'rem') {
+  if (unit === 'rem') {
     return {
       mode: 'arbitrary',
       type: 'generic',

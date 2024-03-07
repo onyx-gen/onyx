@@ -1,11 +1,21 @@
 import type { InferenceColorMap } from '../../config/color'
 import type { ColorUtilityValue } from '../types'
 import { rgbToHex } from '../utils'
-import config, { lookups } from '../../config/config'
 
 const nearestColorCache = new Map<string, string>()
 
-export function getInferredSolidColor(paint: SolidPaint): ColorUtilityValue {
+export function createColorHandler(
+  colorMap: InferenceColorMap,
+  nearestInference: boolean,
+): (paint: SolidPaint) => ColorUtilityValue {
+  return (paint: SolidPaint) => getInferredSolidColor(paint, colorMap, nearestInference)
+}
+
+export function getInferredSolidColor(
+  paint: SolidPaint,
+  colorsLookup: InferenceColorMap,
+  nearestInference: boolean,
+): ColorUtilityValue {
   const color = rgbToHex(
     Math.floor(paint.color.r * 256),
     Math.floor(paint.color.g * 256),
@@ -14,7 +24,7 @@ export function getInferredSolidColor(paint: SolidPaint): ColorUtilityValue {
 
   const opacity = paint.opacity ? paint.opacity * 100 : undefined
 
-  const themeColor: string | undefined = lookups.colors[color]?.[0]
+  const themeColor: string | undefined = colorsLookup[color]?.[0]
   if (themeColor) {
     return {
       mode: 'inferred',
@@ -24,8 +34,8 @@ export function getInferredSolidColor(paint: SolidPaint): ColorUtilityValue {
     }
   }
 
-  if (config.nearestInference) {
-    const closestColor = findNearestColor(paint.color, lookups.colors)
+  if (nearestInference) {
+    const closestColor = findNearestColor(paint.color, colorsLookup)
     return {
       mode: 'inferred',
       type: 'color',

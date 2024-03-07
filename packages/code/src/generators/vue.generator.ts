@@ -1,6 +1,7 @@
 import type { VariantPermutation } from '../set/types'
 import type { TreeNode } from '../interfaces'
 import { createIndent } from '../utils'
+import type { Configuration } from '../config/config'
 import HTMLGenerator from './html.generator'
 import ScriptSetupGenerator from './script-setup.generator'
 import type { ComputedProperties, PermutationKey, PermutationUnionType, PermutationValue } from './types'
@@ -16,6 +17,7 @@ class VueGenerator {
   constructor(
     private readonly permutations: VariantPermutation[],
     private readonly treeNode: TreeNode | null,
+    config: Configuration,
   ) {
     const permutationCollection: {
       [key: PermutationKey]: Set<PermutationValue>
@@ -25,7 +27,7 @@ class VueGenerator {
     const types: { [key: PermutationKey]: PermutationUnionType } = this.generateUnionTypes(permutationCollection)
 
     this.scriptSetupGenerator = new ScriptSetupGenerator(permutations, computedProperties, types)
-    this.htmlGenerator = new HTMLGenerator(permutations, computedProperties)
+    this.htmlGenerator = new HTMLGenerator(permutations, computedProperties, config)
   }
 
   /**

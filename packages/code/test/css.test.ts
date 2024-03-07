@@ -82,7 +82,7 @@ describe('css', () => {
         secondary: 'bg-gray-300',
       }
 
-      expect(translateContainerNodeCSSData(data)).toEqual(translated)
+      expect(translateContainerNodeCSSData(data, true)).toEqual(translated)
     })
 
     it('ignores empty variant CSS data', () => {
@@ -99,7 +99,7 @@ describe('css', () => {
         primary: 'bg-red',
       }
 
-      expect(translateContainerNodeCSSData(data)).toStrictEqual(translated)
+      expect(translateContainerNodeCSSData(data, true)).toStrictEqual(translated)
     })
   })
 

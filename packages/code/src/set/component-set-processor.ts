@@ -6,6 +6,8 @@ import VariantTreeMerger from '../merge/variant/variant-tree-merger'
 import CssTraverser from '../traverser/css.traverser'
 import VueGenerator from '../generators/vue.generator'
 import { variantKey } from '../merge/utils'
+import type { Configuration } from '../config/config'
+import { getComponentProperties, groupComponentsByProp } from './utils'
 import type {
   ComponentCollection,
   ComponentPropsWithState,
@@ -15,7 +17,6 @@ import type {
   VariantTree,
   VariantTrees,
 } from './types'
-import { getComponentProperties, groupComponentsByProp } from './utils'
 
 /**
  * A class that processes a component set or multiple selected components.
@@ -23,6 +24,11 @@ import { getComponentProperties, groupComponentsByProp } from './utils'
  * generating code from the given set of components.
  */
 class ComponentSetProcessor {
+  /**
+   * Constructs an instance of ComponentSetProcessor.
+   */
+  constructor(private readonly config: Configuration) {}
+
   public async process(data: ComponentSetNode | SceneNode[]): Promise<string> {
     const nodes = Array.isArray(data) ? data : [...data.children]
 
@@ -38,6 +44,8 @@ class ComponentSetProcessor {
   ): Promise<string> {
     if (permutations.length === 0)
       throw new Error('Handling of components without permutations is not possible.')
+
+    console.log('permutations', printObject(permutations))
 
     const variantTreesPromises: Promise<VariantTree>[] = permutations.map(async (permutation) => {
       const stateMergedTree = await this.processPermutation(permutation, componentCollectionGroupedByState)
@@ -66,7 +74,7 @@ class ComponentSetProcessor {
       ),
     )
 
-    const vueGenerator = new VueGenerator(filteredPermutations, componentSetTree)
+    const vueGenerator = new VueGenerator(filteredPermutations, componentSetTree, this.config)
     return vueGenerator.generate()
   }
 
@@ -94,6 +102,8 @@ class ComponentSetProcessor {
       componentCollectionWithState = this.filterComponentsWithState(componentCollection)
     }
 
+    console.log('componentCollectionWithState', componentCollectionWithState)
+
     const componentCollectionGroupedByState = groupComponentsByProp(componentCollectionWithState, 'state')
 
     const componentCollectionGroupedByStateWithDefaultVariantIfNecessary: typeof componentCollectionGroupedByState = Object.fromEntries(
@@ -112,6 +122,8 @@ class ComponentSetProcessor {
         },
       ),
     )
+
+    console.log('componentCollectionGroupedByStateWithDefaultVariantIfNecessary', componentCollectionGroupedByStateWithDefaultVariantIfNecessary)
 
     const uniquePropertiesGroupedByPropName = this.getUniquePropertiesGroupedByPropName(componentCollectionGroupedByStateWithDefaultVariantIfNecessary)
     const permutations: VariantPermutation[] = this.generatePropertyPermutations(uniquePropertiesGroupedByPropName)
@@ -310,7 +322,7 @@ class ComponentSetProcessor {
     const processedEntriesPromises = allEntries
       .filter(([, component]) => component !== undefined)
       .map(async ([state, component]) => {
-        const figmaNodeParser = new FigmaNodeParser(permutation)
+        const figmaNodeParser = new FigmaNodeParser(permutation, this.config)
         const parsedComponent = await figmaNodeParser.parse(component!)
         return [state, parsedComponent]
       })

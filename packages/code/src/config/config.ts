@@ -1,31 +1,10 @@
-import { theme } from '@unocss/preset-mini'
 import { defu } from 'defu'
-import type { Configuration } from '@onyx/types'
+import type { IConfiguration } from '@onyx/types'
+import { theme } from '@unocss/preset-mini'
 import type { InferenceColorMap } from './color'
 import { createColorLookup } from './color'
 import type { InferenceDimensionMap } from './dimension'
-import { createDimensionLookup, createDimensionLookupPx } from './dimension'
-
-const defaultConfig: Configuration = {
-  mode: 'variables',
-  unit: 'px',
-  variantGroup: true,
-  nearestInference: true,
-  theme,
-}
-
-let config!: Configuration
-
-export async function loadConfig(loadFromClientStorage = true): Promise<Configuration> {
-  const savedConfig: Partial<Configuration> | undefined = loadFromClientStorage ? await figma.clientStorage.getAsync('config') : undefined
-  config = defu({}, savedConfig, defaultConfig) // Adjust as necessary
-  return config
-}
-
-export async function updateConfig(newConfig: Partial<Configuration>): Promise<void> {
-  config = defu(newConfig, config)
-  await figma.clientStorage.setAsync('config', config)
-}
+import { createDimensionLookup } from './dimension'
 
 interface LookupCache {
   color: InferenceColorMap | null
@@ -33,42 +12,63 @@ interface LookupCache {
   borderDimensions: InferenceDimensionMap | null
 }
 
-const lookupCache: LookupCache = {
-  color: null,
-  dimensions: null,
-  borderDimensions: null,
+const defaultConfig: IConfiguration = {
+  mode: 'variables',
+  unit: 'px',
+  variantGroup: true,
+  nearestInference: true,
+  theme,
 }
 
-export const lookups = {
-  get colors() {
-    if (lookupCache.color)
-      return lookupCache.color
+export class Configuration implements IConfiguration {
+  public mode: IConfiguration['mode']
+  public unit: IConfiguration['unit']
+  public variantGroup: IConfiguration['variantGroup']
+  public nearestInference: IConfiguration['nearestInference']
+  public theme: IConfiguration['theme']
 
-    const lookup = createColorLookup(config.theme.colors || {})
-    lookupCache.color = lookup
+  public readonly config: IConfiguration
+
+  private lookupCache: LookupCache = {
+    color: null,
+    dimensions: null,
+    borderDimensions: null,
+  }
+
+  constructor(
+    config: Partial<IConfiguration> | undefined,
+    ..._defaults: (IConfiguration | undefined)[]
+  ) {
+    const defaults: IConfiguration[] = _defaults.filter(c => !!c) as IConfiguration[]
+    if (config)
+      this.config = defu(config, ...defaults, defaultConfig) as IConfiguration
+    else
+      this.config = defu(defaults[0], ...defaults.slice(1), defaultConfig) as IConfiguration
+
+    this.mode = this.config.mode
+    this.unit = this.config.unit
+    this.variantGroup = this.config.variantGroup
+    this.nearestInference = this.config.nearestInference
+    this.theme = this.config.theme
+  }
+
+  public get colorLookup(): InferenceColorMap {
+    if (this.lookupCache.color)
+      return this.lookupCache.color
+
+    const lookup = createColorLookup(this.theme.colors || {})
+    this.lookupCache.color = lookup
 
     return lookup
-  },
+  }
 
-  get dimensions() {
-    if (lookupCache.dimensions)
-      return lookupCache.dimensions
+  public get dimensionsLookup(): InferenceDimensionMap {
+    if (this.lookupCache.dimensions)
+      return this.lookupCache.dimensions
 
-    const lookup = createDimensionLookup(config.theme.spacing || {})
-    lookupCache.dimensions = lookup
-
-    return lookup
-  },
-
-  get borderDimensions() {
-    if (lookupCache.borderDimensions)
-      return lookupCache.borderDimensions
-
-    const lookup = createDimensionLookupPx()
-    lookupCache.borderDimensions = lookup
+    const lookup = createDimensionLookup(this.theme.spacing || {})
+    this.lookupCache.dimensions = lookup
 
     return lookup
-  },
+  }
 }
-
-export default config

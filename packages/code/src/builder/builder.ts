@@ -1,14 +1,15 @@
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
-import { lookups } from '../config/config'
-import type { InferenceDimensionMap } from '../config/dimension'
+import type { Configuration } from '../config/config'
 import type { RectCornersNew, RectSidesNew } from './types'
-import { getInferredSolidColor } from './inference/color'
+import { createColorHandler } from './inference/color'
 import AutoLayoutBuilder from './auto-layout-builder'
 import { getUtilityClass, translateUtilityValue } from './inference/utility'
-import { createDimensionHandler, getInferredDimension } from './inference/dimension'
+import { createDimensionHandler } from './inference/dimension'
 
 class Builder {
+  constructor(private readonly config: Configuration) {}
+
   private attributes: Set<string> = new Set()
 
   public build(node: SceneNode) {
@@ -36,12 +37,12 @@ class Builder {
     const tokens = getAppliedTokens(node)
 
     if (node.layoutMode !== 'NONE')
-      autoLayoutBuilder = new AutoLayoutBuilder(node, node, tokens)
+      autoLayoutBuilder = new AutoLayoutBuilder(node, node, tokens, this.config)
 
     // User has not explicitly set auto-layout, but Figma has inferred auto-layout
     // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
     else if ('inferredAutoLayout' in node && node.inferredAutoLayout !== null)
-      autoLayoutBuilder = new AutoLayoutBuilder(node, node.inferredAutoLayout, tokens)
+      autoLayoutBuilder = new AutoLayoutBuilder(node, node.inferredAutoLayout, tokens, this.config)
 
     if (autoLayoutBuilder)
       autoLayoutBuilder.build().forEach(css => this.attributes.add(css))
@@ -78,8 +79,10 @@ class Builder {
     const cornerRadius = node.cornerRadius
 
     if (cornerRadius !== figma.mixed) {
-      if (cornerRadius !== 0)
-        this.attributes.add(`rounded-${translateUtilityValue(getInferredDimension(cornerRadius))}`)
+      if (cornerRadius !== 0) {
+        const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+        this.attributes.add(`rounded-${translateUtilityValue(dimensionHandler(cornerRadius))}`)
+      }
     }
     else if (Builder.isRectangleCornerMixin(node)) {
       const {
@@ -115,8 +118,10 @@ class Builder {
       && rectCorners.topRight === rectCorners.bottomLeft
       && rectCorners.bottomLeft === rectCorners.bottomRight
 
+    const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
     if (allCornersEqual) {
-      this.attributes.add(`${attributePrefix}-${translateUtilityValue(getInferredDimension(rectCorners.topLeft!))}`)
+      this.attributes.add(`${attributePrefix}-${translateUtilityValue(dimensionHandler(rectCorners.topLeft!))}`)
       return
     }
 
@@ -130,25 +135,25 @@ class Builder {
       && rectCorners.topRight === rectCorners.bottomRight
 
     if (hasTopCornersEqual)
-      this.attributes.add(`${attributePrefix}-t-${translateUtilityValue(getInferredDimension(rectCorners.topLeft!))}`)
+      this.attributes.add(`${attributePrefix}-t-${translateUtilityValue(dimensionHandler(rectCorners.topLeft!))}`)
     if (hasBottomCornersEqual)
-      this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(getInferredDimension(rectCorners.bottomLeft!))}`)
+      this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(dimensionHandler(rectCorners.bottomLeft!))}`)
     if (hasLeftCornersEqual)
-      this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(getInferredDimension(rectCorners.topLeft!))}`)
+      this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(dimensionHandler(rectCorners.topLeft!))}`)
     if (hasRightCornersEqual)
-      this.attributes.add(`${attributePrefix}-r-${translateUtilityValue(getInferredDimension(rectCorners.topRight!))}`)
+      this.attributes.add(`${attributePrefix}-r-${translateUtilityValue(dimensionHandler(rectCorners.topRight!))}`)
 
     if (hasTopCornersEqual && hasBottomCornersEqual && hasLeftCornersEqual && hasRightCornersEqual)
       return
 
     if (rectCorners.topLeft !== null && !hasTopCornersEqual && !hasLeftCornersEqual)
-      this.attributes.add(`${attributePrefix}-tl-${translateUtilityValue(getInferredDimension(rectCorners.topLeft))}`)
+      this.attributes.add(`${attributePrefix}-tl-${translateUtilityValue(dimensionHandler(rectCorners.topLeft))}`)
     if (rectCorners.topRight !== null && !hasTopCornersEqual && !hasRightCornersEqual)
-      this.attributes.add(`${attributePrefix}-tr-${translateUtilityValue(getInferredDimension(rectCorners.topRight))}`)
+      this.attributes.add(`${attributePrefix}-tr-${translateUtilityValue(dimensionHandler(rectCorners.topRight))}`)
     if (rectCorners.bottomLeft !== null && !hasBottomCornersEqual && !hasLeftCornersEqual)
-      this.attributes.add(`${attributePrefix}-bl-${translateUtilityValue(getInferredDimension(rectCorners.bottomLeft))}`)
+      this.attributes.add(`${attributePrefix}-bl-${translateUtilityValue(dimensionHandler(rectCorners.bottomLeft))}`)
     if (rectCorners.bottomRight !== null && !hasBottomCornersEqual && !hasRightCornersEqual)
-      this.attributes.add(`${attributePrefix}-br-${translateUtilityValue(getInferredDimension(rectCorners.bottomRight))}`)
+      this.attributes.add(`${attributePrefix}-br-${translateUtilityValue(dimensionHandler(rectCorners.bottomRight))}`)
   }
 
   private buildDimensionAndPositionMixin(node: SceneNode & DimensionAndPositionMixin) {
@@ -161,20 +166,22 @@ class Builder {
       maxHeight,
     } = node
 
-    this.attributes.add(`w-${translateUtilityValue(getInferredDimension(width))}`)
-    this.attributes.add(`h-${translateUtilityValue(getInferredDimension(height))}`)
+    const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
+    this.attributes.add(`w-${translateUtilityValue(dimensionHandler(width))}`)
+    this.attributes.add(`h-${translateUtilityValue(dimensionHandler(height))}`)
 
     if (minWidth)
-      this.attributes.add(`min-w-${translateUtilityValue(getInferredDimension(minWidth))}`)
+      this.attributes.add(`min-w-${translateUtilityValue(dimensionHandler(minWidth))}`)
 
     if (minHeight)
-      this.attributes.add(`min-h-${translateUtilityValue(getInferredDimension(minHeight))}`)
+      this.attributes.add(`min-h-${translateUtilityValue(dimensionHandler(minHeight))}`)
 
     if (maxWidth)
-      this.attributes.add(`max-w-${translateUtilityValue(getInferredDimension(maxWidth))}`)
+      this.attributes.add(`max-w-${translateUtilityValue(dimensionHandler(maxWidth))}`)
 
     if (maxHeight)
-      this.attributes.add(`max-h-${translateUtilityValue(getInferredDimension(maxHeight))}`)
+      this.attributes.add(`max-h-${translateUtilityValue(dimensionHandler(maxHeight))}`)
   }
 
   private buildMinimalStrokesMixin(node: SceneNode & MinimalStrokesMixin) {
@@ -187,13 +194,16 @@ class Builder {
       if (strokes.length === 1) {
         const stroke: Paint = strokes[0]
         if (stroke.type === 'SOLID') {
+          const colorHandler = createColorHandler(this.config.colorLookup, this.config.nearestInference)
+
           const utilityClass = getUtilityClass(
             node,
             'color',
             Properties.borderColor,
             'border-color',
             stroke,
-            getInferredSolidColor,
+            colorHandler,
+            this.config.mode,
           )
           this.attributes.add(utilityClass)
         }
@@ -204,13 +214,16 @@ class Builder {
       }
 
       if (strokeWeight !== figma.mixed) {
+        const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
         const utilityClass = getUtilityClass(
           node,
           'generic',
           Properties.borderWidth,
           'border',
           strokeWeight,
-          createDimensionHandler(lookups.borderDimensions),
+          dimensionHandler,
+          this.config.mode,
         )
 
         this.attributes.add(utilityClass)
@@ -230,7 +243,7 @@ class Builder {
           right: strokeRightWeight || null,
         }
 
-        this.handleRectSidesAttribute(rectSides, 'border', lookups.borderDimensions)
+        this.handleRectSidesAttribute(rectSides, 'border')
       }
     }
   }
@@ -240,17 +253,18 @@ class Builder {
    * It generates CSS classes based on the uniformity and equality of the rectangular sides.
    * @param rectSides The object containing values for each side of the rectangle.
    * @param attributePrefix The prefix to use for the CSS class.
-   * @param inferenceDimensionMap The dimension map to use for inferring the dimension.
    */
-  private handleRectSidesAttribute(rectSides: RectSidesNew, attributePrefix: string, inferenceDimensionMap: InferenceDimensionMap) {
+  private handleRectSidesAttribute(rectSides: RectSidesNew, attributePrefix: string) {
     // Check if all sides are the same
     const allSidesEqual = rectSides.top !== null
       && rectSides.top === rectSides.bottom
       && rectSides.bottom === rectSides.left
       && rectSides.left === rectSides.right
 
+    const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
     if (allSidesEqual) {
-      this.attributes.add(`${attributePrefix}-${translateUtilityValue(getInferredDimension(rectSides.top!, inferenceDimensionMap))}`)
+      this.attributes.add(`${attributePrefix}-${translateUtilityValue(dimensionHandler(rectSides.top!))}`)
       return
     }
 
@@ -259,22 +273,22 @@ class Builder {
     const axisYEqual = rectSides.top !== null && rectSides.top === rectSides.bottom
 
     if (axisXEqual)
-      this.attributes.add(`${attributePrefix}-x-${translateUtilityValue(getInferredDimension(rectSides.left!, inferenceDimensionMap))}`)
+      this.attributes.add(`${attributePrefix}-x-${translateUtilityValue(dimensionHandler(rectSides.left!))}`)
     if (axisYEqual)
-      this.attributes.add(`${attributePrefix}-y-${translateUtilityValue(getInferredDimension(rectSides.top!, inferenceDimensionMap))}`)
+      this.attributes.add(`${attributePrefix}-y-${translateUtilityValue(dimensionHandler(rectSides.top!))}`)
 
     if (axisXEqual && axisYEqual)
       return
 
     // Individual sides
     if (rectSides.top !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-t-${translateUtilityValue(getInferredDimension(rectSides.top, inferenceDimensionMap))}`)
+      this.attributes.add(`${attributePrefix}-t-${translateUtilityValue(dimensionHandler(rectSides.top))}`)
     if (rectSides.right !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-r-${translateUtilityValue(getInferredDimension(rectSides.right, inferenceDimensionMap))}`)
+      this.attributes.add(`${attributePrefix}-r-${translateUtilityValue(dimensionHandler(rectSides.right))}`)
     if (rectSides.bottom !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(getInferredDimension(rectSides.bottom, inferenceDimensionMap))}`)
+      this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(dimensionHandler(rectSides.bottom))}`)
     if (rectSides.left !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(getInferredDimension(rectSides.left, inferenceDimensionMap))}`)
+      this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(dimensionHandler(rectSides.left))}`)
   }
 
   private buildMinimalFillsMixin(node: SceneNode & MinimalFillsMixin) {
@@ -283,7 +297,17 @@ class Builder {
       if (fills.length === 1) {
         const fill = fills[0]
         if (fill.type === 'SOLID') {
-          const utilityClass = getUtilityClass(node, 'color', Properties.fill, 'bg', fill, getInferredSolidColor)
+          const colorHandler = createColorHandler(this.config.colorLookup, this.config.nearestInference)
+
+          const utilityClass = getUtilityClass(
+            node,
+            'color',
+            Properties.fill,
+            'bg',
+            fill,
+            colorHandler,
+            this.config.mode,
+          )
           this.attributes.add(utilityClass)
         }
         else { console.error('[Builder] Only solid fills are supported yet.') }

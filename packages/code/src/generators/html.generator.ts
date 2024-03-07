@@ -4,7 +4,7 @@ import { createIndent, entries } from '../utils'
 import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
-import config from '../config/config'
+import type { Configuration } from '../config/config'
 import { simplifyConditionalString, transformPropKey } from './utils'
 import type {
   Attributes,
@@ -25,6 +25,7 @@ class HTMLGenerator {
   constructor(
     private readonly permutations: VariantPermutation[] = [],
     private readonly computedProperties: ComputedProperties = {},
+    private readonly config: Configuration,
   ) {
     this.permutationMap = Object.fromEntries(
       this.permutations.map((permutation) => {
@@ -93,7 +94,7 @@ class HTMLGenerator {
       const defaultVariantCSS: VariantCSS | undefined = Object.values(tree.data.css)[0]
 
       if (defaultVariantCSS)
-        attrs.static = translateVariantCSS(defaultVariantCSS, config.variantGroup)
+        attrs.static = translateVariantCSS(defaultVariantCSS, this.config.variantGroup)
 
       // Remove empty top-level variant CSS entries
       // TODO: Optimization is incomplete as it does not remove recursively empty variant CSS entries
@@ -109,7 +110,7 @@ class HTMLGenerator {
       if (length > 1) {
         const clonedCSS = cloneDeep(tree.data.css)
         delete clonedCSS.default // TODO: We have a symbol for that
-        const translatedCSSData = translateContainerNodeCSSData(clonedCSS, config.variantGroup)
+        const translatedCSSData = translateContainerNodeCSSData(clonedCSS, this.config.variantGroup)
         attrs.dynamic = Object.fromEntries(
           Object.entries(translatedCSSData).map(([key, value]) => {
             const permutation: VariantPermutation | undefined = this.permutationMap[key]

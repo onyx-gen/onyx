@@ -1,6 +1,7 @@
 import type { DesignTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
-import { getInferredDimension } from './inference/dimension'
+import type { Configuration } from '../config/config'
+import { createDimensionHandler } from './inference/dimension'
 import { getUtilityClass } from './inference/utility'
 
 /**
@@ -16,11 +17,13 @@ class AutoLayoutBuilder {
    * @param node - The SceneNode for which the auto layout properties are inferred.
    * @param autoLayout - The inferred auto layout result of the node.
    * @param tokens - Design tokens used for styling.
+   * @param config - The configuration for the builder.
    */
   constructor(
     private readonly node: SceneNode,
     private readonly autoLayout: AutoLayoutMixin,
     private readonly tokens: DesignTokens,
+    private readonly config: Configuration,
   ) {}
 
   /**
@@ -77,13 +80,16 @@ class AutoLayoutBuilder {
     const hasGap = this.autoLayout.itemSpacing > 0 && this.autoLayout.primaryAxisAlignItems !== 'SPACE_BETWEEN'
 
     if (hasGap) {
+      const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
       return getUtilityClass(
         this.node,
         'generic',
         Properties.itemSpacing,
         'gap',
         this.autoLayout.itemSpacing,
-        getInferredDimension,
+        dimensionHandler,
+        this.config.mode,
       )
     }
 
@@ -99,13 +105,16 @@ class AutoLayoutBuilder {
     const hasHorizontalPadding = this.autoLayout.horizontalPadding > 0
 
     if (hasHorizontalPadding) {
+      const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
       return getUtilityClass(
         this.node,
         'generic',
         Properties.horizontalPadding,
         'px',
         this.autoLayout.horizontalPadding,
-        getInferredDimension,
+        dimensionHandler,
+        this.config.mode,
       )
     }
 
@@ -121,13 +130,16 @@ class AutoLayoutBuilder {
     const hasVerticalPadding = this.autoLayout.verticalPadding > 0
 
     if (hasVerticalPadding) {
+      const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
       return getUtilityClass(
         this.node,
         'generic',
         Properties.verticalPadding,
         'py',
         this.autoLayout.verticalPadding,
-        getInferredDimension,
+        dimensionHandler,
+        this.config.mode,
       )
     }
 

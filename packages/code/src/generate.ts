@@ -4,13 +4,14 @@ import { getSelectedNodes } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
 import { sendHtmlMessage, sendSelectedMessage, sendUnselectedMessage } from './messages'
 import { getComponentProperties } from './set/utils'
+import type { Configuration } from './config/config'
 
 /**
  * Generate HTML code for the selected Figma nodes.
  *
  * @returns A Promise that resolves to the generated HTML code as a string or void if no node is selected.
  */
-export default async function generate(): Promise<string | void> {
+export default async function generate(config: Configuration): Promise<string | void> {
   try {
     const nodes = getSelectedNodes()
 
@@ -20,16 +21,13 @@ export default async function generate(): Promise<string | void> {
       return
     }
 
-    const parser = new FigmaNodeParser()
-    const generator = new HTMLGenerator()
-
     let html = ''
 
     if (nodes.length === 1) {
       const node = nodes[0]
 
       if (node.type === 'COMPONENT_SET') {
-        const componentSetProcessor = new ComponentSetProcessor()
+        const componentSetProcessor = new ComponentSetProcessor(config)
 
         try {
           html = await componentSetProcessor.process(node)
@@ -40,9 +38,11 @@ export default async function generate(): Promise<string | void> {
         }
       }
       else {
+        const parser = new FigmaNodeParser({ default: 'default' }, config)
         const tree = await parser.parse(node)
 
         if (tree) {
+          const generator = new HTMLGenerator([], {}, config)
           html = generator.generate(tree)
         }
         else {
@@ -52,7 +52,7 @@ export default async function generate(): Promise<string | void> {
       }
     }
     else {
-      const componentSetProcessor = new ComponentSetProcessor()
+      const componentSetProcessor = new ComponentSetProcessor(config)
 
       try {
         html = await componentSetProcessor.process(nodes)

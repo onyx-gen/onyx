@@ -1,7 +1,7 @@
+import type { Mode } from '@onyx/types'
 import type { BaseUtilityValue } from '../types'
 import { isColorUtility } from '../types'
 import type { Properties } from '../../tokens/properties'
-import config from '../../config/config'
 import { getToken } from '../utils'
 
 export function translateUtilityValue(utilityValue: BaseUtilityValue): string {
@@ -31,10 +31,11 @@ export function getUtilityClass<T extends BaseUtilityValue, V>(
   utilityClassPrefix: string,
   figmaValue: V,
   handler: (val: V) => T,
+  mode: Mode,
 ): string {
   let utilityValue: BaseUtilityValue | null = null
 
-  if (config.mode === 'variables') {
+  if (mode === 'variables') {
     const token = getToken(node, property)
 
     if (token) {

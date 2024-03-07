@@ -1,7 +1,7 @@
 import type {
-  Configuration,
   ConfigurationPluginMessage,
   HtmlPluginMessage,
+  IConfiguration,
   PluginMessage,
   SelectedNode,
   SelectedPluginMessage,
@@ -46,7 +46,7 @@ export function sendHtmlMessage(html: string): void {
   figma.ui.postMessage(pluginMessage)
 }
 
-export function sendConfigurationMessage(configuration: Configuration) {
+export function sendConfigurationMessage(configuration: IConfiguration) {
   const pluginMessage: ConfigurationPluginMessage = { event: 'configuration', data: { configuration } }
   figma.ui.postMessage(pluginMessage)
 }

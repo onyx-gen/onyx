@@ -1,6 +1,6 @@
 import generate from './generate'
 import { PluginMessages, sendConfigurationMessage } from './messages'
-import { loadConfig, updateConfig } from './config/config'
+import ConfigurationManager from './config/config-manager'
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 figma.skipInvisibleInstanceChildren = true
@@ -15,36 +15,38 @@ figma.skipInvisibleInstanceChildren = true
  */
 figma.showUI(__html__, { themeColors: true })
 
-loadConfig()
-  .then(async (loadedConfig) => {
-    console.log('[Code] Config loaded from figma client storage', loadedConfig)
+const configurationManager = new ConfigurationManager()
 
-    sendConfigurationMessage(loadedConfig)
+configurationManager.loadConfig()
+  .then(async (config) => {
+    console.log('[Code] Config loaded from figma client storage', config)
+
+    sendConfigurationMessage(config)
 
     // Generate HTML code when the plugin is opened
-    await generate()
+    await generate(config)
 
     // Generate HTML code when the selection changes
-    figma.on('selectionchange', generate)
+    figma.on('selectionchange', () => generate(configurationManager.config))
   })
   .catch((error) => {
     console.error('error loading config', error)
   })
 
 PluginMessages.on('mode-changed', async ({ mode }) => {
-  updateConfig({ mode }).then(generate)
+  configurationManager.updateConfig({ mode }).then((generate))
 })
 
 PluginMessages.on('nearest-changed', async ({ nearestColor }) => {
-  updateConfig({ nearestInference: nearestColor }).then(generate)
+  configurationManager.updateConfig({ nearestInference: nearestColor }).then(generate)
 })
 
 PluginMessages.on('variant-group-changed', async ({ variantGroup }) => {
-  updateConfig({ variantGroup }).then(generate)
+  configurationManager.updateConfig({ variantGroup }).then(generate)
 })
 
 PluginMessages.on('unit-changed', async ({ unit }) => {
-  updateConfig({ unit }).then(generate)
+  configurationManager.updateConfig({ unit }).then(generate)
 })
 
 PluginMessages.on('notification', ({ message }) => {

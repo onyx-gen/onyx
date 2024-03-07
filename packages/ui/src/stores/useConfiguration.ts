@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
-import type { Configuration, Mode, Unit } from '@onyx/types'
+import type { IConfiguration, Mode, Unit } from '@onyx/types'
 import type { Ref } from 'vue'
 import { ref, watch } from 'vue'
 import { usePluginMessage } from './usePluginMessage'
 
 export const useConfiguration = defineStore('configuration-store', () => {
   const isReady = ref(false)
-  const configuration: Ref<Configuration> = ref<Configuration>({} as Configuration)
+  const configuration: Ref<IConfiguration> = ref<IConfiguration>({} as IConfiguration)
 
   async function init() {
     const { oncePluginMessage } = usePluginMessage()

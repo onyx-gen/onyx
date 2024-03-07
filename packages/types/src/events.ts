@@ -1,4 +1,4 @@
-import type { ComponentProps, Configuration, Mode, Unit } from './types'
+import type { ComponentProps, IConfiguration, Mode, Unit } from './types'
 
 export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
 
@@ -24,7 +24,7 @@ interface HtmlPluginMessageData {
 export type ConfigurationPluginMessage = BasePluginMessage<'configuration', ConfigurationPluginMessageData>
 
 interface ConfigurationPluginMessageData {
-  configuration: Configuration
+  configuration: IConfiguration
 }
 
 export type ModeChangedPluginMessage = BasePluginMessage<'mode-changed', ModeChangedPluginMessageData>
@@ -58,8 +58,6 @@ interface NotificationPluginMessageData {
 }
 
 export type UnselectedPluginMessage = BasePluginMessage<'unselected', any>
-
-export type FrontendInitializedPluginMessage = BasePluginMessage<'frontend-initialized', any>
 
 export interface SelectedNode {
   id: string
