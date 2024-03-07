@@ -26,16 +26,16 @@ export function getInferredDimension(
   nearestInference: boolean,
   unit: Unit,
 ): GenericUtilityValue {
-  const themeDimension: string | undefined = dimensionMap[widthOrHeight]?.[0]
-  if (themeDimension) {
-    return {
-      mode: 'inferred',
-      type: 'generic',
-      value: themeDimension,
-    }
-  }
-
   if (nearestInference) {
+    const themeDimension: string | undefined = dimensionMap[widthOrHeight]?.[0]
+    if (themeDimension) {
+      return {
+        mode: 'inferred',
+        type: 'generic',
+        value: themeDimension,
+      }
+    }
+
     const nearestDimension = findNearestDimension(widthOrHeight, dimensionMap)
     return {
       mode: 'inferred',

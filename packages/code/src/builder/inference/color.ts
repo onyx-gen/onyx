@@ -24,17 +24,17 @@ export function getInferredSolidColor(
 
   const opacity = paint.opacity ? paint.opacity * 100 : undefined
 
-  const themeColor: string | undefined = colorsLookup[color]?.[0]
-  if (themeColor) {
-    return {
-      mode: 'inferred',
-      type: 'color',
-      value: themeColor,
-      opacity,
-    }
-  }
-
   if (nearestInference) {
+    const themeColor: string | undefined = colorsLookup[color]?.[0]
+    if (themeColor) {
+      return {
+        mode: 'inferred',
+        type: 'color',
+        value: themeColor,
+        opacity,
+      }
+    }
+
     const closestColor = findNearestColor(paint.color, colorsLookup)
     return {
       mode: 'inferred',
