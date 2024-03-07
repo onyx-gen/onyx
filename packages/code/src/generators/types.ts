@@ -11,7 +11,9 @@ export interface CSSAttributes {
   'dynamic'?: DynamicAttributeValue
 }
 
-type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => Attributes
+type MaybePromise<T> = T | Promise<T>
+
+type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => MaybePromise<Attributes>
 type ConditionalFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string | undefined
 type TagFunction<T extends TreeNodeData> = ((node: TreeNode<T>) => string) | string
 

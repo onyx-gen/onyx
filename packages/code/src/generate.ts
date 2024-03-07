@@ -52,7 +52,7 @@ export default async function generate(config: Configuration): Promise<string | 
 
         if (tree) {
           const generator = new HTMLGenerator([], {}, config)
-          html = generator.generate(tree)
+          html = await generator.generate(tree)
         }
         else {
           console.error('It was not possible to generate HTML code for the selected node.')

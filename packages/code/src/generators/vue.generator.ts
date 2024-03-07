@@ -35,14 +35,14 @@ class VueGenerator {
    *
    * @returns {string} The generated code.
    */
-  public generate(): string {
+  public async generate(): Promise<string> {
     const code: string[] = []
 
     if (this.permutations.length > 1)
       code.push(this.scriptSetupGenerator.generate())
 
     if (this.treeNode) {
-      const html = this.htmlGenerator.generate(this.treeNode)
+      const html = await this.htmlGenerator.generate(this.treeNode)
       const wrappedHtml = `<template>\n${createIndent(1)}${html.trim().replaceAll('\n', `\n${createIndent(1)}`)}\n</template>`
       code.push(this.permutations.length > 1 ? wrappedHtml : html)
     }

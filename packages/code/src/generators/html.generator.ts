@@ -153,7 +153,7 @@ class HTMLGenerator {
    * @param {number} depth - The current depth in the tree, used for indentation.
    * @returns {string} The generated HTML string.
    */
-  public generate(treeNode: TreeNode, depth: number = 0): string {
+  public async generate(treeNode: TreeNode, depth: number = 0): Promise<string> {
     // Create indentation based on the current depth
     const indent = createIndent(depth)
     let html = indent
@@ -169,7 +169,7 @@ class HTMLGenerator {
 
     // Determine the tag and attributes for the current node
     const tag = typeof nodeMapping.tag === 'function' ? nodeMapping.tag(treeNode as any) : nodeMapping.tag
-    const attrs = nodeMapping.attrs ? nodeMapping.attrs(treeNode as any) : {}
+    const attrs = nodeMapping.attrs ? await nodeMapping.attrs(treeNode as any) : {}
     const hasAttrs = Object.keys(attrs).length > 0 && Object.values(attrs).some(val => !!val)
     const hasAttrsObject = hasAttrs && Object.values(attrs).some(val => typeof val === 'object')
     const hasChildren = treeNode.children && treeNode.children.length > 0
@@ -209,9 +209,10 @@ class HTMLGenerator {
       if (hasChildren) {
         // Add children nodes if present
         html += '>\n'
-        treeNode.children.forEach((child) => {
-          html += this.generate(child, depth + 1)
+        const promises = treeNode.children.map(async (child) => {
+          html += await this.generate(child, depth + 1)
         })
+        await Promise.all(promises)
         // Close the tag
         html += `${indent}</${tag}>\n`
       }
@@ -243,7 +244,7 @@ class HTMLGenerator {
    * @param treeNode - The TreeNode of type InstanceNodeData for which the HTML attributes are to be generated.
    * @returns An object representing the HTML attributes for the given instance node.
    */
-  private getInstanceNodeHTMLAttrs(treeNode: TreeNode<InstanceNodeData>): { [key: string]: string } {
+  private async getInstanceNodeHTMLAttrs(treeNode: TreeNode<InstanceNodeData>): Promise<{ [key: string]: string }> {
     const attrs: { [key: string]: string } = {}
 
     entries(treeNode.data.props)
@@ -252,15 +253,17 @@ class HTMLGenerator {
         attrs[key] = `${prop.value}`
       })
 
-    entries(treeNode.data.props)
+    const instanceSwapPromises = entries(treeNode.data.props)
       .filter(([, prop]) => prop.type === 'INSTANCE_SWAP')
-      .forEach(([key, prop]) => {
+      .map(async ([key, prop]) => {
         if (typeof prop.value === 'string') {
-          const instance: BaseNode | null = figma.getNodeById(prop.value)
+          const instance: BaseNode | null = await figma.getNodeByIdAsync(prop.value)
           if (instance)
             attrs[transformPropKey(`${key}`)] = `${instance.name}`
         }
       })
+
+    await Promise.all(instanceSwapPromises)
 
     return attrs
   }

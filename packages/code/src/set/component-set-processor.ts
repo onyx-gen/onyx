@@ -75,7 +75,7 @@ class ComponentSetProcessor {
     )
 
     const vueGenerator = new VueGenerator(filteredPermutations, componentSetTree, this.config)
-    return vueGenerator.generate()
+    return await vueGenerator.generate()
   }
 
   /**
