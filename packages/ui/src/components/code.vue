@@ -6,7 +6,7 @@ import { useTheme } from '../composables/useTheme'
 import { useNotification } from '../composables/useNotification'
 import { useCode } from '../stores/useCode'
 
-const { code, isLoading } = storeToRefs(useCode())
+const { code, isLoading, executionTime } = storeToRefs(useCode())
 
 const { theme } = useTheme()
 
@@ -49,6 +49,10 @@ function onCopy() {
         </div>
       </div>
     </div>
+  </div>
+
+  <div v-if="!isLoading" class="font-sans text-xs font-medium w-full text-right pt-0.5 color-$figma-color-text-secondary">
+    {{ executionTime }}ms
   </div>
 </template>
 

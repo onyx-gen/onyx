@@ -2,7 +2,13 @@ import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
 import { getSelectedNodes } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
-import { sendHtmlMessage, sendIsLoadingMessage, sendSelectedMessage, sendUnselectedMessage } from './messages'
+import {
+  sendExecutionTimeMessage,
+  sendHtmlMessage,
+  sendIsLoadingMessage,
+  sendSelectedMessage,
+  sendUnselectedMessage,
+} from './messages'
 import { getComponentProperties } from './set/utils'
 import type { Configuration } from './config/config'
 
@@ -13,6 +19,7 @@ import type { Configuration } from './config/config'
  */
 export default async function generate(config: Configuration): Promise<string | void> {
   sendIsLoadingMessage(true)
+  const startTime: number = Date.now()
 
   try {
     const nodes = getSelectedNodes()
@@ -90,6 +97,10 @@ export default async function generate(config: Configuration): Promise<string | 
     console.error(`[Onyx Plugin] Error during HTML generation`, e)
   }
   finally {
+    const endTime = Date.now()
+    const executionTime = endTime - startTime
+    console.log(`Execution time: ${executionTime} milliseconds`)
     sendIsLoadingMessage(false)
+    sendExecutionTimeMessage(executionTime)
   }
 }

@@ -1,5 +1,6 @@
 import type {
   ConfigurationPluginMessage,
+  ExecutionTimePluginMessage,
   HtmlPluginMessage,
   IConfiguration,
   IsLoadingPluginMessage,
@@ -20,8 +21,21 @@ export function sendUnselectedMessage() {
   figma.ui.postMessage(pluginMessage)
 }
 
+/**
+ * Sends a message to the Figma UI when the loading state changes.
+ * @param state - The new loading state.
+ */
 export function sendIsLoadingMessage(state: boolean) {
   const pluginMessage: IsLoadingPluginMessage = { event: 'loading', data: { state } }
+  figma.ui.postMessage(pluginMessage)
+}
+
+/**
+ * Sends a message to the Figma UI when the execution time is available.
+ * @param time - The execution time in milliseconds.
+ */
+export function sendExecutionTimeMessage(time: number) {
+  const pluginMessage: ExecutionTimePluginMessage = { event: 'execution-time', data: { time } }
   figma.ui.postMessage(pluginMessage)
 }
 

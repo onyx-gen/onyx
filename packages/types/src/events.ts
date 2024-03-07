@@ -65,6 +65,12 @@ export type UnselectedPluginMessage = BasePluginMessage<'unselected', any>
 
 export type IsLoadingPluginMessage = BasePluginMessage<'loading', IsLoadingPluginMessageData>
 
+export type ExecutionTimePluginMessage = BasePluginMessage<'execution-time', ExecutionTimePluginMessageData>
+
+interface ExecutionTimePluginMessageData {
+  time: number
+}
+
 export interface SelectedNode {
   id: string
   props?: ComponentProps
@@ -79,6 +85,7 @@ interface SelectedPluginMessageData {
 export type PluginMessage =
   | HtmlPluginMessage
   | UnselectedPluginMessage
+  | ExecutionTimePluginMessage
   | IsLoadingPluginMessage
   | SelectedPluginMessage
   | ModeChangedPluginMessage
