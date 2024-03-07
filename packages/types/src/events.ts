@@ -57,7 +57,13 @@ interface NotificationPluginMessageData {
   message: string
 }
 
+interface IsLoadingPluginMessageData {
+  state: boolean
+}
+
 export type UnselectedPluginMessage = BasePluginMessage<'unselected', any>
+
+export type IsLoadingPluginMessage = BasePluginMessage<'loading', IsLoadingPluginMessageData>
 
 export interface SelectedNode {
   id: string
@@ -73,6 +79,7 @@ interface SelectedPluginMessageData {
 export type PluginMessage =
   | HtmlPluginMessage
   | UnselectedPluginMessage
+  | IsLoadingPluginMessage
   | SelectedPluginMessage
   | ModeChangedPluginMessage
   | NearestChangedPluginMessage

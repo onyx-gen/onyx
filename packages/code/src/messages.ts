@@ -2,6 +2,7 @@ import type {
   ConfigurationPluginMessage,
   HtmlPluginMessage,
   IConfiguration,
+  IsLoadingPluginMessage,
   PluginMessage,
   SelectedNode,
   SelectedPluginMessage,
@@ -16,6 +17,11 @@ import EventBus from './event-bus'
  */
 export function sendUnselectedMessage() {
   const pluginMessage: UnselectedPluginMessage = { event: 'unselected', data: undefined }
+  figma.ui.postMessage(pluginMessage)
+}
+
+export function sendIsLoadingMessage(state: boolean) {
+  const pluginMessage: IsLoadingPluginMessage = { event: 'loading', data: { state } }
   figma.ui.postMessage(pluginMessage)
 }
 

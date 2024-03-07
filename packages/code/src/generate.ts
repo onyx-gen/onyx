@@ -2,7 +2,7 @@ import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
 import { getSelectedNodes } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
-import { sendHtmlMessage, sendSelectedMessage, sendUnselectedMessage } from './messages'
+import { sendHtmlMessage, sendIsLoadingMessage, sendSelectedMessage, sendUnselectedMessage } from './messages'
 import { getComponentProperties } from './set/utils'
 import type { Configuration } from './config/config'
 
@@ -12,6 +12,8 @@ import type { Configuration } from './config/config'
  * @returns A Promise that resolves to the generated HTML code as a string or void if no node is selected.
  */
 export default async function generate(config: Configuration): Promise<string | void> {
+  sendIsLoadingMessage(true)
+
   try {
     const nodes = getSelectedNodes()
 
@@ -86,5 +88,8 @@ export default async function generate(config: Configuration): Promise<string | 
   catch (e) {
     figma.notify('Onyx: Unexpected Error')
     console.error(`[Onyx Plugin] Error during HTML generation`, e)
+  }
+  finally {
+    sendIsLoadingMessage(false)
   }
 }

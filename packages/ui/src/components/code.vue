@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { toRefs } from 'vue'
 import { codeToHtml } from 'shiki'
 import { computedAsync, useClipboard } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import { useTheme } from '../composables/useTheme'
 import { useNotification } from '../composables/useNotification'
 import { useCode } from '../stores/useCode'
 
-const { code } = toRefs(useCode())
+const { code, isLoading } = storeToRefs(useCode())
 
 const { theme } = useTheme()
 
@@ -43,7 +43,10 @@ function onCopy() {
 
     <div class="code-copy max-h-82 overflow-scroll">
       <div class="px-3 py-2">
-        <div class="w-full" v-html="html" />
+        <div v-show="!isLoading" class="w-full" v-html="html" />
+        <div v-show="isLoading">
+          Loading...
+        </div>
       </div>
     </div>
   </div>
