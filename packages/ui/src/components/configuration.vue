@@ -55,7 +55,7 @@ const options: SelectOption[] = [
 
     <div>
       <h2>
-        Unit (rem/px)
+        Unit (px/rem)
       </h2>
 
       <Switch v-model="isRem" class="mt-2" />
