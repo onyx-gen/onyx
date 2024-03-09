@@ -1,20 +1,16 @@
 {
-  "name": "unocss-variables",
+  "name": "onyx",
   "id": "1331160444558094836",
   "api": "1.0.0",
-  "main": "dist/bundle.js",
+  "ui": "packages/ui/dist/index.html",
+  "main": "packages/code/dist/code.js",
   "capabilities": [
-    "codegen"
+    "inspect"
   ],
   "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
   "editorType": [
     "dev"
-  ],
-  "codegenLanguages": [
-    {
-      "label": "Language Label",
-      "value": "language-value"
-    }
   ],
   "networkAccess": {
     "allowedDomains": [

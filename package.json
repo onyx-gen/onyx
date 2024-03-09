@@ -1,36 +1,26 @@
 {
-  "name": "unocss-variables",
+  "name": "onyx",
   "type": "module",
   "version": "1.0.0",
+  "private": "true",
+  "packageManager": "pnpm@8.9.0",
   "description": "Your Figma Plugin",
-  "author": "",
-  "license": "",
-  "main": "code.js",
+  "author": "Miguel Franken",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit",
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo test",
+    "clean": "turbo clean",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "test": "vitest --ui"
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.6.3",
-    "@figma/plugin-typings": "^1.84.0",
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.6",
-    "@types/lodash-es": "^4.17.12",
-    "@vitest/ui": "^1.2.1",
-    "eslint": "^8.56.0",
-    "rollup": "^4.9.6",
-    "tslib": "^2.6.2",
-    "typescript": "^5.3.3",
-    "vitest": "^1.2.1"
-  },
-  "dependencies": {
-    "lodash-es": "^4.17.21"
+    "@antfu/eslint-config": "^2.6.4",
+    "eslint": "^8.57.0",
+    "turbo": "^1.12.4"
   }
 }

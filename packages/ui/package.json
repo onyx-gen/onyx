@@ -1,0 +1,32 @@
+{
+  "name": "@onyx/ui",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@headlessui/vue": "^1.7.19",
+    "@heroicons/vue": "^2.1.1",
+    "@unocss/reset": "^0.58.5",
+    "@vueuse/core": "^10.8.0",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.19"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.87.0",
+    "@onyx/icons": "workspace:^",
+    "@onyx/tsconfig": "workspace:^",
+    "@onyx/types": "workspace:^",
+    "@unocss/transformer-variant-group": "^0.58.5",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "shiki": "^1.1.7",
+    "typescript": "^5.3.3",
+    "unocss": "^0.58.5",
+    "vite": "^5.1.4",
+    "vite-plugin-singlefile": "^2.0.0"
+  }
+}
