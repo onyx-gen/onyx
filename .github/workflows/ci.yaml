@@ -31,6 +31,8 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          FIGMA_PERSONAL_ACCESS_TOKEN: ${{ secrets.FIGMA_PERSONAL_ACCESS_TOKEN }}
 
       - name: Test
         run: pnpm test
