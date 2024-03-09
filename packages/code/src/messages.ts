@@ -45,7 +45,6 @@ export function sendExecutionTimeMessage(time: number) {
  * The message contains the selected nodes.
  *
  * @param {SelectedNode[]} nodes - The selected nodes to send.
- * @param props
  *
  * @return {void}
  */
