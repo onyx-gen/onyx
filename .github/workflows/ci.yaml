@@ -33,6 +33,8 @@ jobs:
         run: pnpm build
         env:
           FIGMA_PERSONAL_ACCESS_TOKEN: ${{ secrets.FIGMA_PERSONAL_ACCESS_TOKEN }}
+          FIGMA_FILE: ${{ vars.FIGMA_FILE }}
+          FIGMA_USE_CACHE: ${{ vars.FIGMA_USE_CACHE }}
 
       - name: Test
         run: pnpm test
