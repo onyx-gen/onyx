@@ -34,3 +34,12 @@ export function getToken(node: SceneNode, type: Properties): string | null {
   const tokens = getAppliedTokens(node)
   return tokens.get(type) || null
 }
+
+/**
+ * Checks if a given node has a token of a specified type applied to it.
+ * @param node - The node to check for the token.
+ * @param type - The type of token to check for.
+ */
+export function hasToken(node: SceneNode, type: Properties): boolean {
+  return getAppliedTokens(node).has(type)
+}

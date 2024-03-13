@@ -6,6 +6,8 @@ export type DesignTokensObject = {
 
 export type DesignTokens = Map<Properties, string>
 
+// TODO MF: Caching of the applied tokens
+
 /**
  * Retrieves the applied design tokens from a given node.
  * It iterates over each property in Properties, retrieves the corresponding shared plugin data from the node,

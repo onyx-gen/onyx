@@ -1,11 +1,12 @@
 import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
-import type { RectCornersNew, RectSidesNew } from './types'
+import type { GenericUtilityValue, RectCornersNew, RectSidesNew } from './types'
 import { createColorHandler } from './inference/color'
 import AutoLayoutBuilder from './auto-layout-builder'
 import { getUtilityClass, translateUtilityValue } from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
+import { getToken, hasToken } from './utils'
 
 class Builder {
   constructor(private readonly config: Configuration) {}
@@ -306,76 +307,88 @@ class Builder {
       lineHeight,
     } = node
 
-    if (fontName === figma.mixed) {
-      console.error('[Builder] Mixed font names are not supported yet.')
+    if (this.config.mode === 'variables' && hasToken(node, Properties.typography)) {
+      const typographyToken = getToken(node, Properties.typography)!
+
+      const utilityValue: GenericUtilityValue = {
+        mode: 'variable',
+        type: 'generic',
+        value: typographyToken,
+      }
+
+      this.attributes.add(`font-${translateUtilityValue(utilityValue)}`)
     }
     else {
-      // TODO
-    }
+      if (fontName === figma.mixed)
+        console.error('[Builder] Mixed font names are not supported yet.')
+      else
+        console.error('[Builder] Font names are not supported yet.')
+        // TODO
 
-    if (fontSize === figma.mixed) {
-      console.error('[Builder] Mixed font sizes are not supported yet.')
-    }
-    else {
-      console.log('this.config.nearestInference', this.config.nearestInference)
-      const utilityClass = getUtilityClass(
-        node,
-        'generic',
-        Properties.fontSizes,
-        'text',
-        fontSize,
-        createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
-        this.config.mode,
-      )
-
-      this.attributes.add(utilityClass)
-    }
-
-    if (letterSpacing === figma.mixed) {
-      console.error('[Builder] Mixed letter spacings are not supported yet.')
-    }
-    else {
-      if (letterSpacing.unit === 'PIXELS') {
-        const space = letterSpacing.value
-
+      if (fontSize === figma.mixed) {
+        console.error('[Builder] Mixed font sizes are not supported yet.')
+      }
+      else {
+        console.log('this.config.nearestInference', this.config.nearestInference)
         const utilityClass = getUtilityClass(
           node,
           'generic',
-          Properties.letterSpacing,
-          'tracking',
-          space,
+          Properties.fontSizes,
+          'text',
+          fontSize,
           createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
           this.config.mode,
         )
 
         this.attributes.add(utilityClass)
       }
-      else {
-        console.error('[Builder] Only pixel letter spacings are supported yet.')
-      }
-    }
 
-    if (lineHeight === figma.mixed) {
-      console.error('[Builder] Mixed line heights are not supported yet.')
-    }
-    else {
-      if (lineHeight.unit === 'PIXELS') {
-        const value = lineHeight.value
-
-        const utilityClass = getUtilityClass(
-          node,
-          'generic',
-          Properties.letterSpacing,
-          'leading',
-          value,
-          createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
-          this.config.mode,
-        )
-
-        this.attributes.add(utilityClass)
+      if (letterSpacing === figma.mixed) {
+        console.error('[Builder] Mixed letter spacings are not supported yet.')
       }
       else {
-        console.error('[Builder] Only pixel line heights are supported yet.')
+        if (letterSpacing.unit === 'PIXELS') {
+          const space = letterSpacing.value
+
+          const utilityClass = getUtilityClass(
+            node,
+            'generic',
+            Properties.letterSpacing,
+            'tracking',
+            space,
+            createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
+            this.config.mode,
+          )
+
+          this.attributes.add(utilityClass)
+        }
+        else {
+          console.error('[Builder] Only pixel letter spacings are supported yet.')
+        }
+      }
+
+      if (lineHeight === figma.mixed) {
+        console.error('[Builder] Mixed line heights are not supported yet.')
+      }
+      else {
+        if (lineHeight.unit === 'PIXELS') {
+          const value = lineHeight.value
+
+          const utilityClass = getUtilityClass(
+            node,
+            'generic',
+            Properties.letterSpacing,
+            'leading',
+            value,
+            createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
+            this.config.mode,
+          )
+
+          this.attributes.add(utilityClass)
+        }
+        else {
+          console.error('[Builder] Only pixel line heights are supported yet.')
+        }
       }
     }
   }

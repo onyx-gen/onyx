@@ -79,6 +79,12 @@ export function printObject(obj: any): any {
   if (obj instanceof Set) {
     return Array.from(obj)
   }
+  else if (obj instanceof Map) {
+    const transformedMap: any = {}
+    for (const [key, value] of obj)
+      transformedMap[key] = printObject(value)
+    return transformedMap
+  }
   else if (typeof obj === 'object' && obj !== null) {
     const transformedObj: any = Array.isArray(obj) ? [] : {}
     for (const key in obj) {
