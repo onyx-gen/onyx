@@ -18,6 +18,7 @@ const defaultConfig: IConfiguration = {
   variantGroup: true,
   nearestInference: true,
   theme,
+  newBuilder: true,
 }
 
 export class Configuration implements IConfiguration {
@@ -26,6 +27,7 @@ export class Configuration implements IConfiguration {
   public variantGroup: IConfiguration['variantGroup']
   public nearestInference: IConfiguration['nearestInference']
   public theme: IConfiguration['theme']
+  public newBuilder: IConfiguration['newBuilder']
 
   public readonly config: IConfiguration
 
@@ -50,6 +52,7 @@ export class Configuration implements IConfiguration {
     this.variantGroup = this.config.variantGroup
     this.nearestInference = this.config.nearestInference
     this.theme = this.config.theme
+    this.newBuilder = this.config.newBuilder
   }
 
   public get colorLookup(): InferenceColorMap {

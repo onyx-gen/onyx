@@ -1,3 +1,7 @@
+export interface IBuilder {
+  build: (node: SceneNode) => Set<string>
+}
+
 /**
  * Represents the sides of a rectangle.
  * @interface RectSides

@@ -1,4 +1,3 @@
-import type { DesignTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
 import { createDimensionHandler } from './inference/dimension'
@@ -22,7 +21,6 @@ class AutoLayoutBuilder {
   constructor(
     private readonly node: SceneNode,
     private readonly autoLayout: AutoLayoutMixin,
-    private readonly tokens: DesignTokens,
     private readonly config: Configuration,
   ) {}
 

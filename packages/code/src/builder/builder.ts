@@ -1,14 +1,13 @@
-import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
-import type { GenericUtilityValue, RectCornersNew, RectSidesNew } from './types'
+import type { GenericUtilityValue, IBuilder, RectCornersNew, RectSidesNew } from './types'
 import { createColorHandler } from './inference/color'
 import AutoLayoutBuilder from './auto-layout-builder'
 import { getUtilityClass, translateUtilityValue } from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
 import { getToken, hasToken } from './utils'
 
-class Builder {
+class Builder implements IBuilder {
   constructor(private readonly config: Configuration) {}
 
   private attributes: Set<string> = new Set()
@@ -38,15 +37,13 @@ class Builder {
   private buildAutoLayout(node: SceneNode & AutoLayoutMixin) {
     let autoLayoutBuilder: AutoLayoutBuilder | null = null
 
-    const tokens = getAppliedTokens(node)
-
     if (node.layoutMode !== 'NONE')
-      autoLayoutBuilder = new AutoLayoutBuilder(node, node, tokens, this.config)
+      autoLayoutBuilder = new AutoLayoutBuilder(node, node, this.config)
 
     // User has not explicitly set auto-layout, but Figma has inferred auto-layout
     // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
     else if ('inferredAutoLayout' in node && node.inferredAutoLayout !== null)
-      autoLayoutBuilder = new AutoLayoutBuilder(node, node.inferredAutoLayout, tokens, this.config)
+      autoLayoutBuilder = new AutoLayoutBuilder(node, node.inferredAutoLayout, this.config)
 
     if (autoLayoutBuilder)
       autoLayoutBuilder.build().forEach(css => this.attributes.add(css))

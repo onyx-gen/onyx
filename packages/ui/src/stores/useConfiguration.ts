@@ -22,6 +22,7 @@ export const useConfiguration = defineStore('configuration-store', () => {
     watch(() => configuration.value.nearestInference, (nearestColor: boolean) => emitPluginMessage('nearest-changed', { nearestColor }))
     watch(() => configuration.value.variantGroup, (variantGroup: boolean) => emitPluginMessage('variant-group-changed', { variantGroup }))
     watch(() => configuration.value.mode, (mode: Mode) => emitPluginMessage('mode-changed', { mode }))
+    watch(() => configuration.value.newBuilder, (newBuilder: boolean) => emitPluginMessage('new-builder-changed', { newBuilder }))
   })
 
   return {

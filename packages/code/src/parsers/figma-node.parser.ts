@@ -3,6 +3,8 @@ import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
 import Builder from '../builder/builder'
 import type { Configuration } from '../config/config'
+import { UnocssBuilder } from '../builder/unocss-builder'
+import type { IBuilder } from '../builder/types'
 
 /**
  * Class to generate a abstract tree structure from a Figma node.
@@ -60,7 +62,13 @@ class FigmaNodeParser {
       const mainComponent = await node.getMainComponentAsync()
       const iconName = mainComponent?.name
 
-      const builder = new Builder(this.config)
+      let builder: IBuilder
+
+      if (this.config.newBuilder)
+        builder = new Builder(this.config)
+      else
+        builder = new UnocssBuilder(node, this.config)
+
       const css = builder.build(node)
 
       if (!iconName)
@@ -109,7 +117,13 @@ class FigmaNodeParser {
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
   private async parseNode(node: SceneNode): Promise<TreeNode | null> {
-    const builder = new Builder(this.config)
+    let builder: IBuilder
+
+    if (this.config.newBuilder)
+      builder = new Builder(this.config)
+    else
+      builder = new UnocssBuilder(node, this.config)
+
     const css = builder.build(node)
 
     const hasChildren = 'children' in node && node.children.length > 0

@@ -45,6 +45,10 @@ PluginMessages.on('variant-group-changed', async ({ variantGroup }) => {
   configurationManager.updateConfig({ variantGroup }).then(generate)
 })
 
+PluginMessages.on('new-builder-changed', async ({ newBuilder }) => {
+  configurationManager.updateConfig({ newBuilder }).then(generate)
+})
+
 PluginMessages.on('unit-changed', async ({ unit }) => {
   configurationManager.updateConfig({ unit }).then(generate)
 })
