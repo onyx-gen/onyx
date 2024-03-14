@@ -8,6 +8,6 @@
 export function replaceToken(token: string): string {
   // use regex to remove all beginning 'min.' from the token
   return token
-    .replace(/^min\./, '')
-    .replace(/^max\./, '')
+    .replace(/min\./, '')
+    .replace(/max\./, '')
 }
