@@ -3,9 +3,36 @@ import { consola } from 'consola'
 type Constructor<T = any> = new (...args: any[]) => T
 
 /**
- * Attempts to apply logging to a class or a method.
- * If applied to a class, wraps each method to log invocations.
- * If applied to a method, wraps the single method to log its invocation.
+ * A decorator for logging class or method invocations.
+ * @remarks
+ * When applied to a class, it wraps each method to log its invocations.
+ * When applied to a method, it wraps the specific method to log its invocation.
+ *
+ * @example
+ * // Applying `Log` as a class decorator
+ * ＠Log
+ * class ExampleClass {
+ *   method1(param1: string) {
+ *     console.log(param1);
+ *   }
+ *
+ *   method2(param2: number) {
+ *     console.log(param2);
+ *   }
+ * }
+ *
+ * @example
+ * // Applying `Log` directly to a method
+ * class AnotherClass {
+ *   ＠Log
+ *   someMethod(param: string) {
+ *     console.log(param);
+ *   }
+ * }
+ *
+ * @param args - The arguments passed to the decorator, determining its application context.
+ * @returns The decorator applied to a class or method, depending on the provided arguments.
+ * @throws {Error} Throws an error if the decorator is used incorrectly.
  */
 export function Log(...args: any[]): any {
   // Determine if the decorator is used as a class or method decorator
@@ -22,6 +49,12 @@ export function Log(...args: any[]): any {
   }
 }
 
+/**
+ * Applies the logging decorator to a class.
+ * @param constructor - The class constructor to which the logging functionality will be applied.
+ * @returns The class constructor with wrapped methods for logging.
+ * @template T - The type of the class constructor.
+ */
 function applyClassDecorator<T extends Constructor>(constructor: T): T {
   // Get the prototype of the class
   const prototype = constructor.prototype
@@ -52,6 +85,13 @@ function applyClassDecorator<T extends Constructor>(constructor: T): T {
   return constructor
 }
 
+/**
+ * Applies the logging decorator to a single method of a class.
+ * @param target - The prototype of the class containing the method.
+ * @param propertyKey - The name or symbol of the method to be decorated.
+ * @param descriptor - The property descriptor for the method.
+ * @returns {void | PropertyDescriptor} A possibly modified property descriptor incorporating logging, or `void`.
+ */
 function applyMethodDecorator(target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void | PropertyDescriptor {
   const originalMethod = descriptor.value
   const className = target.constructor.name
@@ -64,6 +104,11 @@ function applyMethodDecorator(target: object, propertyKey: string | symbol, desc
   }
 }
 
+/**
+ * Extracts parameter names from a function.
+ * @param func - The function from which parameter names are to be extracted.
+ * @returns An array of parameter names.
+ */
 function getParamNames(func: Function): string[] {
   const result = func.toString().match(/function\s.*?\(([^)]*)\)/) || func.toString().match(/(?:\(.*?\))\s*=>/)
   if (result && result[1])
@@ -72,6 +117,13 @@ function getParamNames(func: Function): string[] {
   return []
 }
 
+/**
+ * Logs a method's invocation with its arguments.
+ * @param className - The name of the class containing the invoked method.
+ * @param methodName - The name of the invoked method.
+ * @param paramNames - The names of the parameters of the invoked method.
+ * @param methodArgs - The arguments passed to the invoked method.
+ */
 function logMethodInvocation(className: string, methodName: string, paramNames: string[], methodArgs: any[]) {
   const argsWithNames = paramNames.reduce((obj, name, index) => {
     obj[name] = methodArgs[index]
