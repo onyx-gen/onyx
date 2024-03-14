@@ -147,5 +147,10 @@ function logMethodInvocation(className: string, methodName: string, paramNames: 
     return obj
   }, {} as Record<string, any>)
 
-  consola.withDefaults({ level: 5 }).withTag(`${className}.${methodName}`).debug('Parameters:', argsWithNames, 'Result:', result)
+  consola
+    .withDefaults({
+      level: 5,
+      tag: `${className}.${methodName}`,
+    })
+    .debug('Parameters:', argsWithNames, 'Result:', result)
 }
