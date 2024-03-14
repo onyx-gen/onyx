@@ -182,17 +182,13 @@ class FigmaNodeParser {
    * @param {TreeNode} treeNode - The tree node to add children to.
    */
   private async addChildrenToNode(node: ChildrenMixin & SceneNode, treeNode: TreeNode): Promise<void> {
-    // Create an array to hold all the promises
-    const promises = node.children
-      .filter(child => child.visible)
-      .map(async (child) => { // Use map instead of forEach to return an array of promises
-        const childTree = await this.parse(child)
-        if (childTree)
-          treeNode.children.push(childTree)
-      })
+    const visibleChildren = node.children.filter(child => child.visible)
 
-    // Wait for all promises in the array to be resolved
-    await Promise.all(promises)
+    for (const visibleChild of visibleChildren) {
+      const childTree = await this.parse(visibleChild)
+      if (childTree)
+        treeNode.children.push(childTree)
+    }
   }
 }
 
