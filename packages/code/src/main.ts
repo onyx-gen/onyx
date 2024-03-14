@@ -2,11 +2,16 @@ import { consola } from 'consola'
 import generate from './generate'
 import { PluginMessages, sendConfigurationMessage } from './messages'
 import ConfigurationManager from './config/config-manager'
+import CustomReporter from './consola-reporter'
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 figma.skipInvisibleInstanceChildren = true
 
+// Set the log level and reporters for the consola logger
 consola.level = 5
+consola.setReporters([
+  new CustomReporter({}),
+])
 
 /**
  * Show the UI of the plugin.
