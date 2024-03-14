@@ -155,6 +155,7 @@ class HTMLGenerator {
    * @param {number} depth - The current depth in the tree, used for indentation.
    * @returns {string} The generated HTML string.
    */
+  @Log
   public async generate(treeNode: TreeNode, depth: number = 0): Promise<string> {
     // Create indentation based on the current depth
     const indent = createIndent(depth)
@@ -211,10 +212,10 @@ class HTMLGenerator {
       if (hasChildren) {
         // Add children nodes if present
         html += '>\n'
-        const promises = treeNode.children.map(async (child) => {
+
+        for (const child of treeNode.children)
           html += await this.generate(child, depth + 1)
-        })
-        await Promise.all(promises)
+
         // Close the tag
         html += `${indent}</${tag}>\n`
       }
