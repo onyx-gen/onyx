@@ -71,8 +71,9 @@ function applyClassDecorator<T extends Constructor>(constructor: T): T {
       Object.defineProperty(prototype, methodName, {
         value(...args: any[]) {
           const paramNames = getParamNames(descriptor.value)
-          logMethodInvocation(constructor.name, methodName, paramNames, args)
-          return descriptor.value.apply(this, args)
+          const result = descriptor.value.apply(this, args)
+          logMethodInvocation(constructor.name, methodName, paramNames, args, result)
+          return result
         },
         writable: descriptor.writable,
         enumerable: descriptor.enumerable,
@@ -99,8 +100,9 @@ function applyMethodDecorator(target: object, propertyKey: string | symbol, desc
   const paramNames = getParamNames(originalMethod)
 
   descriptor.value = function (...methodArgs: any[]) {
-    logMethodInvocation(className, methodName, paramNames, methodArgs)
-    return originalMethod.apply(this, methodArgs)
+    const result = originalMethod.apply(this, methodArgs)
+    logMethodInvocation(className, methodName, paramNames, methodArgs, result)
+    return result
   }
 }
 
@@ -123,12 +125,13 @@ function getParamNames(func: Function): string[] {
  * @param methodName - The name of the invoked method.
  * @param paramNames - The names of the parameters of the invoked method.
  * @param methodArgs - The arguments passed to the invoked method.
+ * @param result - The result of the invoked method, if any.
  */
-function logMethodInvocation(className: string, methodName: string, paramNames: string[], methodArgs: any[]) {
+function logMethodInvocation(className: string, methodName: string, paramNames: string[], methodArgs: any[], result?: any) {
   const argsWithNames = paramNames.reduce((obj, name, index) => {
     obj[name] = methodArgs[index]
     return obj
   }, {} as Record<string, any>)
 
-  consola.withDefaults({ level: 5 }).withTag(`${className}.${methodName}`).debug(argsWithNames)
+  consola.withDefaults({ level: 5 }).withTag(`${className}.${methodName}`).debug('Parameters:', argsWithNames, 'Result:', result)
 }
