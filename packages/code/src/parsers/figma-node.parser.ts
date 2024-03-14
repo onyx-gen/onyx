@@ -1,3 +1,4 @@
+import { createConsola } from 'consola'
 import type { ContainerNodeData, IconNodeData, InstanceNodeData, TextNodeData, TreeNode } from '../interfaces'
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
@@ -5,6 +6,8 @@ import Builder from '../builder/builder'
 import type { Configuration } from '../config/config'
 import { UnocssBuilder } from '../builder/unocss-builder'
 import type { IBuilder } from '../builder/types'
+
+const c = createConsola({ level: 5 }).withTag('FigmaNodeParser')
 
 /**
  * Class to generate a abstract tree structure from a Figma node.
@@ -14,7 +17,9 @@ class FigmaNodeParser {
   constructor(
     private readonly variantPermutation: VariantPermutation = { default: 'default' },
     private readonly config: Configuration,
-  ) {}
+  ) {
+    c.debug('Constructed FigmaNodeParser', { variantPermutation })
+  }
 
   /**
    * Returns the unique variant key based on the current permutation.
@@ -33,6 +38,8 @@ class FigmaNodeParser {
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
   public async parse(node: SceneNode): Promise<TreeNode | null> {
+    c.debug('Parsing scene node', node.name)
+
     if (node.type === 'INSTANCE')
       return this.parseInstanceNode(node)
     else
@@ -45,6 +52,8 @@ class FigmaNodeParser {
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
   private async parseInstanceNode(node: InstanceNode): Promise<TreeNode | null> {
+    c.debug('Parsing instance node', node.name)
+
     const isIcon = node.name === 'icon'
     if (isIcon)
       return this.createIconNode(node)
@@ -58,6 +67,8 @@ class FigmaNodeParser {
    * @returns {TreeNode} The generated tree node for the icon.
    */
   private async createIconNode(node: InstanceNode): Promise<TreeNode<IconNodeData>> {
+    c.debug('Creating icon node', node.name)
+
     try {
       const mainComponent = await node.getMainComponentAsync()
       const iconName = mainComponent?.name
@@ -101,6 +112,8 @@ class FigmaNodeParser {
    * @returns {TreeNode} The generated tree node for the instance.
    */
   private createInstanceNode(node: InstanceNode): TreeNode<InstanceNodeData> {
+    c.debug('Creating instance node', node.name)
+
     return {
       children: [],
       data: {
@@ -117,6 +130,8 @@ class FigmaNodeParser {
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
   private async parseNode(node: SceneNode): Promise<TreeNode | null> {
+    c.debug('Parsing node other than instance type', node.name)
+
     let builder: IBuilder
 
     if (this.config.newBuilder)
@@ -144,6 +159,8 @@ class FigmaNodeParser {
    * @returns {TreeNode} The generated tree node for the text.
    */
   private createTextNode(node: TextNode, css: Set<string>): TreeNode {
+    c.debug('Creating text node', node.name, node.characters)
+
     const parentNodeData: ContainerNodeData = {
       type: 'container',
       css: { [this.variant]: { css: [css] } },
@@ -162,6 +179,8 @@ class FigmaNodeParser {
    * @returns {TreeNode} The generated tree node for the container.
    */
   private async createContainerNode(node: SceneNode, css: Set<string>, hasChildren: boolean): Promise<TreeNode> {
+    c.debug('Creating container node', node.name)
+
     const data: ContainerNodeData = {
       type: 'container',
       css: { [this.variant]: { css: [css] } },
@@ -180,6 +199,8 @@ class FigmaNodeParser {
    * @param {TreeNode} treeNode - The tree node to add children to.
    */
   private async addChildrenToNode(node: ChildrenMixin & SceneNode, treeNode: TreeNode): Promise<void> {
+    c.debug('Adding children to node', node.name)
+
     // Create an array to hold all the promises
     const promises = node.children
       .filter(child => child.visible)
