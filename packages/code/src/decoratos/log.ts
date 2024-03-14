@@ -71,9 +71,9 @@ function applyClassDecorator<T extends Constructor>(constructor: T): T {
       Object.defineProperty(prototype, methodName, {
         value(...args: any[]) {
           const paramNames = getParamNames(descriptor.value)
-          const result = descriptor.value.apply(this, args)
-          logMethodInvocation(constructor.name, methodName, paramNames, args, result)
-          return result
+          const methodResult = descriptor.value.apply(this, args)
+          handleMethodInvocationLogging(constructor.name, methodName, paramNames, args, methodResult)
+          return methodResult
         },
         writable: descriptor.writable,
         enumerable: descriptor.enumerable,
@@ -100,9 +100,9 @@ function applyMethodDecorator(target: object, propertyKey: string | symbol, desc
   const paramNames = getParamNames(originalMethod)
 
   descriptor.value = function (...methodArgs: any[]) {
-    const result = originalMethod.apply(this, methodArgs)
-    logMethodInvocation(className, methodName, paramNames, methodArgs, result)
-    return result
+    const methodResult = originalMethod.apply(this, methodArgs)
+    handleMethodInvocationLogging(className, methodName, paramNames, methodArgs, methodResult)
+    return methodResult
   }
 }
 
@@ -117,6 +117,20 @@ function getParamNames(func: Function): string[] {
     return result[1].replace(/ /g, '').split(',')
 
   return []
+}
+
+function handleMethodInvocationLogging(className: string, methodName: string, paramNames: string[], methodArgs: any[], methodResult: any) {
+  if (methodResult instanceof Promise) {
+    methodResult.then((resolvedResult) => {
+      logMethodInvocation(className, methodName, paramNames, methodArgs, resolvedResult)
+    }).catch((error) => {
+      // Optionally log errors or handle them as needed
+      console.error(`${className}.${methodName} resulted in error:`, error)
+    })
+  }
+  else {
+    logMethodInvocation(className, methodName, paramNames, methodArgs, methodResult)
+  }
 }
 
 /**
