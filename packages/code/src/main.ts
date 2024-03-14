@@ -1,9 +1,12 @@
+import { consola } from 'consola'
 import generate from './generate'
 import { PluginMessages, sendConfigurationMessage } from './messages'
 import ConfigurationManager from './config/config-manager'
 
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 figma.skipInvisibleInstanceChildren = true
+
+consola.level = 5
 
 /**
  * Show the UI of the plugin.
