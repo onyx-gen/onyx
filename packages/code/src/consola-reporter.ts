@@ -1,4 +1,5 @@
 import type { LogObject } from 'consola'
+import { createIndent } from './utils'
 
 interface ColorShade {
   [shade: string]: string
@@ -318,19 +319,8 @@ class CustomReporter {
   log(logObj: LogObject) {
     const consoleLogFn = this._getLogFn(logObj.level)
 
-    // Type
-    const type = logObj.type === 'log' ? '' : logObj.type
-
     // Tag
-    const tag = logObj.tag || ''
-
-    const useLogType = false
-
-    const arr = useLogType ? [tag, type] : [tag]
-
-    const badge = `%c${arr.filter(Boolean).join(':')}`
-
-    const [className, methodName] = badge.split('.')
+    const { className, methodName, level, type } = JSON.parse(logObj.tag)
 
     const style1 = `
       background: ${stringToColor(className)};
@@ -344,28 +334,30 @@ class CustomReporter {
 
     const style2 = `
       background: ${stringToColor(methodName)};
-      border-radius: 0.5em;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
       color: white;
       font-weight: bold;
       padding: 2px 0.5em;
     `
 
-    // Log to the console
-    if (typeof logObj.args[0] === 'string') {
-      consoleLogFn(
-        `${badge.split('.')[0]}%c${badge.split('.')[1]}%c ${logObj.args[0]}`,
-        style1,
-        style2,
-        // Empty string as style resets to default console style
-        '',
-        ...logObj.args.slice(1),
-      )
-    }
-    else {
-      consoleLogFn(badge, style1, ...logObj.args)
-    }
+    const style3 = `
+      background: lightgray;
+      border-radius: 0.5em;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      color: black;
+      font-weight: bold;
+      padding: 2px 0.5em;
+    `
+
+    consoleLogFn(
+      `${createIndent(level - 1)}%c${className}%c${methodName}%c${type}`,
+      style1,
+      style2,
+      style3,
+      // Empty string as style resets to default console style
+      '',
+      ...logObj.args,
+    )
   }
 }
 

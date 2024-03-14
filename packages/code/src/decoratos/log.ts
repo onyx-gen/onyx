@@ -2,6 +2,9 @@ import { consola } from 'consola'
 
 type Constructor<T = any> = new (...args: any[]) => T
 
+// Global variable to track the current nesting level of method invocations
+let currentLevel = 0
+
 /**
  * A decorator for logging class or method invocations.
  * @remarks
@@ -65,24 +68,43 @@ function applyClassDecorator<T extends Constructor>(constructor: T): T {
     if (methodName === 'constructor')
       return
 
+    console.log('methodName:', methodName)
+
     const descriptor = Object.getOwnPropertyDescriptor(prototype, methodName)
+
     if (descriptor && typeof descriptor.value === 'function') {
-      // Wrap the method with logging functionality
-      Object.defineProperty(prototype, methodName, {
-        value(...args: any[]) {
-          const paramNames = getParamNames(descriptor.value)
-          const methodResult = descriptor.value.apply(this, args)
-          handleMethodInvocationLogging(constructor.name, methodName, paramNames, args, methodResult)
-          return methodResult
-        },
-        writable: descriptor.writable,
-        enumerable: descriptor.enumerable,
-        configurable: descriptor.configurable,
-      })
+      const originalMethod = prototype[methodName]
+
+      prototype[methodName] = function (...args: any[]) {
+        const paramNames = getParamNames(originalMethod)
+        logMethodStart(constructor.name, methodName, paramNames, args, ++currentLevel)
+
+        try {
+          const result = originalMethod.apply(this, args)
+          if (result instanceof Promise) {
+            return result.then((resolvedResult) => {
+              logMethodEnd(constructor.name, methodName, resolvedResult, currentLevel--)
+              return resolvedResult
+            }).catch((error) => {
+              console.error(`${constructor.name}.${methodName} resulted in error:`, error)
+              --currentLevel
+              throw error
+            })
+          }
+          else {
+            logMethodEnd(constructor.name, methodName, result, currentLevel--)
+            return result
+          }
+        }
+        catch (error) {
+          console.error(`${constructor.name}.${methodName} resulted in error:`, error)
+          --currentLevel
+          throw error
+        }
+      }
     }
   })
 
-  // Return the modified constructor
   return constructor
 }
 
@@ -95,14 +117,34 @@ function applyClassDecorator<T extends Constructor>(constructor: T): T {
  */
 function applyMethodDecorator(target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void | PropertyDescriptor {
   const originalMethod = descriptor.value
-  const className = target.constructor.name
-  const methodName = propertyKey.toString()
-  const paramNames = getParamNames(originalMethod)
 
   descriptor.value = function (...methodArgs: any[]) {
-    const methodResult = originalMethod.apply(this, methodArgs)
-    handleMethodInvocationLogging(className, methodName, paramNames, methodArgs, methodResult)
-    return methodResult
+    // Adjusted to log before method execution
+    const paramNames = getParamNames(originalMethod)
+    logMethodStart(target.constructor.name, propertyKey.toString(), paramNames, methodArgs, ++currentLevel)
+
+    try {
+      const result = originalMethod.apply(this, methodArgs)
+      if (result instanceof Promise) {
+        return result.then((resolvedResult) => {
+          logMethodEnd(target.constructor.name, propertyKey.toString(), resolvedResult, currentLevel--)
+          return resolvedResult
+        }).catch((error) => {
+          console.error(`${target.constructor.name}.${propertyKey.toString()} resulted in error:`, error)
+          --currentLevel
+          throw error
+        })
+      }
+      else {
+        logMethodEnd(target.constructor.name, propertyKey.toString(), result, currentLevel--)
+        return result
+      }
+    }
+    catch (error) {
+      console.error(`${target.constructor.name}.${propertyKey.toString()} resulted in error:`, error)
+      --currentLevel
+      throw error
+    }
   }
 }
 
@@ -119,38 +161,35 @@ function getParamNames(func: Function): string[] {
   return []
 }
 
-function handleMethodInvocationLogging(className: string, methodName: string, paramNames: string[], methodArgs: any[], methodResult: any) {
-  if (methodResult instanceof Promise) {
-    methodResult.then((resolvedResult) => {
-      logMethodInvocation(className, methodName, paramNames, methodArgs, resolvedResult)
-    }).catch((error) => {
-      // Optionally log errors or handle them as needed
-      console.error(`${className}.${methodName} resulted in error:`, error)
-    })
-  }
-  else {
-    logMethodInvocation(className, methodName, paramNames, methodArgs, methodResult)
-  }
-}
-
-/**
- * Logs a method's invocation with its arguments.
- * @param className - The name of the class containing the invoked method.
- * @param methodName - The name of the invoked method.
- * @param paramNames - The names of the parameters of the invoked method.
- * @param methodArgs - The arguments passed to the invoked method.
- * @param result - The result of the invoked method, if any.
- */
-function logMethodInvocation(className: string, methodName: string, paramNames: string[], methodArgs: any[], result?: any) {
+function logMethodStart(className: string, methodName: string, paramNames: string[], methodArgs: any[], level: number) {
   const argsWithNames = paramNames.reduce((obj, name, index) => {
     obj[name] = methodArgs[index]
     return obj
   }, {} as Record<string, any>)
 
+  logInvocation('start', className, methodName, argsWithNames, undefined, level)
+}
+
+function logMethodEnd(className: string, methodName: string, result: any, level: number) {
+  logInvocation('end', className, methodName, {}, result, level)
+}
+
+function logInvocation(type: 'start' | 'end', className: string, methodName: string, argsWithNames: Record<string, any>, result: any, level: number) {
+  const tag = {
+    className,
+    methodName,
+    level,
+    type,
+  }
+
   consola
     .withDefaults({
       level: 5,
-      tag: `${className}.${methodName}`,
+      tag: JSON.stringify(tag),
     })
-    .debug('Parameters:', argsWithNames, 'Result:', result)
+    // .debug(`${type.toUpperCase()} - Parameters:`, argsWithNames, 'Result:', result)
+    .debug({
+      parameters: argsWithNames,
+      result,
+    })
 }
