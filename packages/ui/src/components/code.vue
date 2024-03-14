@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { useTheme } from '../composables/useTheme'
 import { useNotification } from '../composables/useNotification'
 import { useCode } from '../stores/useCode'
+import LoadingSpinner from './loading-spinner.vue'
 
 const { code, isLoading, executionTime } = storeToRefs(useCode())
 
@@ -41,12 +42,21 @@ function onCopy() {
       </button>
     </div>
 
-    <div class="code-copy max-h-82 overflow-scroll">
-      <div class="px-3 py-2">
-        <div v-show="!isLoading" class="w-full" v-html="html" />
-        <div v-show="isLoading">
-          Loading...
-        </div>
+    <div class="code-copy max-h-82 overflow-scroll relative">
+      <div
+        class="px-3 py-2"
+        :class="{
+          'opacity-50': isLoading,
+        }"
+      >
+        <div class="w-full" v-html="html" />
+      </div>
+
+      <div
+        v-show="isLoading"
+        class="absolute inset-0 flex justify-center items-center pointer-events-none"
+      >
+        <LoadingSpinner />
       </div>
     </div>
   </div>
