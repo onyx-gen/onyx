@@ -5,6 +5,7 @@ import { translateContainerNodeCSSData, translateVariantCSS } from '../css'
 import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
 import type { Configuration } from '../config/config'
+import { Log } from '../decoratos/log'
 import { simplifyConditionalString, transformPropKey } from './utils'
 import type {
   Attributes,
@@ -87,6 +88,7 @@ class HTMLGenerator {
    * @param {TreeNode<TreeNodeData & HasNodeCSSData>} tree - The TreeNode with CSS data.
    * @returns {CSSAttributes} - The CSS attributes extracted from the TreeNode.
    */
+  @Log
   private getCSSAttributes(tree: TreeNode<TreeNodeData & HasNodeCSSData>): CSSAttributes {
     const attrs: CSSAttributes = {}
 
