@@ -1,5 +1,6 @@
 import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
+import { Log } from '../decoratos/log'
 import type { GenericUtilityValue, IBuilder, RectCornersNew, RectSidesNew } from './types'
 import { createColorHandler } from './inference/color'
 import AutoLayoutBuilder from './auto-layout-builder'
@@ -7,6 +8,7 @@ import { getUtilityClass, translateUtilityValue } from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
 import { getToken, hasToken } from './utils'
 
+@Log
 class Builder implements IBuilder {
   constructor(private readonly config: Configuration) {}
 

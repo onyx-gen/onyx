@@ -68,8 +68,6 @@ function applyClassDecorator<T extends Constructor>(constructor: T): T {
     if (methodName === 'constructor')
       return
 
-    console.log('methodName:', methodName)
-
     const descriptor = Object.getOwnPropertyDescriptor(prototype, methodName)
 
     if (descriptor && typeof descriptor.value === 'function') {
