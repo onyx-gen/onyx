@@ -6,6 +6,7 @@ import { getToken, hasToken } from './utils'
 import { getUtilityClass, translateUtilityValue } from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
 import { isNonResizableTextMixin } from './mixins'
+import { createFontNameHandler } from './inference/font'
 
 /**
  * A builder for text nodes.
@@ -49,10 +50,22 @@ class TextBuilder implements IBuilder {
   private buildFontName(node: SceneNode & NonResizableTextMixin) {
     const { fontName } = node
 
-    if (fontName === figma.mixed)
+    if (fontName === figma.mixed) {
       console.error('[Builder] Mixed font names are not supported yet.')
-    else
-      console.error('[Builder] Font names are not supported yet.')
+    }
+    else {
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.fontFamilies,
+        'font',
+        fontName.family,
+        createFontNameHandler(this.config.nearestInference),
+        this.config.mode,
+      )
+
+      this.attributes.add(utilityClass)
+    }
   }
 
   /**
