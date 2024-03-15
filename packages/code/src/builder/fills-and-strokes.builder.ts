@@ -1,10 +1,14 @@
 import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
 import { Log } from '../decoratos/log'
-import type { IBuilder, RectSidesNew } from './types'
+import type { IBuilder } from './types'
 import { isMinimalFillsMixin, isMinimalStrokesMixin } from './mixins'
 import { createColorHandler } from './inference/color'
-import { getUtilityClass, translateUtilityValue } from './inference/utility'
+import {
+  type TokenPropertyUtilityClassPrefixMap,
+  getUtilityClass,
+  getUtilityClassForSides,
+} from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
 
 @Log
@@ -114,59 +118,61 @@ class FillsAndStrokesBuilder implements IBuilder {
           strokeRightWeight,
         } = node as SceneNode & IndividualStrokesMixin
 
-        const rectSides: RectSidesNew = {
-          top: strokeTopWeight || null,
-          bottom: strokeBottomWeight || null,
-          left: strokeLeftWeight || null,
-          right: strokeRightWeight || null,
+        const hasTopStrokeWeight = strokeTopWeight > 0
+        const hasBottomStrokeWeight = strokeBottomWeight > 0
+        const hasRightStrokeWeight = strokeRightWeight > 0
+        const hasLeftStrokeWeight = strokeLeftWeight > 0
+
+        const transformMap: TokenPropertyUtilityClassPrefixMap<number> = {}
+
+        if (hasTopStrokeWeight) {
+          transformMap.top = {
+            property: Properties.borderWidthTop,
+            utilityClassPrefix: 'border-t',
+            figmaValue: strokeTopWeight,
+          }
         }
 
-        this.handleRectSidesAttribute(rectSides, 'border')
+        if (hasBottomStrokeWeight) {
+          transformMap.bottom = {
+            property: Properties.borderWidthBottom,
+            utilityClassPrefix: 'border-b',
+            figmaValue: strokeBottomWeight,
+          }
+        }
+
+        if (hasRightStrokeWeight) {
+          transformMap.right = {
+            property: Properties.borderWidthRight,
+            utilityClassPrefix: 'border-r',
+            figmaValue: strokeRightWeight,
+          }
+        }
+
+        if (hasLeftStrokeWeight) {
+          transformMap.left = {
+            property: Properties.borderWidthLeft,
+            utilityClassPrefix: 'border-l',
+            figmaValue: strokeLeftWeight,
+          }
+        }
+
+        const attrs = getUtilityClassForSides(
+          node,
+          'generic',
+          transformMap,
+          {
+            horizontalEqualUtilityClassPrefix: 'border-x',
+            verticalEqualUtilityClassPrefix: 'border-y',
+            allEqualUtilityClassPrefix: 'border',
+          },
+          createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
+          this.config.mode,
+        )
+
+        attrs.forEach(element => this.attributes.add(element))
       }
     }
-  }
-
-  /**
-   * Handles attributes for rectangular sides (such as padding or border-width).
-   * It generates CSS classes based on the uniformity and equality of the rectangular sides.
-   * @param rectSides The object containing values for each side of the rectangle.
-   * @param attributePrefix The prefix to use for the CSS class.
-   */
-  private handleRectSidesAttribute(rectSides: RectSidesNew, attributePrefix: string) {
-    // Check if all sides are the same
-    const allSidesEqual = rectSides.top !== null
-      && rectSides.top === rectSides.bottom
-      && rectSides.bottom === rectSides.left
-      && rectSides.left === rectSides.right
-
-    const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
-
-    if (allSidesEqual) {
-      this.attributes.add(`${attributePrefix}-${translateUtilityValue(dimensionHandler(rectSides.top!))}`)
-      return
-    }
-
-    // Check if one axis is the same
-    const axisXEqual = rectSides.left !== null && rectSides.left === rectSides.right
-    const axisYEqual = rectSides.top !== null && rectSides.top === rectSides.bottom
-
-    if (axisXEqual)
-      this.attributes.add(`${attributePrefix}-x-${translateUtilityValue(dimensionHandler(rectSides.left!))}`)
-    if (axisYEqual)
-      this.attributes.add(`${attributePrefix}-y-${translateUtilityValue(dimensionHandler(rectSides.top!))}`)
-
-    if (axisXEqual && axisYEqual)
-      return
-
-    // Individual sides
-    if (rectSides.top !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-t-${translateUtilityValue(dimensionHandler(rectSides.top))}`)
-    if (rectSides.right !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-r-${translateUtilityValue(dimensionHandler(rectSides.right))}`)
-    if (rectSides.bottom !== null && !axisYEqual)
-      this.attributes.add(`${attributePrefix}-b-${translateUtilityValue(dimensionHandler(rectSides.bottom))}`)
-    if (rectSides.left !== null && !axisXEqual)
-      this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(dimensionHandler(rectSides.left))}`)
   }
 }
 
