@@ -4,6 +4,15 @@ import { isColorUtility } from '../types'
 import type { Properties } from '../../tokens/properties'
 import { getToken } from '../utils'
 
+/**
+ * Translates a `BaseUtilityValue` to a string representation based on its mode.
+ * - If the mode is `inferred`, it directly uses the value.
+ * - If the mode is `arbitrary`, it wraps the value in brackets.
+ * - If the mode is `variable`, it prefixes the value with a `$`.
+ * Additionally, if the utility value represents a color and has an opacity less than 100, it appends the opacity.
+ * @param utilityValue The utility value to translate.
+ * @returns The string representation of the utility value.
+ */
 export function translateUtilityValue(utilityValue: BaseUtilityValue): string {
   let value = ''
   switch (utilityValue.mode) {
@@ -46,6 +55,18 @@ type UtilityValuesRectSides = {
   [key in RectSide]: BaseUtilityValue
 }
 
+/**
+ * Retrieves a utility value for a specific property from a Figma node.
+ * This function supports different modes, such as using predefined variables or handling custom values through a handler function.
+ * @param node The Figma node to retrieve the value from.
+ * @param type The type of utility value being handled.
+ * @param property The specific property to handle.
+ * @param figmaValue The raw value from Figma to be processed.
+ * @param handler A function to process the figmaValue into a utility value.
+ * @param mode Specifies how to handle the utility value (e.g., as a variable).
+ * @returns The resulting utility value after processing.
+ * @throws If no utility value can be found or processed.
+ */
 function getUtilityValue<T extends BaseUtilityValue, V>(
   node: SceneNode,
   type: T['type'],
@@ -54,13 +75,10 @@ function getUtilityValue<T extends BaseUtilityValue, V>(
   handler: (val: V) => T,
   mode: Mode,
 ): BaseUtilityValue {
-  console.log('property', property)
-
   let utilityValue: BaseUtilityValue | null = null
 
   if (mode === 'variables') {
     const token = getToken(node, property)
-    console.log('token', token)
 
     if (token) {
       utilityValue = {
@@ -80,6 +98,18 @@ function getUtilityValue<T extends BaseUtilityValue, V>(
   return utilityValue
 }
 
+/**
+ * Constructs a utility class string for a given property on a Figma node.
+ * This function utilizes `getUtilityValue` to retrieve the utility value and then prefixes it with a class prefix.
+ * @param node The Figma node to retrieve the value from.
+ * @param type The type of utility value being handled.
+ * @param property The specific property to handle.
+ * @param utilityClassPrefix The prefix for the utility class.
+ * @param figmaValue The raw value from Figma to be processed.
+ * @param handler A function to process the figmaValue into a utility value.
+ * @param mode Specifies how to handle the utility value (e.g., as a variable).
+ * @returns The full utility class string.
+ */
 export function getUtilityClass<T extends BaseUtilityValue, V>(
   node: SceneNode,
   type: T['type'],
@@ -123,6 +153,17 @@ function has<V>(side: RectSide, map: TokenPropertyUtilityClassPrefixMap<V>): boo
   return map[side] !== undefined
 }
 
+/**
+ * Generates a set of utility classes for each side of a node, based on provided side maps and shortcuts.
+ *
+ * @param node - The Figma node to generate utility classes for.
+ * @param type - The type of the base utility value.
+ * @param rectSideMap - A map of utility class prefixes for each rect side.
+ * @param sideShortcuts - Shortcuts for generating classes when values are equal on all sides, or on horizontal/vertical axes.
+ * @param handler - A handler function to transform Figma values into utility values.
+ * @param mode - The mode to use for generating utility values.
+ * @returns A set of utility class strings.
+ */
 export function getUtilityClassForSides<T extends BaseUtilityValue, V>(
   node: SceneNode,
   type: T['type'],
