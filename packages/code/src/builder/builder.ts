@@ -8,12 +8,27 @@ import { getUtilityClass, translateUtilityValue } from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
 import { getToken, hasToken } from './utils'
 
+/**
+ * A builder class for constructing CSS attributes based on a scene node's properties.
+ * It supports various mixins to handle different properties like auto layout, dimensions,
+ * fills, and strokes. The builder uses configuration for dimension and color inference.
+ */
 @Log
 class Builder implements IBuilder {
-  constructor(private readonly config: Configuration) {}
-
   private attributes: Set<string> = new Set()
 
+  /**
+   * Constructs a new Builder instance with the provided configuration.
+   * @param config The configuration object containing settings for dimension and color inference.
+   */
+  constructor(private readonly config: Configuration) {}
+
+  /**
+   * Builds and collects CSS attributes for the given scene node based on its properties.
+   * It identifies the applicable mixins in the node and processes each accordingly.
+   * @param node The scene node to process.
+   * @returns A set of CSS attributes applicable to the node.
+   */
   public build(node: SceneNode) {
     if (Builder.isMinimalFillsMixin(node))
       this.buildMinimalFillsMixin(node)
@@ -36,6 +51,10 @@ class Builder implements IBuilder {
     return this.attributes
   }
 
+  /**
+   * Processes the auto layout properties of the given node, if applicable, and collects CSS attributes.
+   * @param node The scene node with auto layout properties to process.
+   */
   private buildAutoLayout(node: SceneNode & AutoLayoutMixin) {
     let autoLayoutBuilder: AutoLayoutBuilder | null = null
 
@@ -51,30 +70,65 @@ class Builder implements IBuilder {
       autoLayoutBuilder.build(node).forEach(css => this.attributes.add(css))
   }
 
+  /**
+   * Determines if the given node has auto layout properties.
+   * @param node The scene node to check.
+   * @returns True if the node has auto layout properties; otherwise, false.
+   */
   private static isAutoLayoutMixin(node: SceneNode): node is SceneNode & AutoLayoutMixin {
     return 'layoutMode' in node
   }
 
+  /**
+   * Determines if the given node has dimension and position properties.
+   * @param node The scene node to check.
+   * @returns True if the node has dimension and position properties; otherwise, false.
+   */
   private static isDimensionAndPositionMixin(node: SceneNode): node is SceneNode & DimensionAndPositionMixin {
     return 'width' in node && 'height' in node && 'x' in node && 'y' in node
   }
 
+  /**
+   * Determines if the given node has minimal fills properties.
+   * @param node The scene node to check.
+   * @returns True if the node has minimal fills properties; otherwise, false.
+   */
   private static isMinimalFillsMixin(node: SceneNode): node is SceneNode & MinimalFillsMixin {
     return 'fills' in node
   }
 
+  /**
+   * Determines if the given node has minimal strokes properties.
+   * @param node The scene node to check.
+   * @returns True if the node has minimal strokes properties; otherwise, false.
+   */
   private static isMinimalStrokesMixin(node: SceneNode): node is SceneNode & MinimalStrokesMixin {
     return 'strokes' in node
   }
 
+  /**
+   * Determines if the given node has properties related to non-resizable text.
+   * @param node The scene node to check.
+   * @returns True if the node has non-resizable text properties; otherwise, false.
+   */
   private static isNonResizableTextMixin(node: SceneNode): node is SceneNode & NonResizableTextMixin {
     return 'fontName' in node && 'fontSize' in node && 'letterSpacing' in node && 'lineHeight' in node
   }
 
+  /**
+   * Determines if the given node has corner properties.
+   * @param node The scene node to check.
+   * @returns True if the node has corner properties; otherwise, false.
+   */
   private static isCornerMixin(node: SceneNode): node is SceneNode & CornerMixin {
     return 'cornerRadius' in node
   }
 
+  /**
+   * Determines if the given node has properties for rectangular corners.
+   * @param node The scene node to check.
+   * @returns True if the node has rectangular corner properties; otherwise, false.
+   */
   private static isRectangleCornerMixin(node: SceneNode) {
     return 'topLeftRadius' in node
       && 'topRightRadius' in node
@@ -82,6 +136,10 @@ class Builder implements IBuilder {
       && 'bottomRightRadius' in node
   }
 
+  /**
+   * Processes the corner properties of the given node, if applicable, and collects CSS attributes.
+   * @param node The scene node with corner properties to process.
+   */
   private buildCornerMixin(node: SceneNode & CornerMixin) {
     const cornerRadius = node.cornerRadius
 
@@ -163,6 +221,10 @@ class Builder implements IBuilder {
       this.attributes.add(`${attributePrefix}-br-${translateUtilityValue(dimensionHandler(rectCorners.bottomRight))}`)
   }
 
+  /**
+   * Processes dimension and position properties of the given node, if applicable, and collects CSS attributes.
+   * @param node The scene node with dimension and position properties to process.
+   */
   private buildDimensionAndPositionMixin(node: SceneNode & DimensionAndPositionMixin) {
     const {
       width,
@@ -260,6 +322,10 @@ class Builder implements IBuilder {
     }
   }
 
+  /**
+   * Processes minimal strokes properties of the given node, if applicable, and collects CSS attributes.
+   * @param node The scene node with minimal strokes properties to process.
+   */
   private buildMinimalStrokesMixin(node: SceneNode & MinimalStrokesMixin) {
     const {
       strokes,
@@ -367,6 +433,10 @@ class Builder implements IBuilder {
       this.attributes.add(`${attributePrefix}-l-${translateUtilityValue(dimensionHandler(rectSides.left))}`)
   }
 
+  /**
+   * Processes non-resizable text properties of the given node, if applicable, and collects CSS attributes.
+   * @param node The scene node with non-resizable text properties to process.
+   */
   private buildNonResizableTextMixin(node: SceneNode & NonResizableTextMixin) {
     const {
       fontName,
@@ -461,6 +531,10 @@ class Builder implements IBuilder {
     }
   }
 
+  /**
+   * Processes minimal fills properties of the given node, if applicable, and collects CSS attributes.
+   * @param node The scene node with minimal fills properties to process.
+   */
   private buildMinimalFillsMixin(node: SceneNode & MinimalFillsMixin) {
     const fills = node.fills
     if (Array.isArray(fills) && fills.length > 0) {
