@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { rgbToHex } from '../src/builder/utils'
+import { rgbToHex } from '../../src/builder/utils'
 
 describe('builder', () => {
   describe('utils', () => {
