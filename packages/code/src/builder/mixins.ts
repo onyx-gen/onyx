@@ -74,3 +74,14 @@ export function isAutoLayoutMixin(node: SceneNode): node is SceneNode & AutoLayo
 export function isInferredAutoLayout(node: SceneNode): node is SceneNode & AutoLayoutMixin {
   return 'inferredAutoLayout' in node && node.inferredAutoLayout !== null
 }
+
+/**
+ * Determines if the given node has individual stroke properties.
+ * @param node - The scene node to check.
+ */
+export function isIndividualStrokesMixin(node: SceneNode): node is SceneNode & IndividualStrokesMixin {
+  return 'strokeTopWeight' in node
+    && 'strokeBottomWeight' in node
+    && 'strokeLeftWeight' in node
+    && 'strokeRightWeight' in node
+}

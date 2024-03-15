@@ -2,7 +2,7 @@ import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
 import { Log } from '../decoratos/log'
 import type { IBuilder } from './types'
-import { isMinimalFillsMixin, isMinimalStrokesMixin } from './mixins'
+import { isIndividualStrokesMixin, isMinimalFillsMixin, isMinimalStrokesMixin } from './mixins'
 import { createColorHandler } from './inference/color'
 import {
   type TokenPropertyUtilityClassPrefixMap,
@@ -110,69 +110,78 @@ class FillsAndStrokesBuilder implements IBuilder {
 
         this.attributes.add(utilityClass)
       }
-      else {
-        const {
-          strokeTopWeight,
-          strokeBottomWeight,
-          strokeLeftWeight,
-          strokeRightWeight,
-        } = node as SceneNode & IndividualStrokesMixin
-
-        const hasTopStrokeWeight = strokeTopWeight > 0
-        const hasBottomStrokeWeight = strokeBottomWeight > 0
-        const hasRightStrokeWeight = strokeRightWeight > 0
-        const hasLeftStrokeWeight = strokeLeftWeight > 0
-
-        const transformMap: TokenPropertyUtilityClassPrefixMap<number> = {}
-
-        if (hasTopStrokeWeight) {
-          transformMap.top = {
-            property: Properties.borderWidthTop,
-            utilityClassPrefix: 'border-t',
-            figmaValue: strokeTopWeight,
-          }
-        }
-
-        if (hasBottomStrokeWeight) {
-          transformMap.bottom = {
-            property: Properties.borderWidthBottom,
-            utilityClassPrefix: 'border-b',
-            figmaValue: strokeBottomWeight,
-          }
-        }
-
-        if (hasRightStrokeWeight) {
-          transformMap.right = {
-            property: Properties.borderWidthRight,
-            utilityClassPrefix: 'border-r',
-            figmaValue: strokeRightWeight,
-          }
-        }
-
-        if (hasLeftStrokeWeight) {
-          transformMap.left = {
-            property: Properties.borderWidthLeft,
-            utilityClassPrefix: 'border-l',
-            figmaValue: strokeLeftWeight,
-          }
-        }
-
-        const attrs = getUtilityClassForSides(
-          node,
-          'generic',
-          transformMap,
-          {
-            horizontalEqualUtilityClassPrefix: 'border-x',
-            verticalEqualUtilityClassPrefix: 'border-y',
-            allEqualUtilityClassPrefix: 'border',
-          },
-          createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
-          this.config.mode,
-        )
-
-        attrs.forEach(element => this.attributes.add(element))
+      else if (isIndividualStrokesMixin(node)) {
+        this.buildIndividualStrokesMixin(node)
       }
     }
+  }
+
+  /**
+   * Processes individual strokes properties of the given node and collects CSS attributes.
+   * @param node - The scene node with individual strokes properties to process.
+   * @private
+   */
+  private buildIndividualStrokesMixin(node: SceneNode & IndividualStrokesMixin) {
+    const {
+      strokeTopWeight,
+      strokeBottomWeight,
+      strokeLeftWeight,
+      strokeRightWeight,
+    } = node
+
+    const hasTopStrokeWeight = strokeTopWeight > 0
+    const hasBottomStrokeWeight = strokeBottomWeight > 0
+    const hasRightStrokeWeight = strokeRightWeight > 0
+    const hasLeftStrokeWeight = strokeLeftWeight > 0
+
+    const transformMap: TokenPropertyUtilityClassPrefixMap<number> = {}
+
+    if (hasTopStrokeWeight) {
+      transformMap.top = {
+        property: Properties.borderWidthTop,
+        utilityClassPrefix: 'border-t',
+        figmaValue: strokeTopWeight,
+      }
+    }
+
+    if (hasBottomStrokeWeight) {
+      transformMap.bottom = {
+        property: Properties.borderWidthBottom,
+        utilityClassPrefix: 'border-b',
+        figmaValue: strokeBottomWeight,
+      }
+    }
+
+    if (hasRightStrokeWeight) {
+      transformMap.right = {
+        property: Properties.borderWidthRight,
+        utilityClassPrefix: 'border-r',
+        figmaValue: strokeRightWeight,
+      }
+    }
+
+    if (hasLeftStrokeWeight) {
+      transformMap.left = {
+        property: Properties.borderWidthLeft,
+        utilityClassPrefix: 'border-l',
+        figmaValue: strokeLeftWeight,
+      }
+    }
+
+    const attrs = getUtilityClassForSides(
+      node,
+      'generic',
+      transformMap,
+      {
+        horizontalEqualUtilityClassPrefix: 'border-x',
+        verticalEqualUtilityClassPrefix: 'border-y',
+        allEqualUtilityClassPrefix: 'border',
+      },
+      createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
+      this.config.mode,
+    )
+
+    attrs.forEach(element => this.attributes.add(element))
   }
 }
 
