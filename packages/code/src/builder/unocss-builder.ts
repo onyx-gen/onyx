@@ -4,7 +4,7 @@ import { Properties } from '../tokens/properties'
 import { replaceToken } from '../tokens/replacer'
 import type { Configuration } from '../config/config'
 import { Log } from '../decoratos/log'
-import AutoLayoutBuilder from './auto-layout-builder'
+import AutoLayoutBuilder from './auto-layout.builder'
 import type { IBuilder, RectCorners, RectSides } from './types'
 
 type TokenHandler = () => void
@@ -284,21 +284,8 @@ export class UnocssBuilder implements IBuilder {
    * It adds CSS classes based on the layout properties of the node.
    */
   private handleAutoLayout() {
-    if (!('layoutMode' in this.node))
-      return
-
-    let autoLayoutBuilder: AutoLayoutBuilder | null = null
-
-    if (this.node.layoutMode !== 'NONE')
-      autoLayoutBuilder = new AutoLayoutBuilder(this.node, this.config)
-
-    // User has not explicitly set auto-layout, but Figma has inferred auto-layout
-    // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
-    else if (this.node.inferredAutoLayout !== null)
-      autoLayoutBuilder = new AutoLayoutBuilder(this.node.inferredAutoLayout, this.config)
-
-    if (autoLayoutBuilder)
-      autoLayoutBuilder.build(this.node).forEach(css => this.attributes.add(css))
+    const autoLayoutBuilder = new AutoLayoutBuilder(this.config)
+    autoLayoutBuilder.build(this.node).forEach(css => this.attributes.add(css))
   }
 
   /**
@@ -366,7 +353,7 @@ export class UnocssBuilder implements IBuilder {
    * It combines all the handled attributes into a single CSS class string.
    * @returns The final CSS class string.
    */
-  public build(node: SceneNode): Set<string> {
+  public build(_: SceneNode): Set<string> {
     this.handlePadding()
     this.handleBorderWidth()
     this.handleBorderRadius()
