@@ -2,7 +2,7 @@ import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
 import { Log } from '../decoratos/log'
 import { createDimensionHandler } from './inference/dimension'
-import { getUtilityClass } from './inference/utility'
+import { getUtilityClass, getUtilityClassForSides } from './inference/utility'
 import type { IBuilder } from './types'
 
 /**
@@ -117,68 +117,50 @@ class AutoLayoutBuilder implements IBuilder {
     const hasTopPadding = paddingTop > 0
     const hasBottomPadding = paddingBottom > 0
 
-    if (hasLeftPadding) {
+    const hasPadding
+      = hasLeftPadding
+      || hasRightPadding
+      || hasTopPadding
+      || hasBottomPadding
+
+    if (hasPadding) {
       const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
 
-      const attr = getUtilityClass(
+      const attrs = getUtilityClassForSides(
         node,
         'generic',
-        Properties.paddingLeft,
-        'pl',
-        paddingLeft,
+        {
+          left: {
+            property: Properties.paddingLeft,
+            utilityClassPrefix: 'pl',
+            figmaValue: paddingLeft,
+          },
+          right: {
+            property: Properties.paddingRight,
+            utilityClassPrefix: 'pr',
+            figmaValue: paddingRight,
+          },
+          top: {
+            property: Properties.paddingTop,
+            utilityClassPrefix: 'pt',
+            figmaValue: paddingTop,
+          },
+          bottom: {
+            property: Properties.paddingBottom,
+            utilityClassPrefix: 'pb',
+            figmaValue: paddingBottom,
+          },
+        },
+        {
+          horizontalEqualUtilityClassPrefix: 'px',
+          verticalEqualUtilityClassPrefix: 'py',
+          allEqualUtilityClassPrefix: 'p',
+        },
         dimensionHandler,
         this.config.mode,
       )
 
-      this.attributes.add(attr)
-    }
-
-    if (hasRightPadding) {
-      const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
-
-      const attr = getUtilityClass(
-        node,
-        'generic',
-        Properties.paddingRight,
-        'pr',
-        paddingRight,
-        dimensionHandler,
-        this.config.mode,
-      )
-
-      this.attributes.add(attr)
-    }
-
-    if (hasBottomPadding) {
-      const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
-
-      const attr = getUtilityClass(
-        node,
-        'generic',
-        Properties.paddingBottom,
-        'pb',
-        paddingBottom,
-        dimensionHandler,
-        this.config.mode,
-      )
-
-      this.attributes.add(attr)
-    }
-
-    if (hasTopPadding) {
-      const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
-
-      const attr = getUtilityClass(
-        node,
-        'generic',
-        Properties.paddingTop,
-        'pt',
-        paddingTop,
-        dimensionHandler,
-        this.config.mode,
-      )
-
-      this.attributes.add(attr)
+      attrs.forEach(element => this.attributes.add(element))
     }
   }
 
