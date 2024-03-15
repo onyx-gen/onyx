@@ -67,52 +67,79 @@ class FillsAndStrokesBuilder implements IBuilder {
    * @param node The scene node with minimal strokes properties to process.
    */
   private buildMinimalStrokesMixin(node: SceneNode & MinimalStrokesMixin) {
-    const {
-      strokes,
-      strokeWeight,
-    } = node
+    this.buildStrokeColor(node)
+    this.buildBorderWidth(node)
+  }
 
-    if (Array.isArray(strokes) && strokes.length > 0) {
-      if (strokes.length === 1) {
-        const stroke: Paint = strokes[0]
-        if (stroke.type === 'SOLID') {
-          const colorHandler = createColorHandler(this.config.colorLookup, this.config.nearestInference)
+  /**
+   * Processes the stroke color of the given node and collects CSS attributes.
+   * @param node - The scene node with stroke color to process.
+   * @private
+   */
+  private buildStrokeColor(node: SceneNode & MinimalStrokesMixin) {
+    const { strokes } = node
 
-          const utilityClass = getUtilityClass(
-            node,
-            'color',
-            Properties.borderColor,
-            'border-color',
-            stroke,
-            colorHandler,
-            this.config.mode,
-          )
-          this.attributes.add(utilityClass)
-        }
-        else { console.error('[Builder] Only solid strokes are supported yet.') }
-      }
-      else {
-        console.error('[Builder] Multiple strokes are not supported yet.')
-      }
+    const hasStrokes = Array.isArray(strokes) && strokes.length > 0
 
-      if (strokeWeight !== figma.mixed) {
-        const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+    if (!hasStrokes)
+      return
+
+    if (strokes.length === 1) {
+      const stroke: Paint = strokes[0]
+
+      if (stroke.type === 'SOLID') {
+        const colorHandler = createColorHandler(this.config.colorLookup, this.config.nearestInference)
 
         const utilityClass = getUtilityClass(
           node,
-          'generic',
-          Properties.borderWidth,
-          'border',
-          strokeWeight,
-          dimensionHandler,
+          'color',
+          Properties.borderColor,
+          'border-color',
+          stroke,
+          colorHandler,
           this.config.mode,
         )
 
         this.attributes.add(utilityClass)
       }
-      else if (isIndividualStrokesMixin(node)) {
-        this.buildIndividualStrokesMixin(node)
+      else {
+        console.error('[Builder] Only solid strokes are supported yet.')
       }
+    }
+    else {
+      console.error('[Builder] Multiple strokes are not supported yet.')
+    }
+  }
+
+  /**
+   * Processes the border width of the given node and collects CSS attributes.
+   * @param node - The scene node with border width to process.
+   * @private
+   */
+  private buildBorderWidth(node: SceneNode & MinimalStrokesMixin) {
+    const { strokeWeight, strokes } = node
+
+    const hasStrokes = Array.isArray(strokes) && strokes.length > 0
+    if (!hasStrokes)
+      return
+
+    if (strokeWeight !== figma.mixed) {
+      const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.borderWidth,
+        'border',
+        strokeWeight,
+        dimensionHandler,
+        this.config.mode,
+      )
+
+      this.attributes.add(utilityClass)
+    }
+    else if (isIndividualStrokesMixin(node)) {
+      this.buildIndividualStrokesMixin(node)
     }
   }
 
