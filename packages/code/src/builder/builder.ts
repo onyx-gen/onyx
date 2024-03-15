@@ -40,15 +40,15 @@ class Builder implements IBuilder {
     let autoLayoutBuilder: AutoLayoutBuilder | null = null
 
     if (node.layoutMode !== 'NONE')
-      autoLayoutBuilder = new AutoLayoutBuilder(node, node, this.config)
+      autoLayoutBuilder = new AutoLayoutBuilder(node, this.config)
 
     // User has not explicitly set auto-layout, but Figma has inferred auto-layout
     // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
     else if ('inferredAutoLayout' in node && node.inferredAutoLayout !== null)
-      autoLayoutBuilder = new AutoLayoutBuilder(node, node.inferredAutoLayout, this.config)
+      autoLayoutBuilder = new AutoLayoutBuilder(node.inferredAutoLayout, this.config)
 
     if (autoLayoutBuilder)
-      autoLayoutBuilder.build().forEach(css => this.attributes.add(css))
+      autoLayoutBuilder.build(node).forEach(css => this.attributes.add(css))
   }
 
   private static isAutoLayoutMixin(node: SceneNode): node is SceneNode & AutoLayoutMixin {

@@ -1,7 +1,9 @@
 import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
+import { Log } from '../decoratos/log'
 import { createDimensionHandler } from './inference/dimension'
 import { getUtilityClass } from './inference/utility'
+import type { IBuilder } from './types'
 
 /**
  * The AutoLayoutBuilder class is responsible for constructing a string of CSS class names
@@ -9,79 +11,85 @@ import { getUtilityClass } from './inference/utility'
  * for certain values like gaps. The generated string can be used to style elements
  * with CSS utility class frameworks like TailwindCSS or UnoCSS.
  */
-class AutoLayoutBuilder {
+@Log
+class AutoLayoutBuilder implements IBuilder {
+  private attributes: Set<string> = new Set()
+
   /**
    * Constructs an instance of AutoLayoutBuilder.
    *
-   * @param node - The SceneNode for which the auto layout properties are inferred.
    * @param autoLayout - The inferred auto layout result of the node.
-   * @param tokens - Design tokens used for styling.
    * @param config - The configuration for the builder.
    */
   constructor(
-    private readonly node: SceneNode,
     private readonly autoLayout: AutoLayoutMixin,
     private readonly config: Configuration,
   ) {}
 
   /**
    * Determines the flex direction based on the auto layout's layout mode.
-   *
-   * @returns A string representing the CSS class for flex direction.
    */
-  private getFlexDirection(): string {
-    return this.autoLayout.layoutMode === 'HORIZONTAL' ? '' : 'flex-col'
+  private buildFlexDirection(): void {
+    const flexDirection = this.autoLayout.layoutMode === 'HORIZONTAL' ? '' : 'flex-col'
+
+    if (flexDirection)
+      this.attributes.add(flexDirection)
   }
 
   /**
    * Determines the appropriate CSS class for 'justify-content' based on the primary axis alignment.
-   *
-   * @returns A string representing the CSS class for justify content.
    */
-  private getJustifyContent(): string {
+  private buildJustifyContent(): void {
     switch (this.autoLayout.primaryAxisAlignItems) {
       case 'MIN':
-        return 'justify-start'
+        this.attributes.add('justify-start')
+        break
+
       case 'CENTER':
-        return 'justify-center'
+        this.attributes.add('justify-center')
+        break
+
       case 'MAX':
-        return 'justify-end'
+        this.attributes.add('justify-end')
+        break
+
       case 'SPACE_BETWEEN':
-        return 'justify-between'
+        this.attributes.add('justify-between')
+        break
     }
   }
 
   /**
    * Determines the appropriate CSS class for 'align-items' based on the counter axis alignment.
-   *
-   * @returns A string representing the CSS class for align items.
    */
-  private getAlignItems(): string {
+  private buildAlignItems(): void {
     switch (this.autoLayout.counterAxisAlignItems) {
       case 'MIN':
-        return 'items-start'
+        this.attributes.add('items-start')
+        break
       case 'CENTER':
-        return 'items-center'
+        this.attributes.add('items-center')
+        break
       case 'MAX':
-        return 'items-end'
+        this.attributes.add('items-end')
+        break
       case 'BASELINE':
-        return 'items-baseline'
+        this.attributes.add('items-baseline')
+        break
     }
   }
 
   /**
    * Determines the gap between items in the layout, using the design tokens if available.
-   *
-   * @returns A string representing the CSS class for gap.
    */
-  private getGap(): string {
+  private buildGap(node: SceneNode): void {
     const hasGap = this.autoLayout.itemSpacing > 0 && this.autoLayout.primaryAxisAlignItems !== 'SPACE_BETWEEN'
 
     if (hasGap) {
       const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
 
-      return getUtilityClass(
-        this.node,
+      const gap = getUtilityClass(
+        node,
         'generic',
         Properties.itemSpacing,
         'gap',
@@ -89,72 +97,102 @@ class AutoLayoutBuilder {
         dimensionHandler,
         this.config.mode,
       )
-    }
 
-    return ''
+      this.attributes.add(gap)
+    }
   }
 
   /**
-   * Determines the horizontal padding of the layout, using the design tokens if available.
+   * Determines the padding of the auto layout, using the design tokens if available.
    * @private
-   * @returns A string representing the CSS class for horizontal padding.
    */
-  private getHorizontalPadding(): string {
-    const hasHorizontalPadding = this.autoLayout.horizontalPadding > 0
+  private buildPadding(node: SceneNode): void {
+    const paddingLeft = this.autoLayout.paddingLeft
+    const paddingRight = this.autoLayout.paddingRight
+    const paddingTop = this.autoLayout.paddingTop
+    const paddingBottom = this.autoLayout.paddingBottom
 
-    if (hasHorizontalPadding) {
+    const hasLeftPadding = paddingLeft > 0
+    const hasRightPadding = paddingRight > 0
+    const hasTopPadding = paddingTop > 0
+    const hasBottomPadding = paddingBottom > 0
+
+    if (hasLeftPadding) {
       const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
 
-      return getUtilityClass(
-        this.node,
+      const attr = getUtilityClass(
+        node,
         'generic',
-        Properties.horizontalPadding,
-        'px',
-        this.autoLayout.horizontalPadding,
+        Properties.paddingLeft,
+        'pl',
+        paddingLeft,
         dimensionHandler,
         this.config.mode,
       )
+
+      this.attributes.add(attr)
     }
 
-    return ''
-  }
-
-  /**
-   * Determines the horizontal padding of the layout, using the design tokens if available.
-   * @private
-   * @returns A string representing the CSS class for horizontal padding.
-   */
-  private getVerticalPadding(): string {
-    const hasVerticalPadding = this.autoLayout.verticalPadding > 0
-
-    if (hasVerticalPadding) {
+    if (hasRightPadding) {
       const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
 
-      return getUtilityClass(
-        this.node,
+      const attr = getUtilityClass(
+        node,
         'generic',
-        Properties.verticalPadding,
-        'py',
-        this.autoLayout.verticalPadding,
+        Properties.paddingRight,
+        'pr',
+        paddingRight,
         dimensionHandler,
         this.config.mode,
       )
+
+      this.attributes.add(attr)
     }
 
-    return ''
+    if (hasBottomPadding) {
+      const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
+      const attr = getUtilityClass(
+        node,
+        'generic',
+        Properties.paddingBottom,
+        'pb',
+        paddingBottom,
+        dimensionHandler,
+        this.config.mode,
+      )
+
+      this.attributes.add(attr)
+    }
+
+    if (hasTopPadding) {
+      const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+
+      const attr = getUtilityClass(
+        node,
+        'generic',
+        Properties.paddingTop,
+        'pt',
+        paddingTop,
+        dimensionHandler,
+        this.config.mode,
+      )
+
+      this.attributes.add(attr)
+    }
   }
 
   /**
    * Determines the flex property based on the node's relationship to its parent.
-   *
-   * @returns A string representing the CSS class for flex.
    */
-  private getFlex(): string {
-    return this.node.parent
-      && 'layoutMode' in this.node.parent
-      && this.node.parent.layoutMode === this.autoLayout.layoutMode
+  private buildFlex(node: SceneNode): void {
+    const flex = node.parent
+      && 'layoutMode' in node.parent
+      && node.parent.layoutMode === this.autoLayout.layoutMode
       ? 'flex'
       : 'inline-flex'
+
+    this.attributes.add(flex)
   }
 
   /**
@@ -162,19 +200,15 @@ class AutoLayoutBuilder {
    *
    * @returns A string of CSS class names.
    */
-  public build(): Set<string> {
-    return new Set<string>(
-      Object.values({
-        flex: this.getFlex(),
-        flexDirection: this.getFlexDirection(),
-        justifyContent: this.getJustifyContent(),
-        alignItems: this.getAlignItems(),
-        gap: this.getGap(),
-        horizontalPadding: this.getHorizontalPadding(),
-        verticalPadding: this.getVerticalPadding(),
-      })
-        .filter(value => value !== ''),
-    )
+  public build(node: SceneNode): Set<string> {
+    this.buildFlex(node)
+    this.buildFlexDirection()
+    this.buildJustifyContent()
+    this.buildAlignItems()
+    this.buildGap(node)
+    this.buildPadding(node)
+
+    return this.attributes
   }
 }
 

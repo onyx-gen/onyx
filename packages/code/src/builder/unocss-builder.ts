@@ -290,15 +290,15 @@ export class UnocssBuilder implements IBuilder {
     let autoLayoutBuilder: AutoLayoutBuilder | null = null
 
     if (this.node.layoutMode !== 'NONE')
-      autoLayoutBuilder = new AutoLayoutBuilder(this.node, this.node, this.config)
+      autoLayoutBuilder = new AutoLayoutBuilder(this.node, this.config)
 
     // User has not explicitly set auto-layout, but Figma has inferred auto-layout
     // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
     else if (this.node.inferredAutoLayout !== null)
-      autoLayoutBuilder = new AutoLayoutBuilder(this.node, this.node.inferredAutoLayout, this.config)
+      autoLayoutBuilder = new AutoLayoutBuilder(this.node.inferredAutoLayout, this.config)
 
     if (autoLayoutBuilder)
-      autoLayoutBuilder.build().forEach(css => this.attributes.add(css))
+      autoLayoutBuilder.build(this.node).forEach(css => this.attributes.add(css))
   }
 
   /**
