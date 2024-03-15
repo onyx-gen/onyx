@@ -159,6 +159,14 @@ function getParamNames(func: Function): string[] {
   return []
 }
 
+/**
+ * Logs the start of a method invocation, including method parameters and their values.
+ * @param className - The name of the class containing the method.
+ * @param methodName - The name of the invoked method.
+ * @param paramNames - An array containing the names of the parameters of the method.
+ * @param methodArgs - The arguments passed to the method at invocation.
+ * @param level - The current nesting level of method invocations, used for hierarchical logging.
+ */
 function logMethodStart(className: string, methodName: string, paramNames: string[], methodArgs: any[], level: number) {
   const argsWithNames = paramNames.reduce((obj, name, index) => {
     obj[name] = methodArgs[index]
@@ -168,10 +176,26 @@ function logMethodStart(className: string, methodName: string, paramNames: strin
   logInvocation('start', className, methodName, argsWithNames, undefined, level)
 }
 
+/**
+ * Logs the end of a method invocation, including the result of the method call.
+ * @param className - The name of the class containing the method.
+ * @param methodName - The name of the method whose invocation has ended.
+ * @param result - The result returned by the method invocation.
+ * @param level - The current nesting level of method invocations, decremented after logging.
+ */
 function logMethodEnd(className: string, methodName: string, result: any, level: number) {
   logInvocation('end', className, methodName, {}, result, level)
 }
 
+/**
+ * Generic logging function for both start and end of method invocations.
+ * @param type - Indicates whether the invocation is starting or ending ('start' | 'end').
+ * @param className - The name of the class containing the method.
+ * @param methodName - The name of the method being invoked.
+ * @param argsWithNames - An object mapping parameter names to their values. Empty for method end.
+ * @param result - The result of the method invocation. Defined for method end.
+ * @param level - The nesting level of the method invocation.
+ */
 function logInvocation(type: 'start' | 'end', className: string, methodName: string, argsWithNames: Record<string, any>, result: any, level: number) {
   const tag = {
     className,
