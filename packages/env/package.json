@@ -1,0 +1,24 @@
+{
+  "name": "@onyx/rollup-plugin-env",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "main": "dist/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@onyx/tsconfig": "workspace:^",
+    "dotenv": "^16.4.5",
+    "rollup": "^4.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.28",
+    "typescript": "^5.3.3"
+  }
+}

@@ -9,5 +9,9 @@
       "./node_modules/@figma"
     ]
   },
-  "include": ["./src/**/*", "./test/**/*"]
+  "include": [
+    "./src/**/*",
+    "./test/**/*",
+    "./.build/*.d.ts"
+  ]
 }

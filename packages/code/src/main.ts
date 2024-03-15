@@ -1,4 +1,5 @@
 import { consola } from 'consola'
+import env from 'virtual:env'
 import generate from './generate'
 import { PluginMessages, sendConfigurationMessage } from './messages'
 import ConfigurationManager from './config/config-manager'
@@ -7,8 +8,12 @@ import CustomReporter from './consola-reporter'
 // Skip over invisible nodes and their descendants inside instances for faster performance.
 figma.skipInvisibleInstanceChildren = true
 
+console.log('Loaded environment', env)
+
+console.log('log level', env.CODE_LOG_LEVEL)
+
 // Set the log level and reporters for the consola logger
-consola.level = 5
+consola.level = env.CODE_LOG_LEVEL
 consola.setReporters([
   new CustomReporter({}),
 ])
