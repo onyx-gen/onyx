@@ -7,6 +7,13 @@ import { getUtilityClass, translateUtilityValue } from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
 import { getToken, hasToken } from './utils'
 import FillsAndStrokesBuilder from './fills-and-strokes.builder'
+import {
+  isAutoLayoutMixin,
+  isCornerMixin,
+  isDimensionAndPositionMixin,
+  isNonResizableTextMixin,
+  isRectangleCornerMixin,
+} from './mixins'
 
 /**
  * A builder class for constructing CSS attributes based on a scene node's properties.
@@ -32,16 +39,16 @@ class Builder implements IBuilder {
   public build(node: SceneNode) {
     this.buildFillsAndStrokes(node)
 
-    if (Builder.isDimensionAndPositionMixin(node))
+    if (isDimensionAndPositionMixin(node))
       this.buildDimensionAndPositionMixin(node)
 
-    if (Builder.isCornerMixin(node))
+    if (isCornerMixin(node))
       this.buildCornerMixin(node)
 
-    if (Builder.isAutoLayoutMixin(node))
+    if (isAutoLayoutMixin(node))
       this.buildAutoLayout(node)
 
-    if (Builder.isNonResizableTextMixin(node))
+    if (isNonResizableTextMixin(node))
       this.buildNonResizableTextMixin(node)
 
     return this.attributes
@@ -87,54 +94,6 @@ class Builder implements IBuilder {
   }
 
   /**
-   * Determines if the given node has auto layout properties.
-   * @param node The scene node to check.
-   * @returns True if the node has auto layout properties; otherwise, false.
-   */
-  private static isAutoLayoutMixin(node: SceneNode): node is SceneNode & AutoLayoutMixin {
-    return 'layoutMode' in node
-  }
-
-  /**
-   * Determines if the given node has dimension and position properties.
-   * @param node The scene node to check.
-   * @returns True if the node has dimension and position properties; otherwise, false.
-   */
-  private static isDimensionAndPositionMixin(node: SceneNode): node is SceneNode & DimensionAndPositionMixin {
-    return 'width' in node && 'height' in node && 'x' in node && 'y' in node
-  }
-
-  /**
-   * Determines if the given node has properties related to non-resizable text.
-   * @param node The scene node to check.
-   * @returns True if the node has non-resizable text properties; otherwise, false.
-   */
-  private static isNonResizableTextMixin(node: SceneNode): node is SceneNode & NonResizableTextMixin {
-    return 'fontName' in node && 'fontSize' in node && 'letterSpacing' in node && 'lineHeight' in node
-  }
-
-  /**
-   * Determines if the given node has corner properties.
-   * @param node The scene node to check.
-   * @returns True if the node has corner properties; otherwise, false.
-   */
-  private static isCornerMixin(node: SceneNode): node is SceneNode & CornerMixin {
-    return 'cornerRadius' in node
-  }
-
-  /**
-   * Determines if the given node has properties for rectangular corners.
-   * @param node The scene node to check.
-   * @returns True if the node has rectangular corner properties; otherwise, false.
-   */
-  private static isRectangleCornerMixin(node: SceneNode) {
-    return 'topLeftRadius' in node
-      && 'topRightRadius' in node
-      && 'bottomLeftRadius' in node
-      && 'bottomRightRadius' in node
-  }
-
-  /**
    * Processes the corner properties of the given node, if applicable, and collects CSS attributes.
    * @param node The scene node with corner properties to process.
    */
@@ -147,7 +106,7 @@ class Builder implements IBuilder {
         this.attributes.add(`rounded-${translateUtilityValue(dimensionHandler(cornerRadius))}`)
       }
     }
-    else if (Builder.isRectangleCornerMixin(node)) {
+    else if (isRectangleCornerMixin(node)) {
       const {
         topLeftRadius,
         topRightRadius,
