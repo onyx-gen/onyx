@@ -175,20 +175,89 @@ class Builder implements IBuilder {
 
     const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
 
-    this.attributes.add(`w-${translateUtilityValue(dimensionHandler(width))}`)
-    this.attributes.add(`h-${translateUtilityValue(dimensionHandler(height))}`)
+    if (width > 0) {
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.width,
+        'w',
+        width,
+        dimensionHandler,
+        this.config.mode,
+      )
 
-    if (minWidth)
-      this.attributes.add(`min-w-${translateUtilityValue(dimensionHandler(minWidth))}`)
+      this.attributes.add(utilityClass)
+    }
 
-    if (minHeight)
-      this.attributes.add(`min-h-${translateUtilityValue(dimensionHandler(minHeight))}`)
+    if (height > 0) {
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.height,
+        'h',
+        height,
+        dimensionHandler,
+        this.config.mode,
+      )
 
-    if (maxWidth)
-      this.attributes.add(`max-w-${translateUtilityValue(dimensionHandler(maxWidth))}`)
+      this.attributes.add(utilityClass)
+    }
 
-    if (maxHeight)
-      this.attributes.add(`max-h-${translateUtilityValue(dimensionHandler(maxHeight))}`)
+    if (minWidth) {
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.minWidth,
+        'min-w',
+        minWidth,
+        dimensionHandler,
+        this.config.mode,
+      )
+
+      this.attributes.add(utilityClass)
+    }
+
+    if (minHeight) {
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.minHeight,
+        'min-h',
+        minHeight,
+        dimensionHandler,
+        this.config.mode,
+      )
+
+      this.attributes.add(utilityClass)
+    }
+
+    if (maxWidth) {
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.maxWidth,
+        'max-w',
+        maxWidth,
+        dimensionHandler,
+        this.config.mode,
+      )
+
+      this.attributes.add(utilityClass)
+    }
+
+    if (maxHeight) {
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.maxHeight,
+        'max-h',
+        maxHeight,
+        dimensionHandler,
+        this.config.mode,
+      )
+
+      this.attributes.add(utilityClass)
+    }
   }
 
   private buildMinimalStrokesMixin(node: SceneNode & MinimalStrokesMixin) {
