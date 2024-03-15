@@ -8,7 +8,6 @@ import { createDimensionHandler } from './inference/dimension'
 import { getToken, hasToken } from './utils'
 import FillsAndStrokesBuilder from './fills-and-strokes.builder'
 import {
-  isAutoLayoutMixin,
   isCornerMixin,
   isDimensionAndPositionMixin,
   isNonResizableTextMixin,
@@ -38,15 +37,13 @@ class Builder implements IBuilder {
    */
   public build(node: SceneNode) {
     this.buildFillsAndStrokes(node)
+    this.buildAutoLayout(node)
 
     if (isDimensionAndPositionMixin(node))
       this.buildDimensionAndPositionMixin(node)
 
     if (isCornerMixin(node))
       this.buildCornerMixin(node)
-
-    if (isAutoLayoutMixin(node))
-      this.buildAutoLayout(node)
 
     if (isNonResizableTextMixin(node))
       this.buildNonResizableTextMixin(node)
@@ -66,31 +63,23 @@ class Builder implements IBuilder {
   }
 
   /**
+   * Processes the auto layout properties of the given node, if applicable, and collects CSS attributes.
+   * @param node The scene node with auto layout properties to process.
+   * @private
+   */
+  private buildAutoLayout(node: SceneNode): void {
+    const autoLayoutBuilder = new AutoLayoutBuilder(this.config)
+    const autoLayoutAttributes = autoLayoutBuilder.build(node)
+    this.addAttributes(autoLayoutAttributes)
+  }
+
+  /**
    * Adds the given attributes to the internal set of attributes.
    * @param attributes
    * @private
    */
   private addAttributes(attributes: Set<string>): void {
     attributes.forEach(attribute => this.attributes.add(attribute))
-  }
-
-  /**
-   * Processes the auto layout properties of the given node, if applicable, and collects CSS attributes.
-   * @param node The scene node with auto layout properties to process.
-   */
-  private buildAutoLayout(node: SceneNode & AutoLayoutMixin) {
-    let autoLayoutBuilder: AutoLayoutBuilder | null = null
-
-    if (node.layoutMode !== 'NONE')
-      autoLayoutBuilder = new AutoLayoutBuilder(node, this.config)
-
-    // User has not explicitly set auto-layout, but Figma has inferred auto-layout
-    // https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
-    else if ('inferredAutoLayout' in node && node.inferredAutoLayout !== null)
-      autoLayoutBuilder = new AutoLayoutBuilder(node.inferredAutoLayout, this.config)
-
-    if (autoLayoutBuilder)
-      autoLayoutBuilder.build(node).forEach(css => this.attributes.add(css))
   }
 
   /**

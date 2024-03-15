@@ -63,3 +63,14 @@ export function isRectangleCornerMixin(node: SceneNode) {
 export function isAutoLayoutMixin(node: SceneNode): node is SceneNode & AutoLayoutMixin {
   return 'layoutMode' in node
 }
+
+/**
+ * Determines if the given node has inferred auto layout properties.
+ *
+ * User has not explicitly set auto-layout, but Figma has inferred auto-layout
+ * https://www.figma.com/plugin-docs/api/ComponentNode/#inferredautolayout
+ * @param node
+ */
+export function isInferredAutoLayout(node: SceneNode): node is SceneNode & AutoLayoutMixin {
+  return 'inferredAutoLayout' in node && node.inferredAutoLayout !== null
+}
