@@ -3,6 +3,7 @@ import { getAppliedTokens } from '../tokens/tokens'
 import { Properties } from '../tokens/properties'
 import { replaceToken } from '../tokens/replacer'
 import type { Configuration } from '../config/config'
+import { Log } from '../decoratos/log'
 import AutoLayoutBuilder from './auto-layout-builder'
 import type { IBuilder, RectCorners, RectSides } from './types'
 
@@ -28,6 +29,7 @@ type TokenHandlers = { [key in Properties]?: TokenHandler }
  * CSS generation logic, providing a simple interface to generate UnoCSS utility classes
  * from Figma nodes.
  */
+@Log
 export class UnocssBuilder implements IBuilder {
   private attributes: Set<string> = new Set()
   private readonly tokens: DesignTokens
@@ -365,8 +367,6 @@ export class UnocssBuilder implements IBuilder {
    * @returns The final CSS class string.
    */
   public build(node: SceneNode): Set<string> {
-    console.log('Building CSS for node', node.name)
-
     this.handlePadding()
     this.handleBorderWidth()
     this.handleBorderRadius()
