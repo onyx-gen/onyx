@@ -3,7 +3,6 @@ import type { BaseUtilityValue } from '../types'
 import { isColorUtility } from '../types'
 import type { Properties } from '../../tokens/properties'
 import { getToken } from '../utils'
-import { entries } from '../../utils'
 
 export function translateUtilityValue(utilityValue: BaseUtilityValue): string {
   let value = ''
@@ -33,8 +32,8 @@ interface UtilityClassPrefixTokenProperty<V> {
 
 type RectSide = 'left' | 'right' | 'top' | 'bottom'
 
-type TokenPropertyUtilityClassPrefixMap<V> = {
-  [key in RectSide]: UtilityClassPrefixTokenProperty<V>
+export type TokenPropertyUtilityClassPrefixMap<V> = {
+  [key in RectSide]?: UtilityClassPrefixTokenProperty<V>
 }
 
 interface SideShortcuts {
@@ -111,6 +110,19 @@ function checkUtilityClassEquality<T extends BaseUtilityValue, V extends BaseUti
   return true
 }
 
+/**
+ * Checks if the map has a specific side.
+ * @param side {RectSide} - The side to check for.
+ * @param map {TokenPropertyUtilityClassPrefixMap} - The map to check.
+ */
+function has<V>(side: 'left', map: TokenPropertyUtilityClassPrefixMap<V>): map is TokenPropertyUtilityClassPrefixMap<V> & { left: UtilityClassPrefixTokenProperty<V> }
+function has<V>(side: 'right', map: TokenPropertyUtilityClassPrefixMap<V>): map is TokenPropertyUtilityClassPrefixMap<V> & { right: UtilityClassPrefixTokenProperty<V> }
+function has<V>(side: 'top', map: TokenPropertyUtilityClassPrefixMap<V>): map is TokenPropertyUtilityClassPrefixMap<V> & { top: UtilityClassPrefixTokenProperty<V> }
+function has<V>(side: 'bottom', map: TokenPropertyUtilityClassPrefixMap<V>): map is TokenPropertyUtilityClassPrefixMap<V> & { bottom: UtilityClassPrefixTokenProperty<V> }
+function has<V>(side: RectSide, map: TokenPropertyUtilityClassPrefixMap<V>): boolean {
+  return map[side] !== undefined
+}
+
 export function getUtilityClassForSides<T extends BaseUtilityValue, V>(
   node: SceneNode,
   type: T['type'],
@@ -120,42 +132,67 @@ export function getUtilityClassForSides<T extends BaseUtilityValue, V>(
   mode: Mode,
 ) {
   const valuesForProperties: UtilityValuesRectSides = Object.fromEntries(
-    entries(rectSideMap).map(([side, sideMapEntry]) => {
+    Object.entries(rectSideMap).map(([side, sideMapEntry]) => {
       return [side as RectSide, getUtilityValue(node, type, sideMapEntry.property, sideMapEntry.figmaValue, handler, mode)]
     }),
   ) as UtilityValuesRectSides
 
   const attributes: Set<string> = new Set()
 
-  // Check if all sides are the same
-  const allSidesEqual = Object.values(valuesForProperties).every(value => checkUtilityClassEquality(valuesForProperties.left, value))
+  const sides: RectSide[] = ['top', 'right', 'bottom', 'left']
 
-  if (allSidesEqual) {
-    attributes.add(`${sideShortcuts.allEqualUtilityClassPrefix}-${translateUtilityValue(valuesForProperties.left)}`)
-    return attributes
+  const hasAllSides = sides.every(side => rectSideMap[side] !== undefined)
+
+  // Check if all sides are the same
+  if (hasAllSides) {
+    const allSidesEqual = Object.values(valuesForProperties).every(value => checkUtilityClassEquality(valuesForProperties.left, value))
+
+    if (allSidesEqual) {
+      attributes.add(`${sideShortcuts.allEqualUtilityClassPrefix}-${translateUtilityValue(valuesForProperties.left)}`)
+      return attributes
+    }
   }
 
   // Check if one axis is the same
-  const axisXEqual = checkUtilityClassEquality(valuesForProperties.left, valuesForProperties.right)
-  const axisYEqual = checkUtilityClassEquality(valuesForProperties.top, valuesForProperties.bottom)
+  const xAxisSides: RectSide[] = ['left', 'right']
+  const yAxisSides: RectSide[] = ['top', 'bottom']
 
-  if (axisXEqual)
-    attributes.add(`${sideShortcuts.horizontalEqualUtilityClassPrefix}-${translateUtilityValue(valuesForProperties.left)}`)
-  if (axisYEqual)
-    attributes.add(`${sideShortcuts.verticalEqualUtilityClassPrefix}-${translateUtilityValue(valuesForProperties.top)}`)
+  const hasXAxis = xAxisSides.every(side => rectSideMap[side] !== undefined)
+  const hasYAxis = yAxisSides.every(side => rectSideMap[side] !== undefined)
+
+  let axisXEqual = false
+  let axisYEqual = false
+
+  if (hasXAxis) {
+    axisXEqual = checkUtilityClassEquality(valuesForProperties.left, valuesForProperties.right)
+    if (axisXEqual)
+      attributes.add(`${sideShortcuts.horizontalEqualUtilityClassPrefix}-${translateUtilityValue(valuesForProperties.left)}`)
+  }
+
+  if (hasYAxis) {
+    axisYEqual = checkUtilityClassEquality(valuesForProperties.top, valuesForProperties.bottom)
+    if (axisYEqual)
+      attributes.add(`${sideShortcuts.verticalEqualUtilityClassPrefix}-${translateUtilityValue(valuesForProperties.top)}`)
+  }
 
   if (axisXEqual && axisYEqual)
     return attributes
 
   // Add individual sides
   if (!axisXEqual) {
-    attributes.add(`${rectSideMap.left.utilityClassPrefix}-${translateUtilityValue(valuesForProperties.left)}`)
-    attributes.add(`${rectSideMap.right.utilityClassPrefix}-${translateUtilityValue(valuesForProperties.right)}`)
+    if (has('left', rectSideMap))
+      attributes.add(`${rectSideMap.left.utilityClassPrefix}-${translateUtilityValue(valuesForProperties.left)}`)
+
+    if (has('right', rectSideMap))
+      attributes.add(`${rectSideMap.right.utilityClassPrefix}-${translateUtilityValue(valuesForProperties.right)}`)
   }
 
   if (!axisYEqual) {
-    attributes.add(`${rectSideMap.top.utilityClassPrefix}-${translateUtilityValue(valuesForProperties.top)}`)
-    attributes.add(`${rectSideMap.bottom.utilityClassPrefix}-${translateUtilityValue(valuesForProperties.bottom)}`)
+    if (has('top', rectSideMap))
+      attributes.add(`${rectSideMap.top.utilityClassPrefix}-${translateUtilityValue(valuesForProperties.top)}`)
+
+    if (has('bottom', rectSideMap))
+      attributes.add(`${rectSideMap.bottom.utilityClassPrefix}-${translateUtilityValue(valuesForProperties.bottom)}`)
   }
 
   return attributes

@@ -2,6 +2,7 @@ import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
 import { Log } from '../decoratos/log'
 import { createDimensionHandler } from './inference/dimension'
+import type { TokenPropertyUtilityClassPrefixMap } from './inference/utility'
 import { getUtilityClass, getUtilityClassForSides } from './inference/utility'
 import type { IBuilder } from './types'
 
@@ -126,31 +127,44 @@ class AutoLayoutBuilder implements IBuilder {
     if (hasPadding) {
       const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
 
+      const transformMap: TokenPropertyUtilityClassPrefixMap<number> = {}
+
+      if (hasTopPadding) {
+        transformMap.top = {
+          property: Properties.paddingTop,
+          utilityClassPrefix: 'pt',
+          figmaValue: paddingTop,
+        }
+      }
+
+      if (hasBottomPadding) {
+        transformMap.bottom = {
+          property: Properties.paddingBottom,
+          utilityClassPrefix: 'pb',
+          figmaValue: paddingBottom,
+        }
+      }
+
+      if (hasLeftPadding) {
+        transformMap.left = {
+          property: Properties.paddingLeft,
+          utilityClassPrefix: 'pl',
+          figmaValue: paddingLeft,
+        }
+      }
+
+      if (hasRightPadding) {
+        transformMap.right = {
+          property: Properties.paddingRight,
+          utilityClassPrefix: 'pr',
+          figmaValue: paddingRight,
+        }
+      }
+
       const attrs = getUtilityClassForSides(
         node,
         'generic',
-        {
-          left: {
-            property: Properties.paddingLeft,
-            utilityClassPrefix: 'pl',
-            figmaValue: paddingLeft,
-          },
-          right: {
-            property: Properties.paddingRight,
-            utilityClassPrefix: 'pr',
-            figmaValue: paddingRight,
-          },
-          top: {
-            property: Properties.paddingTop,
-            utilityClassPrefix: 'pt',
-            figmaValue: paddingTop,
-          },
-          bottom: {
-            property: Properties.paddingBottom,
-            utilityClassPrefix: 'pb',
-            figmaValue: paddingBottom,
-          },
-        },
+        transformMap,
         {
           horizontalEqualUtilityClassPrefix: 'px',
           verticalEqualUtilityClassPrefix: 'py',
