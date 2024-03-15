@@ -180,14 +180,17 @@ function logInvocation(type: 'start' | 'end', className: string, methodName: str
     type,
   }
 
+  const message: any = {
+    parameters: argsWithNames,
+  }
+
+  if (result)
+    message.result = result
+
   consola
     .withDefaults({
       level: 5,
       tag: JSON.stringify(tag),
     })
-    // .debug(`${type.toUpperCase()} - Parameters:`, argsWithNames, 'Result:', result)
-    .debug({
-      parameters: argsWithNames,
-      result,
-    })
+    .debug(message)
 }
