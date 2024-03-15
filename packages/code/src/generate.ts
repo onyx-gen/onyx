@@ -99,7 +99,6 @@ export default async function generate(config: Configuration): Promise<string | 
   finally {
     const endTime = Date.now()
     const executionTime = endTime - startTime
-    console.log(`Execution time: ${executionTime} milliseconds`)
     sendIsLoadingMessage(false)
     sendExecutionTimeMessage(executionTime)
   }
