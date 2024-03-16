@@ -1,4 +1,6 @@
-class FrameNodeFactory {
+import type { INodeFactory } from './types'
+
+class FrameNodeFactory implements INodeFactory<FrameNode> {
   private children: SceneNode[] = []
 
   public addChild(child: SceneNode) {
