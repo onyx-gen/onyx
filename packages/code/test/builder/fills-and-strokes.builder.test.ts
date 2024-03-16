@@ -11,11 +11,26 @@ describe('fills and strokes builder', () => {
   })
 
   it('handles fills inference correctly', () => {
-    const config: Configuration = new Configuration({})
+    const config: Configuration = new Configuration({
+      nearestInference: true,
+    })
     const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
 
     const node = minimalFillsMixinFactory.create()
     const attrs = fillsAndStrokesBuilder.build(node)
     expect(attrs).toContain(`bg-light-50`)
+  })
+
+  it('handles fills arbitrary correctly', () => {
+    const config: Configuration = new Configuration({
+      nearestInference: false,
+    })
+    const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
+
+    const color = '#ab12ef'
+
+    const node = minimalFillsMixinFactory.setColor(color).create()
+    const attrs = fillsAndStrokesBuilder.build(node)
+    expect(attrs).toContain(`bg-[${color}]`)
   })
 })
