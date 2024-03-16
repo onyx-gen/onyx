@@ -18,6 +18,8 @@ class TextBuilder implements IBuilder {
   constructor(private readonly config: Configuration) {}
 
   build(node: SceneNode): Set<string> {
+    this.attributes.clear()
+
     if (isNonResizableTextMixin(node))
       this.buildNonResizableTextMixin(node)
 
@@ -54,6 +56,11 @@ class TextBuilder implements IBuilder {
       console.error('[Builder] Mixed font names are not supported yet.')
     }
     else {
+      // TODO: Handle font family and font style from fontName value
+
+      if (fontName.family === '')
+        return
+
       const utilityClass = getUtilityClass(
         node,
         'generic',
@@ -80,6 +87,9 @@ class TextBuilder implements IBuilder {
       console.error('[Builder] Mixed font sizes are not supported yet.')
     }
     else {
+      if (fontSize === 0)
+        return
+
       const utilityClass = getUtilityClass(
         node,
         'generic',
@@ -108,6 +118,9 @@ class TextBuilder implements IBuilder {
     else {
       if (letterSpacing.unit === 'PIXELS') {
         const space = letterSpacing.value
+
+        if (space === 0)
+          return
 
         const utilityClass = getUtilityClass(
           node,
@@ -141,6 +154,9 @@ class TextBuilder implements IBuilder {
     else {
       if (lineHeight.unit === 'PIXELS') {
         const value = lineHeight.value
+
+        if (value === 0)
+          return
 
         const utilityClass = getUtilityClass(
           node,

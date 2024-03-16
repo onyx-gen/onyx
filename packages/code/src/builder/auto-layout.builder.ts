@@ -30,6 +30,8 @@ class AutoLayoutBuilder implements IBuilder {
    * @returns A string of CSS class names.
    */
   public build(node: SceneNode): Set<string> {
+    this.attributes.clear()
+
     if (isAutoLayoutMixin(node) && node.layoutMode !== 'NONE')
       this.buildAutoLayout(node)
 

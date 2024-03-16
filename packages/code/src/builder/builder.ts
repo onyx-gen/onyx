@@ -35,6 +35,8 @@ class Builder implements IBuilder {
    * @returns A set of CSS attributes applicable to the node.
    */
   public build(node: SceneNode) {
+    this.attributes.clear()
+
     this.buildFillsAndStrokes(node)
     this.buildAutoLayout(node)
     this.buildTextStyling(node)

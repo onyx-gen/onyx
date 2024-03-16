@@ -22,6 +22,8 @@ class FillsAndStrokesBuilder implements IBuilder {
    * @param node
    */
   build(node: SceneNode): Set<string> {
+    this.attributes.clear()
+
     if (isMinimalFillsMixin(node))
       this.buildMinimalFillsMixin(node)
 
