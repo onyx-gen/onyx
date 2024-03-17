@@ -3,6 +3,7 @@ import { Configuration } from '../../src/config/config'
 import MinimalFillsMixinFactory from '../factories/minimal-fills-mixin.factory'
 import FillsAndStrokesBuilder from '../../src/builder/fills-and-strokes.builder'
 import { Properties } from '../../src/tokens/properties'
+import { setTokens } from '../utils/tokens'
 
 describe('fills and strokes builder', () => {
   let minimalFillsMixinFactory: MinimalFillsMixinFactory = new MinimalFillsMixinFactory()
@@ -43,10 +44,15 @@ describe('fills and strokes builder', () => {
 
     const token = 'color-primary-500'
 
-    const node = minimalFillsMixinFactory
-      .addToken(Properties.fill, token)
-      .create()
+    const node = minimalFillsMixinFactory.create()
+
+    setTokens(
+      node,
+      new Map([[Properties.fill, token]]),
+    )
+
     const attrs = fillsAndStrokesBuilder.build(node)
+
     expect(attrs).toContain(`bg-$${token}`)
   })
 })
