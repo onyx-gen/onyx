@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { Configuration } from '../../src/config/config'
 import MinimalFillsMixinFactory from '../factories/minimal-fills-mixin.factory'
 import FillsAndStrokesBuilder from '../../src/builder/fills-and-strokes.builder'
+import { Properties } from '../../src/tokens/properties'
 
 describe('fills and strokes builder', () => {
   let minimalFillsMixinFactory: MinimalFillsMixinFactory = new MinimalFillsMixinFactory()
@@ -32,5 +33,20 @@ describe('fills and strokes builder', () => {
     const node = minimalFillsMixinFactory.setColor(color).create()
     const attrs = fillsAndStrokesBuilder.build(node)
     expect(attrs).toContain(`bg-[${color}]`)
+  })
+
+  it('handles fills token correctly', () => {
+    const config: Configuration = new Configuration({
+      mode: 'variables',
+    })
+    const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
+
+    const token = 'color-primary-500'
+
+    const node = minimalFillsMixinFactory
+      .addToken(Properties.fill, token)
+      .create()
+    const attrs = fillsAndStrokesBuilder.build(node)
+    expect(attrs).toContain(`bg-$${token}`)
   })
 })
