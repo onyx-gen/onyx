@@ -1,5 +1,4 @@
 import { hexToRGB } from '../../src/builder/utils'
-import type { Properties } from '../../src/tokens/properties'
 import type { INodeFactory } from './types'
 
 class MinimalFillsMixinFactory implements INodeFactory<SceneNode & MinimalFillsMixin> {
@@ -18,13 +17,6 @@ class MinimalFillsMixinFactory implements INodeFactory<SceneNode & MinimalFillsM
     return this
   }
 
-  private tokens: Map<Properties, string> = new Map()
-
-  public addToken(tokenName: Properties, tokenValue: string): this {
-    this.tokens.set(tokenName, tokenValue)
-    return this
-  }
-
   create(): SceneNode & MinimalFillsMixin {
     return {
       type: 'FRAME',
@@ -34,9 +26,7 @@ class MinimalFillsMixinFactory implements INodeFactory<SceneNode & MinimalFillsM
           color: this.color,
         },
       ],
-      getSharedPluginData: (namespace: 'tokens', key: Properties) => {
-        return ` ${this.tokens.get(key) ?? ''} `
-      },
+      getSharedPluginData: () => '',
     } as unknown as FrameNode & MinimalFillsMixin
   }
 }
