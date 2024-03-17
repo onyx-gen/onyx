@@ -12,47 +12,49 @@ describe('fills and strokes builder', () => {
     minimalFillsMixinFactory = new MinimalFillsMixinFactory()
   })
 
-  it('handles fills inference correctly', () => {
-    const config: Configuration = new Configuration({
-      nearestInference: true,
+  describe('buildMinimalFillsMixin', () => {
+    it('handles fills inference correctly', () => {
+      const config: Configuration = new Configuration({
+        nearestInference: true,
+      })
+      const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
+
+      const node = minimalFillsMixinFactory.create()
+      const attrs = fillsAndStrokesBuilder.build(node)
+      expect(attrs).toContain(`bg-light-50`)
     })
-    const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
 
-    const node = minimalFillsMixinFactory.create()
-    const attrs = fillsAndStrokesBuilder.build(node)
-    expect(attrs).toContain(`bg-light-50`)
-  })
+    it('handles fills arbitrary correctly', () => {
+      const config: Configuration = new Configuration({
+        nearestInference: false,
+      })
+      const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
 
-  it('handles fills arbitrary correctly', () => {
-    const config: Configuration = new Configuration({
-      nearestInference: false,
+      const color = '#ab12ef'
+
+      const node = minimalFillsMixinFactory.setColor(color).create()
+      const attrs = fillsAndStrokesBuilder.build(node)
+      expect(attrs).toContain(`bg-[${color}]`)
     })
-    const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
 
-    const color = '#ab12ef'
+    it('handles fills token correctly', () => {
+      const config: Configuration = new Configuration({
+        mode: 'variables',
+      })
+      const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
 
-    const node = minimalFillsMixinFactory.setColor(color).create()
-    const attrs = fillsAndStrokesBuilder.build(node)
-    expect(attrs).toContain(`bg-[${color}]`)
-  })
+      const token = 'color-primary-500'
 
-  it('handles fills token correctly', () => {
-    const config: Configuration = new Configuration({
-      mode: 'variables',
+      const node = minimalFillsMixinFactory.create()
+
+      setTokens(
+        node,
+        new Map([[Properties.fill, token]]),
+      )
+
+      const attrs = fillsAndStrokesBuilder.build(node)
+
+      expect(attrs).toContain(`bg-$${token}`)
     })
-    const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
-
-    const token = 'color-primary-500'
-
-    const node = minimalFillsMixinFactory.create()
-
-    setTokens(
-      node,
-      new Map([[Properties.fill, token]]),
-    )
-
-    const attrs = fillsAndStrokesBuilder.build(node)
-
-    expect(attrs).toContain(`bg-$${token}`)
   })
 })
