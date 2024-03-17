@@ -13,7 +13,7 @@ describe('fills and strokes builder', () => {
   })
 
   describe('buildMinimalFillsMixin', () => {
-    it('handles fills inference correctly', () => {
+    it('computes fills utility class (inference)', () => {
       const config: Configuration = new Configuration({
         nearestInference: true,
       })
@@ -24,7 +24,7 @@ describe('fills and strokes builder', () => {
       expect(attrs).toContain(`bg-light-50`)
     })
 
-    it('handles fills arbitrary correctly', () => {
+    it('computes fills utility class (arbitrary)', () => {
       const config: Configuration = new Configuration({
         nearestInference: false,
       })
@@ -37,7 +37,7 @@ describe('fills and strokes builder', () => {
       expect(attrs).toContain(`bg-[${color}]`)
     })
 
-    it('handles fills token correctly', () => {
+    it('computes fills utility class (variables)', () => {
       const config: Configuration = new Configuration({
         mode: 'variables',
       })
@@ -55,6 +55,31 @@ describe('fills and strokes builder', () => {
       const attrs = fillsAndStrokesBuilder.build(node)
 
       expect(attrs).toContain(`bg-$${token}`)
+    })
+  })
+
+  describe('buildMinimalStrokesMixin', () => {
+    describe('buildStrokeColor', () => {
+      it('computes strokes utility class (inference)', () => {})
+
+      it('computes strokes utility class (arbitrary)', () => {
+        const config: Configuration = new Configuration({
+          nearestInference: false,
+        })
+        const fillsAndStrokesBuilder = new FillsAndStrokesBuilder(config)
+
+        const color = '#ab12ef'
+
+        const node = minimalFillsMixinFactory.create()
+        const attrs = fillsAndStrokesBuilder.build(node)
+        expect(attrs).toContain(`border-color-[${color}]`)
+      })
+
+      it('computes strokes utility class (variables)', () => {})
+    })
+
+    describe('buildBorderWidth', () => {
+
     })
   })
 })
