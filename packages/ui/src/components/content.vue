@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { toRefs } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useCode } from '../stores/useCode'
 import Layout from './layout/layout.vue'
 import SelectedNodes from './selection.vue'
 import Configuration from './configuration.vue'
 import Code from './code.vue'
+import Preview from './preview.vue'
 
-const { selectedNodes, hasSelection } = toRefs(useCode())
+const { selectedNodes, hasSelection, hasPreview } = storeToRefs(useCode())
 </script>
 
 <template>
@@ -16,6 +17,12 @@ const { selectedNodes, hasSelection } = toRefs(useCode())
         <h1 class="text-2xl font-bold mb-4">
           Onyx
         </h1>
+      </Layout>
+    </div>
+
+    <div class="border-b border-color-$figma-color-border mb-4">
+      <Layout>
+        <Preview v-if="hasPreview" />
       </Layout>
     </div>
 
