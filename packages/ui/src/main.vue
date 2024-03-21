@@ -5,6 +5,7 @@ import { useConfiguration } from './stores/useConfiguration'
 import { useCode } from './stores/useCode'
 import Content from './components/content.vue'
 import LoadingSpinner from './components/loading-spinner.vue'
+import Preview from './components/preview.vue'
 
 const { listen } = useCode()
 listen()
@@ -13,10 +14,14 @@ const { init } = useConfiguration()
 init()
 
 const { isReady } = storeToRefs(useConfiguration())
+
+const { hasPreview } = storeToRefs(useCode())
 </script>
 
 <template>
   <MainLayout v-if="isReady">
+    <Preview v-if="hasPreview" />
+
     <Content />
   </MainLayout>
 

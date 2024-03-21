@@ -13,8 +13,8 @@
     "dev"
   ],
   "networkAccess": {
-    "allowedDomains": [
-      "none"
-    ]
+    "allowedDomains": ["*"],
+    "reasoning": "MyPlugin queries external resources.",
+    "devAllowedDomains": []
   }
 }

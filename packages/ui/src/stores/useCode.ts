@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { SelectedNode } from '@onyx/types'
 import { whenever } from '@vueuse/core'
+import useRenderer from '../composables/useRenderer'
 import { usePluginMessage } from './usePluginMessage'
 
 export const useCode = defineStore('code', () => {
@@ -10,6 +11,14 @@ export const useCode = defineStore('code', () => {
   const hasSelection = computed(() => selectedNodes.value !== null)
   const isLoading = ref(false)
   const executionTime = ref<number | null>(null)
+
+  const renderedHtml = ref<string | null>(null)
+  const hasPreview = computed(() => !!renderedHtml.value)
+
+  watch(code, async (vueTemplateString) => {
+    const { render } = useRenderer()
+    renderedHtml.value = await render({ vue: vueTemplateString })
+  })
 
   whenever(isLoading, () => executionTime.value = null)
 
@@ -46,5 +55,7 @@ export const useCode = defineStore('code', () => {
     hasSelection,
     isLoading,
     executionTime,
+    renderedHtml,
+    hasPreview,
   }
 })

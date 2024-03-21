@@ -3,9 +3,6 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
     "resolveJsonModule": true,
     "typeRoots": [
       "./node_modules/@types",
