@@ -38,6 +38,8 @@ class FillsAndStrokesBuilder implements IBuilder {
    * @param node The scene node with minimal fills properties to process.
    */
   private buildMinimalFillsMixin(node: SceneNode & MinimalFillsMixin) {
+    const isTextNode = node.type === 'TEXT'
+
     const fills = node.fills
     if (Array.isArray(fills) && fills.length > 0) {
       if (fills.length === 1) {
@@ -49,7 +51,7 @@ class FillsAndStrokesBuilder implements IBuilder {
             node,
             'color',
             Properties.fill,
-            'bg',
+            isTextNode ? 'color' : 'bg',
             fill,
             colorHandler,
             this.config.mode,
