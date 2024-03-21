@@ -26,6 +26,14 @@ export function isDimensionAndPositionMixin(node: SceneNode): node is SceneNode 
 }
 
 /**
+ * Determines if the given node has layout properties.
+ * @param node
+ */
+export function isLayoutMixin(node: SceneNode): node is SceneNode & LayoutMixin {
+  return 'layoutSizingHorizontal' in node && 'layoutSizingVertical' in node
+}
+
+/**
  * Determines if the given node has properties related to non-resizable text.
  * @param node The scene node to check.
  * @returns True if the node has non-resizable text properties; otherwise, false.

@@ -9,6 +9,7 @@ import FillsAndStrokesBuilder from './fills-and-strokes.builder'
 import {
   isCornerMixin,
   isDimensionAndPositionMixin,
+  isLayoutMixin,
   isRectangleCornerMixin,
 } from './mixins'
 import TextBuilder from './text.builder'
@@ -191,90 +192,103 @@ class Builder implements IBuilder {
       maxHeight,
     } = node
 
+    let hasFixedWidth = false
+    let hasFixedHeight = false
+
+    if (isLayoutMixin(node)) {
+      const { layoutSizingHorizontal, layoutSizingVertical } = node
+      hasFixedWidth = layoutSizingHorizontal === 'FIXED'
+      hasFixedHeight = layoutSizingVertical === 'FIXED'
+    }
+
     const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
 
-    if (width > 0) {
-      const utilityClass = getUtilityClass(
-        node,
-        'generic',
-        Properties.width,
-        'w',
-        width,
-        dimensionHandler,
-        this.config.mode,
-      )
+    if (hasFixedWidth) {
+      if (width > 0) {
+        const utilityClass = getUtilityClass(
+          node,
+          'generic',
+          Properties.width,
+          'w',
+          width,
+          dimensionHandler,
+          this.config.mode,
+        )
 
-      this.attributes.add(utilityClass)
+        this.attributes.add(utilityClass)
+      }
+
+      if (minWidth) {
+        const utilityClass = getUtilityClass(
+          node,
+          'generic',
+          Properties.minWidth,
+          'min-w',
+          minWidth,
+          dimensionHandler,
+          this.config.mode,
+        )
+
+        this.attributes.add(utilityClass)
+      }
+
+      if (maxWidth) {
+        const utilityClass = getUtilityClass(
+          node,
+          'generic',
+          Properties.maxWidth,
+          'max-w',
+          maxWidth,
+          dimensionHandler,
+          this.config.mode,
+        )
+
+        this.attributes.add(utilityClass)
+      }
     }
 
-    if (height > 0) {
-      const utilityClass = getUtilityClass(
-        node,
-        'generic',
-        Properties.height,
-        'h',
-        height,
-        dimensionHandler,
-        this.config.mode,
-      )
+    if (hasFixedHeight) {
+      if (height > 0) {
+        const utilityClass = getUtilityClass(
+          node,
+          'generic',
+          Properties.height,
+          'h',
+          height,
+          dimensionHandler,
+          this.config.mode,
+        )
 
-      this.attributes.add(utilityClass)
-    }
+        this.attributes.add(utilityClass)
+      }
 
-    if (minWidth) {
-      const utilityClass = getUtilityClass(
-        node,
-        'generic',
-        Properties.minWidth,
-        'min-w',
-        minWidth,
-        dimensionHandler,
-        this.config.mode,
-      )
+      if (minHeight) {
+        const utilityClass = getUtilityClass(
+          node,
+          'generic',
+          Properties.minHeight,
+          'min-h',
+          minHeight,
+          dimensionHandler,
+          this.config.mode,
+        )
 
-      this.attributes.add(utilityClass)
-    }
+        this.attributes.add(utilityClass)
+      }
 
-    if (minHeight) {
-      const utilityClass = getUtilityClass(
-        node,
-        'generic',
-        Properties.minHeight,
-        'min-h',
-        minHeight,
-        dimensionHandler,
-        this.config.mode,
-      )
+      if (maxHeight) {
+        const utilityClass = getUtilityClass(
+          node,
+          'generic',
+          Properties.maxHeight,
+          'max-h',
+          maxHeight,
+          dimensionHandler,
+          this.config.mode,
+        )
 
-      this.attributes.add(utilityClass)
-    }
-
-    if (maxWidth) {
-      const utilityClass = getUtilityClass(
-        node,
-        'generic',
-        Properties.maxWidth,
-        'max-w',
-        maxWidth,
-        dimensionHandler,
-        this.config.mode,
-      )
-
-      this.attributes.add(utilityClass)
-    }
-
-    if (maxHeight) {
-      const utilityClass = getUtilityClass(
-        node,
-        'generic',
-        Properties.maxHeight,
-        'max-h',
-        maxHeight,
-        dimensionHandler,
-        this.config.mode,
-      )
-
-      this.attributes.add(utilityClass)
+        this.attributes.add(utilityClass)
+      }
     }
   }
 }
