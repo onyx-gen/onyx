@@ -5,7 +5,7 @@ import type { GenericUtilityValue, IBuilder } from './types'
 import { getToken, hasToken } from './utils'
 import { getUtilityClass, translateUtilityValue } from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
-import { isNonResizableTextMixin } from './mixins'
+import { isNonResizableTextMixin, isTextNode } from './mixins'
 import { createFontNameHandler } from './inference/font'
 
 /**
@@ -22,6 +22,11 @@ class TextBuilder implements IBuilder {
 
     if (isNonResizableTextMixin(node))
       this.buildNonResizableTextMixin(node)
+
+    if (isTextNode(node)) {
+      this.buildSuperscriptTextNode(node)
+      this.buildSubscriptTextNode(node)
+    }
 
     return this.attributes
   }
@@ -42,6 +47,60 @@ class TextBuilder implements IBuilder {
       this.buildLetterSpacing(node)
       this.buildLineHeight(node)
     }
+  }
+
+  private buildSuperscriptTextNode(node: TextNode) {
+    if (this.isSuperScriptTextNode(node))
+      this.attributes.add('superscript')
+  }
+
+  private buildSubscriptTextNode(node: TextNode) {
+    if (this.isSubScriptTextNode(node))
+      this.attributes.add('subscript')
+  }
+
+  /**
+   * Checks if a given text node is a superscript text node.
+   *
+   * @param {TextNode} node - The text node to check.
+   * @returns {boolean} - Returns true if the text node is a superscript text node, otherwise false.
+   */
+  private isSuperScriptTextNode(node: TextNode): boolean {
+    // Get the OpenType features applied to the text in the node.
+    const openTypeFeatures = node.getRangeOpenTypeFeatures(0, node.characters.length)
+
+    // Check if there are any OpenType features applied.
+    if (Object.keys(openTypeFeatures).length > 0) {
+      // Check if the 'SUPS' (superscript) OpenType feature is applied.
+      // @ts-expect-error: SUPS is not in the type definition
+      if (openTypeFeatures.SUPS === true)
+        return true
+    }
+
+    // If no 'SUPS' feature is found, return false.
+    return false
+  }
+
+  /**
+   * Checks if a given text node is a subscript text node.
+   *
+   * @param {TextNode} node - The text node to check.
+   * @returns {boolean} - Returns true if the text node is a subtext text node, otherwise false.
+   */
+  private isSubScriptTextNode(node: TextNode): boolean {
+    // Get the OpenType features applied to the text in the node.
+    const openTypeFeatures = node.getRangeOpenTypeFeatures(0, node.characters.length)
+
+    // Check if there are any OpenType features applied.
+    if (Object.keys(openTypeFeatures).length > 0) {
+      // Check if the 'SUBS' (superscript) OpenType feature is applied.
+      // @ts-expect-error: SUBS is not in the type definition
+      if (openTypeFeatures.SUBS === true)
+        return true
+    }
+
+    // If no 'SUBS' feature is found, return false.
+    return false
   }
 
   /**

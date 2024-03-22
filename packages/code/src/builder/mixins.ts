@@ -43,6 +43,14 @@ export function isNonResizableTextMixin(node: SceneNode): node is SceneNode & No
 }
 
 /**
+ * Determines if the given node is a text node.
+ * @param node
+ */
+export function isTextNode(node: SceneNode): node is TextNode {
+  return node.type === 'TEXT'
+}
+
+/**
  * Determines if the given node has corner properties.
  * @param node The scene node to check.
  * @returns True if the node has corner properties; otherwise, false.
