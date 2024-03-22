@@ -25,5 +25,11 @@ watch(blobUrl, updateIFrame)
 </script>
 
 <template>
-  <iframe ref="iframeRef" />
+  <div class="pb-4">
+    <div class="font-sans text-xs font-semibold color-$figma-color-text pb-4">
+      Preview
+    </div>
+
+    <iframe ref="iframeRef" class="w-full h-16 bg-$figma-color-bg-secondary rounded-sm" />
+  </div>
 </template>
