@@ -1,3 +1,4 @@
+import { URL, fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
 import UnoCSS from 'unocss/vite'
@@ -13,6 +14,11 @@ export default defineConfig({
     viteSingleFile(),
     UnoCSS(),
   ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
   build: {
     target: 'esnext',
     assetsInlineLimit: 100000000,

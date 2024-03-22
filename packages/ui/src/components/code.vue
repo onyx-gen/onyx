@@ -2,10 +2,10 @@
 import { codeToHtml } from 'shiki'
 import { computedAsync, useClipboard } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { useTheme } from '../composables/useTheme'
-import { useNotification } from '../composables/useNotification'
-import { useCode } from '../stores/useCode'
 import LoadingSpinner from './loading-spinner.vue'
+import { useTheme } from '@/composables/useTheme'
+import { useNotification } from '@/composables/useNotification'
+import { useCode } from '@/stores/useCode'
 
 const { code, isLoading, executionTime } = storeToRefs(useCode())
 

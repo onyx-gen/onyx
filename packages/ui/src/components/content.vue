@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useCode } from '../stores/useCode'
 import Layout from './layout/layout.vue'
 import SelectedNodes from './selection.vue'
 import Configuration from './configuration.vue'
 import Code from './code.vue'
 import Preview from './preview.vue'
+import { useCode } from '@/stores/useCode'
 
-const { selectedNodes, hasSelection, hasPreview } = storeToRefs(useCode())
+const { selectedNodes, hasSelection } = storeToRefs(useCode())
 </script>
 
 <template>
@@ -20,9 +20,9 @@ const { selectedNodes, hasSelection, hasPreview } = storeToRefs(useCode())
       </Layout>
     </div>
 
-    <div class="border-b border-color-$figma-color-border mb-4">
+    <div v-if="hasSelection" class="border-b border-color-$figma-color-border mb-4">
       <Layout>
-        <Preview v-if="hasPreview" />
+        <Preview />
       </Layout>
     </div>
 

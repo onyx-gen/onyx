@@ -3,12 +3,16 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
+    "module": "esnext",
+    "paths": {
+      "@/*": ["./src/*"],
+    },
     "resolveJsonModule": true,
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@figma"
     ]
   },
-  "include": ["src/**/*", "src/**/*.vue"],
+  "include": ["src/**/*", "src/**/*.vue", "vite.config.ts"],
   "exclude": ["src/**/__tests__/*"]
 }

@@ -2,7 +2,7 @@
 import { onMounted, ref, watch } from 'vue'
 import html from 'virtual:preview-renderer'
 import { storeToRefs } from 'pinia'
-import { useCode } from '../stores/useCode'
+import { useCode } from '@/stores/useCode'
 
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 
