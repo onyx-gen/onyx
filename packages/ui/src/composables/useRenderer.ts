@@ -1,21 +1,11 @@
+import testHtmlString from '@onyx/renderer/dist/index.html?raw'
+
 export default function useRenderer() {
-  async function render(data = {}) {
-    console.log('[useRenderer] Rendering', data)
+  async function render(data: any = {}) {
+    const template = `<div class="h-full flex justify-center items-center">${data.vue}</div>`
 
-    const response = await fetch('http://localhost:3000', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-
-    if (!response.ok) {
-      console.error('[useRenderer] Response not ok', response)
-      throw new Error('Response not ok')
-    }
-
-    return await response.text()
+    return testHtmlString.replace('%template%', template)
+    // return testHtmlString
   }
 
   return { render }

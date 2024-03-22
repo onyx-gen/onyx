@@ -1,27 +1,38 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import html from 'virtual:preview-renderer'
 import { storeToRefs } from 'pinia'
 import { useCode } from '../stores/useCode'
 
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 
-const { renderedHtml } = storeToRefs(useCode())
+const blob = new Blob([html], { type: 'text/html' })
+const blobUrl = URL.createObjectURL(blob)
 
-const blobUrl = computed(() => {
-  if (!renderedHtml.value)
-    throw new Error('No rendered html')
+const { code } = storeToRefs(useCode())
 
-  const blob = new Blob([renderedHtml.value], { type: 'text/html' })
-  return URL.createObjectURL(blob)
+watch(code, (c) => {
+  const iframe = iframeRef.value
+
+  if (iframe) {
+    const targetOrigin = '*'
+
+    // Message you want to send to the iframe
+    const message = {
+      vue: c,
+    }
+
+    // Sending the message
+    iframe.contentWindow?.postMessage(message, targetOrigin)
+  }
 })
 
-function updateIFrame() {
-  if (iframeRef.value)
-    iframeRef.value.src = blobUrl.value
-}
+onMounted(() => {
+  const iframe = iframeRef.value
 
-onMounted(updateIFrame)
-watch(blobUrl, updateIFrame)
+  if (iframe)
+    iframe.src = blobUrl
+})
 </script>
 
 <template>

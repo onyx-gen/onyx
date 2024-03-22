@@ -18,7 +18,7 @@ export default function envRollupPlugin(): Plugin {
 
   const typeDefinitions = Object.keys(envVariables).map((key) => {
     // Detect if the value is a number and adjust the type accordingly
-    const isNumber = !isNaN(Number(envVariables[key]))
+    const isNumber = !Number.isNaN(Number(envVariables[key]))
     return `${key}: ${isNumber ? 'number' : 'string'};`
   }).join('\n    ')
 

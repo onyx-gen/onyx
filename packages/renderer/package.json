@@ -1,0 +1,27 @@
+{
+  "name": "@onyx/renderer",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.html",
+  "files": [
+    "dist/index.html"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@unocss/preset-mini": "^0.58.6",
+    "@unocss/reset": "^0.58.5",
+    "@unocss/runtime": "^0.58.6",
+    "vue": "^3.4.19"
+  },
+  "devDependencies": {
+    "@onyx/tsconfig": "workspace:^",
+    "typescript": "^5.3.3",
+    "vite": "^5.2.3",
+    "vite-plugin-singlefile": "^2.0.1"
+  }
+}
