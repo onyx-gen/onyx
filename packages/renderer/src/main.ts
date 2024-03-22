@@ -1,16 +1,7 @@
-import '@unocss/reset/tailwind.css'
 import { type App, createApp } from 'vue'
-import { presetMini } from '@unocss/preset-mini'
 
-import initUnocssRuntime from '@unocss/runtime'
-
-initUnocssRuntime({
-  defaults: {
-    presets: [
-      presetMini(),
-    ],
-  },
-})
+// Load and activate UnoCSS runtime
+import './unocss'
 
 let app: App | null = null
 
