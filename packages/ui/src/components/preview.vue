@@ -3,6 +3,7 @@ import { onMounted, ref, watch } from 'vue'
 import html from 'virtual:preview-renderer'
 import { storeToRefs } from 'pinia'
 import { useCode } from '@/stores/useCode'
+import Wrapper from '@/components/layout/wrapper.vue'
 
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 
@@ -36,11 +37,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="pb-4">
-    <div class="font-sans text-xs font-semibold color-$figma-color-text pb-4">
-      Preview
-    </div>
-
+  <Wrapper headline="Preview" class="mb-4">
     <iframe ref="iframeRef" class="w-full h-16 bg-$figma-color-bg-secondary rounded-sm" />
-  </div>
+  </Wrapper>
 </template>
