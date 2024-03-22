@@ -8,6 +8,7 @@ import { createDimensionHandler } from './inference/dimension'
 import { isNonResizableTextMixin, isTextNode } from './mixins'
 import { createFontNameHandler } from './inference/font'
 import { createLineHeightHandler } from './inference/line-height'
+import { createLetterSpacingHandler } from './inference/letter-spacing'
 
 /**
  * A builder for text nodes.
@@ -202,27 +203,22 @@ class TextBuilder implements IBuilder {
       console.error('[Builder] Mixed letter spacings are not supported yet.')
     }
     else {
-      if (letterSpacing.unit === 'PIXELS') {
-        const space = letterSpacing.value
+      const space = letterSpacing.value
 
-        if (space === 0)
-          return
+      if (space === 0)
+        return
 
-        const utilityClass = getUtilityClass(
-          node,
-          'generic',
-          Properties.letterSpacing,
-          'tracking',
-          space,
-          createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
-          this.config.mode,
-        )
+      const utilityClass = getUtilityClass(
+        node,
+        'generic',
+        Properties.letterSpacing,
+        'tracking',
+        space,
+        createLetterSpacingHandler(letterSpacing.unit, this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
+        this.config.mode,
+      )
 
-        this.attributes.add(utilityClass)
-      }
-      else {
-        console.error('[Builder] Only pixel letter spacings are supported yet.')
-      }
+      this.attributes.add(utilityClass)
     }
   }
 
