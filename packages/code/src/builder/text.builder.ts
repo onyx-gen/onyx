@@ -7,6 +7,7 @@ import { getUtilityClass, translateUtilityValue } from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
 import { isNonResizableTextMixin, isTextNode } from './mixins'
 import { createFontNameHandler } from './inference/font'
+import { createLineHeightHandler } from './inference/line-height'
 
 /**
  * A builder for text nodes.
@@ -237,7 +238,7 @@ class TextBuilder implements IBuilder {
       console.error('[Builder] Mixed line heights are not supported yet.')
     }
     else {
-      if (lineHeight.unit === 'PIXELS') {
+      if (lineHeight.unit === 'PIXELS' || lineHeight.unit === 'PERCENT') {
         const value = lineHeight.value
 
         if (value === 0)
@@ -249,14 +250,14 @@ class TextBuilder implements IBuilder {
           Properties.letterSpacing,
           'leading',
           value,
-          createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
+          createLineHeightHandler(lineHeight.unit, this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
           this.config.mode,
         )
 
         this.attributes.add(utilityClass)
       }
       else {
-        console.error('[Builder] Only pixel line heights are supported yet.')
+        console.error('[Builder] Only pixel and percent line heights are supported yet.')
       }
     }
   }
