@@ -26,6 +26,8 @@ class TextBuilder implements IBuilder {
     if (isTextNode(node)) {
       this.buildSuperscriptTextNode(node)
       this.buildSubscriptTextNode(node)
+      this.buildTextAlignHorizontal(node)
+      this.buildTextAlignVertical(node)
     }
 
     return this.attributes
@@ -47,6 +49,30 @@ class TextBuilder implements IBuilder {
       this.buildLetterSpacing(node)
       this.buildLineHeight(node)
     }
+  }
+
+  private buildTextAlignHorizontal(node: TextNode) {
+    const { textAlignHorizontal } = node
+
+    if (textAlignHorizontal === 'LEFT')
+      this.attributes.add('text-left') // TODO: Default can be hidden
+    else if (textAlignHorizontal === 'CENTER')
+      this.attributes.add('text-center')
+    else if (textAlignHorizontal === 'RIGHT')
+      this.attributes.add('text-right')
+    else if (textAlignHorizontal === 'JUSTIFIED')
+      this.attributes.add('text-justify')
+  }
+
+  private buildTextAlignVertical(node: TextNode) {
+    const { textAlignVertical } = node
+
+    if (textAlignVertical === 'TOP')
+      this.attributes.add('align-top')
+    else if (textAlignVertical === 'CENTER')
+      this.attributes.add('align-middle')
+    else if (textAlignVertical === 'BOTTOM')
+      this.attributes.add('align-bottom')
   }
 
   private buildSuperscriptTextNode(node: TextNode) {
