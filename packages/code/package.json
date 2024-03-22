@@ -10,7 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@unocss/preset-mini": "^0.58.5",
+    "@unocss/preset-mini": "^0.58.6",
     "consola": "^3.2.3",
     "defu": "^6.1.4",
     "envalid": "^8.0.0",

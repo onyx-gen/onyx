@@ -13,6 +13,6 @@
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.87.0",
-    "@unocss/preset-mini": "^0.58.5"
+    "@unocss/preset-mini": "^0.58.6"
   }
 }
