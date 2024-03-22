@@ -20,7 +20,10 @@ export function translateUtilityValue(utilityValue: BaseUtilityValue): string {
       value = utilityValue.value
       break
     case 'arbitrary':
-      value = `[${utilityValue.value}]`
+      if (utilityValue.type === 'font-name')
+        value = `[${utilityValue.value.replaceAll(' ', '_')}]`
+      else
+        value = `[${utilityValue.value}]`
       break
     case 'variable':
       value = `$${utilityValue.value}`

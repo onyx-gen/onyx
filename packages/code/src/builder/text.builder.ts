@@ -122,7 +122,7 @@ class TextBuilder implements IBuilder {
 
       const utilityClass = getUtilityClass(
         node,
-        'generic',
+        'font-name',
         Properties.fontFamilies,
         'font',
         fontName.family,

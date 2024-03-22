@@ -65,3 +65,7 @@ export interface ColorUtilityValue extends BaseUtilityValue {
 export interface GenericUtilityValue extends BaseUtilityValue {
   type: 'generic'
 }
+
+export interface FontNameUtilityValue extends BaseUtilityValue {
+  type: 'font-name'
+}
