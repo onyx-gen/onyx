@@ -52,7 +52,7 @@ declare module 'virtual:env' {
       if (id === 'virtual:env') {
         // Convert number strings to actual numbers for the output
         const modifiedEnvVariables = Object.fromEntries(
-          Object.entries(envVariables).map(([key, value]) => [key, !isNaN(Number(value)) ? Number(value) : value]),
+          Object.entries(envVariables).map(([key, value]) => [key, !Number.isNaN(Number(value)) ? Number(value) : value]),
         )
 
         return `export default ${JSON.stringify(modifiedEnvVariables)};`
