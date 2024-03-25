@@ -2,7 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/unocss-variables.iml" filepath="$PROJECT_DIR$/.idea/unocss-variables.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/code/code.iml" filepath="$PROJECT_DIR$/packages/code/code.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/env/env.iml" filepath="$PROJECT_DIR$/packages/env/env.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/icons/icons.iml" filepath="$PROJECT_DIR$/packages/icons/icons.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/onyx.iml" filepath="$PROJECT_DIR$/.idea/onyx.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/renderer/renderer.iml" filepath="$PROJECT_DIR$/packages/renderer/renderer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/tsconfig/tsconfig.iml" filepath="$PROJECT_DIR$/packages/tsconfig/tsconfig.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/types/types.iml" filepath="$PROJECT_DIR$/packages/types/types.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/ui/ui.iml" filepath="$PROJECT_DIR$/packages/ui/ui.iml" />
     </modules>
   </component>
 </project>
