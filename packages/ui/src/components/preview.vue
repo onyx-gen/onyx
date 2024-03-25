@@ -54,7 +54,7 @@ onMounted(() => {
     <iframe
       ref="iframeRef"
       :src="blobUrl"
-      class="w-full bg-$figma-color-bg-secondary rounded-sm"
+      class="w-full min-h-24 bg-$figma-color-bg-secondary rounded-sm"
     />
   </Wrapper>
 </template>
