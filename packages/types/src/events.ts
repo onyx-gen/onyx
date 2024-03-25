@@ -2,6 +2,8 @@ import type { ComponentProps, IConfiguration, Mode, Unit } from './types'
 
 export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
 
+export type RendererMessageEvent = MessageEvent<PluginMessage>
+
 /**
  * Represents a base plugin message.
  *
@@ -13,6 +15,12 @@ export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
 interface BasePluginMessage<E, T> {
   event: E
   data: T
+}
+
+export type RendererPluginMessage = BasePluginMessage<'renderer', RendererPluginMessageData>
+
+interface RendererPluginMessageData {
+  height: number
 }
 
 export type HtmlPluginMessage = BasePluginMessage<'html', HtmlPluginMessageData>
@@ -89,6 +97,7 @@ interface SelectedPluginMessageData {
 }
 
 export type PluginMessage =
+  | RendererPluginMessage
   | HtmlPluginMessage
   | UnselectedPluginMessage
   | ExecutionTimePluginMessage

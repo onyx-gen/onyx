@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@onyx/tsconfig": "workspace:^",
+    "@onyx/types": "workspace:^",
     "@unocss/core": "^0.58.6",
     "typescript": "^5.3.3",
     "unocss": "^0.58.6",

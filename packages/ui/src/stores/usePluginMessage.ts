@@ -1,17 +1,34 @@
 import { defineStore } from 'pinia'
 import { useEventBus, useEventListener } from '@vueuse/core'
-import type { PluginMessage, PluginMessageEvent } from '@onyx/types'
+import type { PluginMessage, PluginMessageEvent, RendererMessageEvent } from '@onyx/types'
+
 import { onUnmounted } from 'vue'
 
 export const usePluginMessage = defineStore('pluginMessageStore', () => {
   const bus = useEventBus<PluginMessage>('plugin-message')
 
   /**
+   * Checks if a message event is a plugin message event.
+   *
+   * @param messageEvent - The message event to check.
+   * @returns Whether the message event is a plugin message event.
+   */
+  function isPluginMessageEvent(messageEvent: MessageEvent): messageEvent is PluginMessageEvent {
+    return 'pluginMessage' in messageEvent.data
+  }
+
+  /**
    * Listens to the 'message' event on the window object to handle plugin messages.
    * When a message is received, it emits the message data to the event bus.
    */
-  useEventListener(window, 'message', (event: PluginMessageEvent) => {
-    const pluginMessage = event.data.pluginMessage
+  useEventListener(window, 'message', (event: PluginMessageEvent | RendererMessageEvent) => {
+    let pluginMessage: PluginMessage
+
+    if (isPluginMessageEvent(event))
+      pluginMessage = event.data.pluginMessage
+    else
+      pluginMessage = event.data
+
     bus.emit(pluginMessage)
   })
 

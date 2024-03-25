@@ -1,4 +1,7 @@
-import { type App, createApp } from 'vue'
+import { type App, createApp, nextTick } from 'vue'
+import type {
+  RendererPluginMessage,
+} from '@onyx/types'
 
 // Load and activate UnoCSS runtime
 import './unocss'
@@ -6,7 +9,7 @@ import './unocss'
 let app: App | null = null
 
 // Listen for messages from the parent frame
-window.addEventListener('message', (event) => {
+window.addEventListener('message', async (event) => {
   if (app !== null)
     app.unmount()
 
@@ -19,4 +22,14 @@ window.addEventListener('message', (event) => {
   }
 
   app.mount('#app')
+
+  // Wait for Vue to finish updating the DOM
+  await nextTick()
+
+  // get #app element from dom and calculate scroll height
+  const el = document.getElementById('app')!
+  const height = el.scrollHeight
+
+  const pluginMessage: RendererPluginMessage = { event: 'renderer', data: { height } }
+  window.parent.postMessage(pluginMessage, '*')
 })

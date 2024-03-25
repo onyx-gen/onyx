@@ -146,6 +146,9 @@ importers:
       '@onyx/tsconfig':
         specifier: workspace:^
         version: link:../tsconfig
+      '@onyx/types':
+        specifier: workspace:^
+        version: link:../types
       '@unocss/core':
         specifier: ^0.58.6
         version: 0.58.6

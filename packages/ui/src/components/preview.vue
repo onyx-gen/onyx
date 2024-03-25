@@ -4,6 +4,7 @@ import html from 'virtual:preview-renderer'
 import { storeToRefs } from 'pinia'
 import { useCode } from '@/stores/useCode'
 import Wrapper from '@/components/layout/wrapper.vue'
+import { usePluginMessage } from '@/stores/usePluginMessage'
 
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 
@@ -33,11 +34,17 @@ onMounted(() => {
 
   if (iframe)
     iframe.src = blobUrl
+
+  // Adapt the height of the iframe to the content
+  const { onPluginMessage } = usePluginMessage()
+  onPluginMessage('renderer', (d) => {
+    iframeRef.value!.style.height = `${d.height}px`
+  })
 })
 </script>
 
 <template>
   <Wrapper headline="Preview" class="mb-4">
-    <iframe ref="iframeRef" class="w-full h-16 bg-$figma-color-bg-secondary rounded-sm" />
+    <iframe ref="iframeRef" class="w-full bg-$figma-color-bg-secondary rounded-sm" />
   </Wrapper>
 </template>
