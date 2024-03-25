@@ -1,4 +1,4 @@
-import { type App, createApp, nextTick } from 'vue'
+import { type App, createApp } from 'vue'
 import type {
   RendererPluginMessage,
 } from '@onyx/types'
@@ -22,14 +22,22 @@ window.addEventListener('message', async (event) => {
   }
 
   app.mount('#app')
-
-  // Wait for Vue to finish updating the DOM
-  await nextTick()
-
-  // get #app element from dom and calculate scroll height
-  const el = document.getElementById('app')!
-  const height = el.scrollHeight
-
-  const pluginMessage: RendererPluginMessage = { event: 'renderer', data: { height } }
-  window.parent.postMessage(pluginMessage, '*')
 })
+
+function observeHeight() {
+  const targetElement = document.getElementById('app')!
+
+  // Using ResizeObserver to directly observe size changes
+  const resizeObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const height = entry.contentRect.height
+      const pluginMessage: RendererPluginMessage = { event: 'renderer', data: { height } }
+      window.parent.postMessage(pluginMessage, '*')
+    }
+  })
+
+  // Start observing the target element
+  resizeObserver.observe(targetElement)
+}
+
+observeHeight()
