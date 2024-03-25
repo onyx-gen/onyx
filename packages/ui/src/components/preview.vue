@@ -30,11 +30,6 @@ watch(code, (c) => {
 })
 
 onMounted(() => {
-  const iframe = iframeRef.value
-
-  if (iframe)
-    iframe.src = blobUrl
-
   // Adapt the height of the iframe to the content
   const { onPluginMessage } = usePluginMessage()
   onPluginMessage('renderer', (d) => {
@@ -45,6 +40,10 @@ onMounted(() => {
 
 <template>
   <Wrapper headline="Preview" class="mb-4">
-    <iframe ref="iframeRef" class="w-full bg-$figma-color-bg-secondary rounded-sm" />
+    <iframe
+      ref="iframeRef"
+      :src="blobUrl"
+      class="w-full bg-$figma-color-bg-secondary rounded-sm"
+    />
   </Wrapper>
 </template>
