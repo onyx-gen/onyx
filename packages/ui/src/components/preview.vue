@@ -12,8 +12,9 @@ const blob = new Blob([html], { type: 'text/html' })
 const blobUrl = URL.createObjectURL(blob)
 
 const { code } = storeToRefs(useCode())
+watch(code, sendCode)
 
-watch(code, (c) => {
+function sendCode() {
   const iframe = iframeRef.value
 
   if (iframe) {
@@ -21,13 +22,13 @@ watch(code, (c) => {
 
     // Message you want to send to the iframe
     const message = {
-      vue: c,
+      vue: code.value,
     }
 
     // Sending the message
     iframe.contentWindow?.postMessage(message, targetOrigin)
   }
-})
+}
 
 onMounted(() => {
   // Adapt the height of the iframe to the content
@@ -35,6 +36,16 @@ onMounted(() => {
   onPluginMessage('renderer', (d) => {
     iframeRef.value!.style.height = `${d.height}px`
   })
+
+  // Send code to the iframe when it's loaded.
+  // Necessary, as the iframe is not ready when the code
+  // is sent via the code reference variable watcher.
+  const iframe = iframeRef.value
+  if (iframe) {
+    iframe.onload = () => {
+      sendCode()
+    }
+  }
 })
 </script>
 
