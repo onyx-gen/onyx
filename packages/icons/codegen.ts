@@ -12,6 +12,8 @@ import 'dotenv/config'
 
 // Validate and load environment variables
 const env = cleanEnv(process.env, {
+  FETCH_FROM_FIGMA: bool(),
+
   // Determines whether to use the cache. The value should be either 'true' or 'false'.
   FIGMA_USE_CACHE: bool(),
 
@@ -154,5 +156,7 @@ async function loadIconSetFromFigma(): Promise<void> {
   }
 }
 
-// fetch icons from Figma
-await loadIconSetFromFigma()
+if (env.FETCH_FROM_FIGMA) {
+  // fetch icons from Figma
+  await loadIconSetFromFigma()
+}
