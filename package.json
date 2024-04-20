@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "private": "true",
   "packageManager": "pnpm@9.0.4",
-  "description": "Your Figma Plugin",
+  "description": "Your Figma Plugin!",
   "author": "Miguel Franken",
   "license": "MIT",
   "engines": {
