@@ -13,18 +13,18 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@unocss/preset-mini": "^0.58.6",
-    "@unocss/reset": "^0.58.6",
-    "@unocss/runtime": "^0.58.6",
-    "vue": "^3.4.19"
+    "@unocss/preset-mini": "^0.59.4",
+    "@unocss/reset": "^0.59.4",
+    "@unocss/runtime": "^0.59.4",
+    "vue": "^3.4.23"
   },
   "devDependencies": {
     "@onyx/tsconfig": "workspace:^",
     "@onyx/types": "workspace:^",
-    "@unocss/core": "^0.58.6",
-    "typescript": "^5.3.3",
-    "unocss": "^0.58.6",
-    "vite": "^5.2.3",
+    "@unocss/core": "^0.59.4",
+    "typescript": "^5.4.5",
+    "unocss": "^0.59.4",
+    "vite": "^5.2.10",
     "vite-plugin-singlefile": "^2.0.1"
   }
 }

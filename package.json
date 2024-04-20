@@ -16,11 +16,13 @@
     "test": "turbo test",
     "clean": "turbo clean",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "update-dependencies": "taze major -Ir"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.6.4",
+    "@antfu/eslint-config": "^2.15.0",
     "eslint": "^8.57.0",
-    "turbo": "^1.12.4"
+    "taze": "^0.13.6",
+    "turbo": "^1.13.2"
   }
 }

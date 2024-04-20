@@ -12,7 +12,7 @@
     "@onyx/tsconfig": "workspace:^"
   },
   "devDependencies": {
-    "@figma/plugin-typings": "^1.87.0",
-    "@unocss/preset-mini": "^0.58.6"
+    "@figma/plugin-typings": "^1.91.0",
+    "@unocss/preset-mini": "^0.59.4"
   }
 }
