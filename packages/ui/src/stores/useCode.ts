@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { SelectedNode } from '@onyx/types'
+import type { SelectedNode } from '@onyx-gen/types'
 import { whenever } from '@vueuse/core'
 import { usePluginMessage } from './usePluginMessage'
 

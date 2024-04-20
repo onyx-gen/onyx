@@ -1,5 +1,5 @@
 {
-  "name": "@onyx/types",
+  "name": "@onyx-gen/types",
   "type": "module",
   "version": "0.0.0",
   "private": true,
@@ -9,7 +9,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@onyx/tsconfig": "workspace:^"
+    "@onyx-gen/tsconfig": "workspace:^"
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.91.0",

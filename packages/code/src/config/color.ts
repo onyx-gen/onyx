@@ -1,5 +1,5 @@
 import type { Theme } from '@unocss/preset-mini'
-import type { HEX } from '@onyx/types'
+import type { HEX } from '@onyx-gen/types'
 
 export type InferenceColorMap = Record<HEX, string[]>
 

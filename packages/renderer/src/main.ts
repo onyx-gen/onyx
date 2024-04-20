@@ -1,7 +1,7 @@
 import { type App, createApp } from 'vue'
 import type {
   RendererPluginMessage,
-} from '@onyx/types'
+} from '@onyx-gen/types'
 
 // Load and activate UnoCSS runtime
 import './unocss'

@@ -1,4 +1,4 @@
-import type { Mode } from '@onyx/types'
+import type { Mode } from '@onyx-gen/types'
 import type { BaseUtilityValue } from '../types'
 import { isColorUtility } from '../types'
 import type { Properties } from '../../tokens/properties'

@@ -1,4 +1,4 @@
-import type { NotificationPluginMessage } from '@onyx/types'
+import type { NotificationPluginMessage } from '@onyx-gen/types'
 
 export function useNotification() {
   function notify(message: string) {

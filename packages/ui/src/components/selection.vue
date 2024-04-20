@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ComponentProps, SelectedNode } from '@onyx/types'
+import type { ComponentProps, SelectedNode } from '@onyx-gen/types'
 import { computed, toRefs } from 'vue'
 
 interface Props {

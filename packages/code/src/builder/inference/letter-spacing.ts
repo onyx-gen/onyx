@@ -1,4 +1,4 @@
-import type { Unit } from '@onyx/types'
+import type { Unit } from '@onyx-gen/types'
 import type { GenericUtilityValue } from '../types'
 import type { InferenceDimensionMap } from '../../config/dimension'
 import { createDimensionHandler } from './dimension'

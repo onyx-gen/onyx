@@ -1,4 +1,4 @@
-import type { PluginMessage } from '@onyx/types'
+import type { PluginMessage } from '@onyx-gen/types'
 
 /**
  * A simple event bus for managing events in Figma plugins.

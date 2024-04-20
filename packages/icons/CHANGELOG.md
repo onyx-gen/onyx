@@ -1,4 +1,4 @@
-# @onyx/icons
+# @onyx-gen/icons
 
 ## 1.0.0
 

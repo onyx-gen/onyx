@@ -13,7 +13,7 @@ export default defineConfig({
         'vertical-align': 'middle',
       },
       collections: {
-        onyx: () => import('@onyx/icons/onyx-icon-library.json'),
+        onyx: () => import('@onyx-gen/icons/onyx-icon-library.json'),
       },
     }),
   ],

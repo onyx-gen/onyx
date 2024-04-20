@@ -1,5 +1,5 @@
 {
-  "extends": "@onyx/tsconfig/vue.json",
+  "extends": "@onyx-gen/tsconfig/vue.json",
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
