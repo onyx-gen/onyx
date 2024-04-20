@@ -15,10 +15,10 @@
   "dependencies": {
     "@onyx/tsconfig": "workspace:^",
     "dotenv": "^16.4.5",
-    "rollup": "^4.13.0"
+    "rollup": "^4.15.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.28",
-    "typescript": "^5.3.3"
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
   }
 }

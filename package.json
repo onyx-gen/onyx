@@ -19,8 +19,8 @@
     "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.6.4",
+    "@antfu/eslint-config": "^2.15.0",
     "eslint": "^8.57.0",
-    "turbo": "^1.12.4"
+    "turbo": "^1.13.2"
   }
 }

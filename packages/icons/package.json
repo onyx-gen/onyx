@@ -14,11 +14,11 @@
     "codegen": "tsx codegen.ts"
   },
   "devDependencies": {
-    "@iconify/tools": "^4.0.2",
-    "@iconify/utils": "^2.1.22",
+    "@iconify/tools": "^4.0.4",
+    "@iconify/utils": "^2.1.23",
     "@onyx/tsconfig": "workspace:^",
     "dotenv": "^16.4.5",
     "envalid": "^8.0.0",
-    "tsx": "^4.7.1"
+    "tsx": "^4.7.2"
   }
 }
