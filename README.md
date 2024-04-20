@@ -1,5 +1,5 @@
 <p align='center'>
-<img src='./.readme/logo.svg' width='600'/>
+<img src='./.readme/logo.svg' height='300'/>
 </p>
 
 <h1 align="center">Onyx</h1>
