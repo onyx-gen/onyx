@@ -1,0 +1,15 @@
+addReviewers: true
+
+addAssignees: true
+
+reviewers:
+  - MiguelFranken
+  - lafllamme
+
+assignees: MiguelFranken
+
+numberOfReviewers: 0
+
+numberOfAssignees: 0
+
+skipKeywords: wip, draft
