@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.15.0",
+    "@changesets/cli": "^2.27.1",
     "eslint": "^8.57.0",
     "taze": "^0.13.6",
     "turbo": "^1.13.2"
