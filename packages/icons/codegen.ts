@@ -24,6 +24,13 @@ const env = cleanEnv(process.env, {
   FIGMA_FILE: str(),
 })
 
+/**
+ * Optimizes the given icon set.
+ *
+ * @param {IconSet} iconSet - The icon set to optimize.
+ * @returns {Promise<IconSet>} - A promise that resolves with the optimized icon set.
+ * @throws {Error} - If an unexpected color is found in the SVG.
+ */
 function optimizeIconSet(iconSet: IconSet): Promise<IconSet> {
   return new Promise((resolve, reject) => {
     iconSet
@@ -86,7 +93,12 @@ function optimizeIconSet(iconSet: IconSet): Promise<IconSet> {
   })
 }
 
-async function loadIconSetFromFigma() {
+/**
+ * Loads an icon set from Figma and saves it as TypeScript and JSON files.
+ *
+ * @returns {Promise<void>} - Resolves when the icon set is successfully saved.
+ */
+async function loadIconSetFromFigma(): Promise<void> {
   const result = await importFromFigma({
     file: env.FIGMA_FILE,
 
@@ -142,4 +154,5 @@ async function loadIconSetFromFigma() {
   }
 }
 
+// fetch icons from Figma
 await loadIconSetFromFigma()
