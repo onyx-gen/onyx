@@ -1,16 +1,21 @@
 name: Auto Assign
+
 on:
   issues:
     types: [opened, edited, labeled, unlabeled]
   pull_request:
     types: [opened, edited, labeled, unlabeled]
+
 jobs:
   run:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
-      - uses: wow-actions/auto-assign@v3
+      - name: Auto-assign issue
+        uses: pozil/auto-assign-issue@v1
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          reviewers: MiguelFranken
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           assignees: MiguelFranken
-          skipKeywords: wip, draft
+          numOfAssignee: 1
