@@ -1,5 +1,11 @@
 # @onyx-gen/icons
 
+## 1.3.0
+
+### Minor Changes
+
+- Bump package
+
 ## 1.2.0
 
 ### Minor Changes
