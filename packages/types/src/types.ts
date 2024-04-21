@@ -2,6 +2,10 @@ import type { Theme } from '@unocss/preset-mini'
 
 export type Mode = 'inferred' | 'variables'
 
+export interface VariableNameTransformations {
+  lowercase: boolean
+}
+
 export type Unit = 'px' | 'rem'
 
 export interface ComponentProps {
@@ -17,4 +21,5 @@ export interface IConfiguration {
   nearestInference: boolean
   theme: Theme
   newBuilder: boolean
+  variableNameTransformations: VariableNameTransformations
 }
