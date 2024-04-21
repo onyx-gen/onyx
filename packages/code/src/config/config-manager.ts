@@ -1,4 +1,4 @@
-import type { IConfiguration } from '@onyx/types'
+import type { IConfiguration } from '@onyx-gen/types'
 import { Configuration } from './config'
 
 class ConfigurationManager {

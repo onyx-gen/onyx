@@ -1,5 +1,5 @@
 {
-  "name": "@onyx/renderer",
+  "name": "@onyx-gen/renderer",
   "type": "module",
   "version": "0.0.0",
   "private": true,
@@ -19,8 +19,8 @@
     "vue": "^3.4.23"
   },
   "devDependencies": {
-    "@onyx/tsconfig": "workspace:^",
-    "@onyx/types": "workspace:^",
+    "@onyx-gen/tsconfig": "workspace:^",
+    "@onyx-gen/types": "workspace:^",
     "@unocss/core": "^0.59.4",
     "typescript": "^5.4.5",
     "unocss": "^0.59.4",

@@ -8,12 +8,12 @@ import type {
   SelectedNode,
   SelectedPluginMessage,
   UnselectedPluginMessage,
-} from '@onyx/types'
+} from '@onyx-gen/types'
 import EventBus from './event-bus'
 
 /**
  * This function sends a message to the Figma UI when no node is selected.
- * The message is of type UnselectedPluginMessage, which is defined in '@onyx/types'.
+ * The message is of type UnselectedPluginMessage, which is defined in '@onyx-gen/types'.
  * The event property of the message is set to 'unselected'.
  */
 export function sendUnselectedMessage() {

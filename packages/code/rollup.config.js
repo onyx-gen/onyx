@@ -4,7 +4,7 @@ import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import terser from '@rollup/plugin-terser'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
-import envRollupPlugin from '@onyx/rollup-plugin-env'
+import envRollupPlugin from '@onyx-gen/rollup-plugin-env'
 
 const production = !process.env.ROLLUP_WATCH
 

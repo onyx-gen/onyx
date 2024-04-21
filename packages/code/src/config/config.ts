@@ -1,5 +1,5 @@
 import { defu } from 'defu'
-import type { IConfiguration } from '@onyx/types'
+import type { IConfiguration } from '@onyx-gen/types'
 import { theme } from '@unocss/preset-mini'
 import type { InferenceColorMap } from './color'
 import { createColorLookup } from './color'

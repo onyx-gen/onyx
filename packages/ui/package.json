@@ -1,5 +1,5 @@
 {
-  "name": "@onyx/ui",
+  "name": "@onyx-gen/ui",
   "type": "module",
   "version": "0.0.0",
   "private": true,
@@ -11,7 +11,7 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.20",
     "@heroicons/vue": "^2.1.3",
-    "@onyx/renderer": "workspace:^",
+    "@onyx-gen/renderer": "workspace:^",
     "@unocss/reset": "^0.59.4",
     "@vueuse/core": "^10.9.0",
     "pinia": "^2.1.7",
@@ -19,9 +19,9 @@
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.91.0",
-    "@onyx/icons": "workspace:^",
-    "@onyx/tsconfig": "workspace:^",
-    "@onyx/types": "workspace:^",
+    "@onyx-gen/icons": "0.0.1",
+    "@onyx-gen/tsconfig": "workspace:^",
+    "@onyx-gen/types": "workspace:^",
     "@unocss/transformer-variant-group": "^0.59.4",
     "@vitejs/plugin-vue": "^5.0.4",
     "shiki": "^1.3.0",

@@ -1,8 +1,8 @@
 {
-  "name": "@onyx/icons",
+  "name": "@onyx-gen/icons",
   "type": "module",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.0.1",
+  "private": false,
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -10,13 +10,16 @@
   "exports": {
     "./*": "./dist/*"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "codegen": "tsx codegen.ts"
   },
   "devDependencies": {
     "@iconify/tools": "^4.0.4",
     "@iconify/utils": "^2.1.23",
-    "@onyx/tsconfig": "workspace:^",
+    "@onyx-gen/tsconfig": "workspace:^",
     "dotenv": "^16.4.5",
     "envalid": "^8.0.0",
     "tsx": "^4.7.2"

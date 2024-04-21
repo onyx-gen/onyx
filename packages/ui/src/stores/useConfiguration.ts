@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { IConfiguration, Mode, Unit } from '@onyx/types'
+import type { IConfiguration, Mode, Unit } from '@onyx-gen/types'
 import type { Ref } from 'vue'
 import { ref, watch } from 'vue'
 import { usePluginMessage } from './usePluginMessage'

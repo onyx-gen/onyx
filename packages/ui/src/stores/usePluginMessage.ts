@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useEventBus, useEventListener } from '@vueuse/core'
-import type { PluginMessage, PluginMessageEvent, RendererMessageEvent } from '@onyx/types'
+import type { PluginMessage, PluginMessageEvent, RendererMessageEvent } from '@onyx-gen/types'
 
 import { onUnmounted } from 'vue'
 
