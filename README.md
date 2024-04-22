@@ -41,6 +41,9 @@ $ source ~/.zshrc
 # Prepare .env files
 $ sh setup.sh
 
+# Install project dependencies
+$ pnpm install
+
 # Build the project
 $ pnpm dev
 ```
