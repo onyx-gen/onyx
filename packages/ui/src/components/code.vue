@@ -116,6 +116,7 @@ const flattenedTree = computed(() => {
           color-$figma-color-text-secondary
           border-b-1 border-l-1 border-color-$divider-color-code
           divide-x divide-$divider-color-code
+          overflow-x-scroll
         "
       >
         <Tab
@@ -142,7 +143,7 @@ const flattenedTree = computed(() => {
       </TabList>
       <TabPanels>
         <TabPanel v-for="c in flattenedTree" :key="c.name">
-          <div class="w-full px-3 py-2 code-copy" v-html="c.html" />
+          <div class="w-full px-3 py-2 code-copy overflow-scroll" v-html="c.html" />
         </TabPanel>
       </TabPanels>
     </TabGroup>
