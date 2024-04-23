@@ -97,8 +97,20 @@ export default async function generate(config: Configuration): Promise<string | 
 
     const instances = await Promise.all(mainComponentsOfInstanceNodes.map(instanceNode => generateComponentTree(instanceNode, config)))
 
+    console.log('SELECTED NODE', nodes[0])
+
+    const mainNode = nodes[0]
+    let mainNodeName = mainNode.name
+
+    if (mainNode.type === 'COMPONENT') {
+      const hasComponentSetParent = mainNode.parent?.type === 'COMPONENT_SET'
+
+      if (hasComponentSetParent)
+        mainNodeName = mainNode.parent.name
+    }
+
     const componentTree: ComponentTreeNode = {
-      name: nodes[0].name,
+      name: mainNodeName,
       figmaNode: nodes[0] as ComponentNode, // TODO MF: Should also work for other node types
       code: html,
       instances,
