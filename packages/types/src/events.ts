@@ -23,9 +23,9 @@ interface RendererPluginMessageData {
   height: number
 }
 
-export type HtmlPluginMessage = BasePluginMessage<'html', HtmlPluginMessageData>
+export type GeneratedComponentsPluginMessage = BasePluginMessage<'generated-components', GeneratedComponentsPluginMessageData>
 
-interface HtmlPluginMessageData {
+interface GeneratedComponentsPluginMessageData {
   html: string
 }
 
@@ -110,7 +110,7 @@ interface SelectedPluginMessageData {
 
 export type PluginMessage =
   | RendererPluginMessage
-  | HtmlPluginMessage
+  | GeneratedComponentsPluginMessage
   | UnselectedPluginMessage
   | ExecutionTimePluginMessage
   | IsLoadingPluginMessage

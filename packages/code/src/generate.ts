@@ -4,7 +4,7 @@ import { getInstanceNodes, getSelectedNodes } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
 import {
   sendExecutionTimeMessage,
-  sendHtmlMessage,
+  sendGeneratedComponentsMessage,
   sendIsLoadingMessage,
   sendSelectedMessage,
   sendUnselectedMessage,
@@ -91,7 +91,7 @@ export default async function generate(config: Configuration): Promise<string | 
 
     // only send message if html is not empty
     if (html)
-      sendHtmlMessage(html)
+      sendGeneratedComponentsMessage(html)
     else
       sendUnselectedMessage()
   }

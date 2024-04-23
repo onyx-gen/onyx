@@ -18,7 +18,7 @@ export const useCode = defineStore('code', () => {
 
     const { onPluginMessage } = usePluginMessage()
 
-    onPluginMessage('html', ({ html }) => {
+    onPluginMessage('generated-components', ({ html }) => {
       code.value = html
     })
 

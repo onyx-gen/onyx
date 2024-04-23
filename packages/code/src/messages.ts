@@ -1,7 +1,7 @@
 import type {
   ConfigurationPluginMessage,
   ExecutionTimePluginMessage,
-  HtmlPluginMessage,
+  GeneratedComponentsPluginMessage,
   IConfiguration,
   IsLoadingPluginMessage,
   PluginMessage,
@@ -60,8 +60,8 @@ export function sendSelectedMessage(nodes: SelectedNode[] | null): void {
  *
  * @return {void}
  */
-export function sendHtmlMessage(html: string): void {
-  const pluginMessage: HtmlPluginMessage = { event: 'html', data: { html } }
+export function sendGeneratedComponentsMessage(html: string): void {
+  const pluginMessage: GeneratedComponentsPluginMessage = { event: 'generated-components', data: { html } }
   figma.ui.postMessage(pluginMessage)
 }
 
