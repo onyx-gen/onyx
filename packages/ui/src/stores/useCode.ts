@@ -18,8 +18,9 @@ export const useCode = defineStore('code', () => {
 
     const { onPluginMessage } = usePluginMessage()
 
-    onPluginMessage('generated-components', ({ html }) => {
-      code.value = html
+    onPluginMessage('generated-components', ({ mainComponent, components }) => {
+      console.log('Received generated components', mainComponent, components)
+      code.value = components[mainComponent]
     })
 
     onPluginMessage('unselected', () => {

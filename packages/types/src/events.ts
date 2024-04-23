@@ -25,8 +25,12 @@ interface RendererPluginMessageData {
 
 export type GeneratedComponentsPluginMessage = BasePluginMessage<'generated-components', GeneratedComponentsPluginMessageData>
 
-interface GeneratedComponentsPluginMessageData {
-  html: string
+type ComponentName = string
+type GeneratedComponent = string
+
+export interface GeneratedComponentsPluginMessageData {
+  mainComponent: string
+  components: Record<ComponentName, GeneratedComponent>
 }
 
 export type ConfigurationPluginMessage = BasePluginMessage<'configuration', ConfigurationPluginMessageData>

@@ -2,6 +2,7 @@ import type {
   ConfigurationPluginMessage,
   ExecutionTimePluginMessage,
   GeneratedComponentsPluginMessage,
+  GeneratedComponentsPluginMessageData,
   IConfiguration,
   IsLoadingPluginMessage,
   PluginMessage,
@@ -9,6 +10,7 @@ import type {
   SelectedPluginMessage,
   UnselectedPluginMessage,
 } from '@onyx-gen/types'
+
 import EventBus from './event-bus'
 
 /**
@@ -56,12 +58,12 @@ export function sendSelectedMessage(nodes: SelectedNode[] | null): void {
 /**
  * Sends an HTML message to the UI plugin.
  *
- * @param {string} html - The HTML content to send.
+ * @param {GeneratedComponentsPluginMessageData} data - The generated components data.
  *
  * @return {void}
  */
-export function sendGeneratedComponentsMessage(html: string): void {
-  const pluginMessage: GeneratedComponentsPluginMessage = { event: 'generated-components', data: { html } }
+export function sendGeneratedComponentsMessage(data: GeneratedComponentsPluginMessageData): void {
+  const pluginMessage: GeneratedComponentsPluginMessage = { event: 'generated-components', data }
   figma.ui.postMessage(pluginMessage)
 }
 

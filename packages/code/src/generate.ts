@@ -90,10 +90,13 @@ export default async function generate(config: Configuration): Promise<string | 
     }
 
     // only send message if html is not empty
-    if (html)
-      sendGeneratedComponentsMessage(html)
-    else
-      sendUnselectedMessage()
+    if (html) {
+      sendGeneratedComponentsMessage({
+        mainComponent: 'main',
+        components: { main: html },
+      })
+    }
+    else { sendUnselectedMessage() }
   }
   catch (e) {
     figma.notify('Onyx: Unexpected Error')
