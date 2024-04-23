@@ -115,7 +115,7 @@ const flattenedTree = computed(() => {
           flex
           color-$figma-color-text-secondary
           border-b-1 border-l-1 border-color-$divider-color-code
-          divide-x divide-color-$divider-color-code
+          divide-x divide-$divider-color-code
         "
       >
         <Tab
