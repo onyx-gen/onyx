@@ -48,16 +48,39 @@ const componentList = computedAsync(async () => {
 </script>
 
 <template>
-  <Wrapper headline="Generated Code" :loading="isLoading">
+  <Wrapper headline="Generated Code" :loading="isLoading" class="!p-0">
     <TabGroup class="w-full" as="div">
-      <TabList>
-        <Tab v-for="c in componentList" :key="c.name">
-          Component {{ c.name }}
+      <TabList
+        as="div"
+        class="
+          flex
+          items-center
+          color-$figma-color-text-secondary
+          border-b-1 border-l-1 border-color-$divider-color-code
+          divide-x divide-color-$divider-color-code
+        "
+      >
+        <Tab
+          v-for="c in componentList"
+          :key="c.name"
+          v-slot="{ selected }"
+        >
+          <button
+            class="
+              font-sans text-xs font-medium
+              px-4 py-2
+            "
+            :class="{
+              'bg-$figma-color-bg': selected,
+            }"
+          >
+            {{ c.name }}.vue
+          </button>
         </Tab>
       </TabList>
       <TabPanels>
         <TabPanel v-for="c in componentList" :key="c.name">
-          <div class="w-full" v-html="c.html" />
+          <div class="w-full px-3 py-2" v-html="c.html" />
         </TabPanel>
       </TabPanels>
     </TabGroup>

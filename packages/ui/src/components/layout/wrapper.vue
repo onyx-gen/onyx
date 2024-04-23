@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAttrs } from 'vue'
 import LoadingSpinner from '@/components/loading-spinner.vue'
 
 withDefaults(defineProps<{
@@ -7,6 +8,8 @@ withDefaults(defineProps<{
 }>(), {
   loading: false,
 })
+
+const attrs = useAttrs()
 </script>
 
 <template>
@@ -31,6 +34,7 @@ withDefaults(defineProps<{
 
     <div class="code-copy max-h-82 overflow-scroll relative">
       <div
+        v-bind="attrs"
         class="px-3 py-2"
         :class="{
           'opacity-50': loading,
