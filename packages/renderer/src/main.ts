@@ -1,5 +1,8 @@
-import { type App, createApp } from 'vue'
+import type { App, Component } from 'vue'
+import { createApp } from 'vue'
 import type {
+  GeneratedComponentsPluginMessageData,
+
   RendererPluginMessage,
 } from '@onyx-gen/types'
 
@@ -9,12 +12,29 @@ import './unocss'
 let app: App | null = null
 
 // Listen for messages from the parent frame
-window.addEventListener('message', async (event) => {
+window.addEventListener('message', async (event: MessageEvent & { data: GeneratedComponentsPluginMessageData }) => {
   if (app !== null)
     app.unmount()
 
+  const data: GeneratedComponentsPluginMessageData = event.data
+
+  const mainComponentName = data.mainComponent
+  const mainComponentCode = data.components[mainComponentName]
+
+  // Remove the main component from the list of components and create a Vue component for each
+  const nonMainComponents: Record<string, Component> = Object.fromEntries(
+    Object.entries(data.components)
+      .filter(([name]) => name !== mainComponentName)
+      .map(([name, code]) => [name, { template: code }]),
+  )
+
   try {
-    app = createApp({ template: event.data.vue })
+    const vueComponent: Component = {
+      template: mainComponentCode,
+      components: nonMainComponents,
+    }
+
+    app = createApp(vueComponent)
   }
   catch (e) {
     console.error('[iFrame] Error creating Vue app', e)

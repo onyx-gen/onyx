@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, toRaw, watch } from 'vue'
 import html from 'virtual:preview-renderer'
 import { storeToRefs } from 'pinia'
+import type { GeneratedComponentsPluginMessageData } from '@onyx-gen/types'
 import { useCode } from '@/stores/useCode'
 import Wrapper from '@/components/layout/wrapper.vue'
 import { usePluginMessage } from '@/stores/usePluginMessage'
@@ -11,8 +12,8 @@ const iframeRef = ref<HTMLIFrameElement | null>(null)
 const blob = new Blob([html], { type: 'text/html' })
 const blobUrl = URL.createObjectURL(blob)
 
-const { code } = storeToRefs(useCode())
-watch(code, sendCode)
+const { components } = storeToRefs(useCode())
+watch(components, sendCode)
 
 function sendCode() {
   const iframe = iframeRef.value
@@ -20,10 +21,11 @@ function sendCode() {
   if (iframe) {
     const targetOrigin = '*'
 
+    if (components.value === null)
+      return
+
     // Message you want to send to the iframe
-    const message = {
-      vue: code.value,
-    }
+    const message: GeneratedComponentsPluginMessageData = toRaw(components.value)
 
     // Sending the message
     iframe.contentWindow?.postMessage(message, targetOrigin)
