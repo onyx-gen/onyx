@@ -22,7 +22,7 @@ const defaultConfig: IConfiguration = {
   variableNameTransformations: {
     lowercase: false,
   },
-  ignoredComponentInstances: ['_DS/resizer'],
+  ignoredComponentInstances: [],
 }
 
 export class Configuration implements IConfiguration {
