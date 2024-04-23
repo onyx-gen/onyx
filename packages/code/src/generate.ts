@@ -1,7 +1,7 @@
 import type { ComponentTreeNode } from '@onyx-gen/types'
 import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
-import { getInstanceNodes, getSelectedNodes } from './utils'
+import { getSelectedNodes, getUniqueInstanceNodes } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
 import {
   sendExecutionTimeMessage,
@@ -87,7 +87,8 @@ export default async function generate(config: Configuration): Promise<string | 
         sendSelectedMessage([])
     }
 
-    const instanceNodes = nodes.flatMap(node => getInstanceNodes(node))
+    const instanceNodes = (await Promise.all(nodes.map(node => getUniqueInstanceNodes(node)))).flat()
+
     const mainComponentsOfInstanceNodes = await Promise.all(
       instanceNodes
         .map(instanceNode => instanceNode.getMainComponentAsync())
@@ -138,7 +139,7 @@ async function generateComponentTree(node: ComponentNode, config: Configuration)
 
   const instances: ComponentTreeNode[] = []
 
-  const instanceNodes = getInstanceNodes(node)
+  const instanceNodes = await getUniqueInstanceNodes(node)
   for (const instanceNode of instanceNodes) {
     if (!config.ignoredComponentInstances.includes(instanceNode.name)) {
       const mainComponent = await instanceNode.getMainComponentAsync()

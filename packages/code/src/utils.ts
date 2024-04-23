@@ -58,6 +58,30 @@ export function getInstanceNodes(node: SceneNode): InstanceNode[] {
 }
 
 /**
+ * Retrieves all unique instance nodes in the node tree.
+ * @param node
+ */
+export async function getUniqueInstanceNodes(node: SceneNode): Promise<InstanceNode[]> {
+  const instanceNodes = getInstanceNodes(node)
+
+  const mainComponentsInstanceNodePairs = (
+    await Promise.all(
+      instanceNodes
+        .map(async (node) => {
+          const mainComponent = await node.getMainComponentAsync()
+          return [node, mainComponent] as [InstanceNode, ComponentNode | null]
+        }),
+    )
+  ).filter((d): d is [InstanceNode, ComponentNode] => d[1] !== null)
+
+  const uniqueMainComponentIds = Array.from(new Set(mainComponentsInstanceNodePairs.map(([_, mainComponent]) => mainComponent.id)))
+  return uniqueMainComponentIds.map((id) => {
+    const foundPair = mainComponentsInstanceNodePairs.find(([_, mainComponent]) => mainComponent.id === id)
+    return foundPair![0]
+  })
+}
+
+/**
  * Zips two arrays together, creating pairs of corresponding elements.
  *
  * @template T - The type of elements in the arrays.
