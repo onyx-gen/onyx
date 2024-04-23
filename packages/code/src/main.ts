@@ -62,6 +62,11 @@ PluginMessages.on('variable-name-transformations-changed', async ({ variableName
   configurationManager.updateConfig({ variableNameTransformations }).then(generate)
 })
 
+PluginMessages.on('ignored-component-instances-changed', async ({ ignoredComponentInstances }) => {
+  console.log('ignored-component-instances-changed', ignoredComponentInstances)
+  configurationManager.updateConfig({ ignoredComponentInstances }).then(generate)
+})
+
 PluginMessages.on('new-builder-changed', async ({ newBuilder }) => {
   configurationManager.updateConfig({ newBuilder }).then(generate)
 })

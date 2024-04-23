@@ -22,6 +22,13 @@ const shouldLowercaseVariableNames = computed({
   },
 })
 
+const ignoredComponentInstancesModel = computed({
+  get: () => configuration.value.ignoredComponentInstances.join(', '),
+  set: (ignoredComponentInstances) => {
+    configuration.value.ignoredComponentInstances = ignoredComponentInstances.split(',').map(name => name.trim())
+  },
+})
+
 const options: SelectOption[] = [
   {
     value: 'inferred',
@@ -80,6 +87,18 @@ const options: SelectOption[] = [
       <h2>Old/New Builder</h2>
 
       <Switch v-model="configuration.newBuilder" class="mt-2" />
+    </div>
+
+    <div>
+      <h2>
+        Ignored Component Instances
+      </h2>
+
+      <input
+        v-model="ignoredComponentInstancesModel"
+        class="w-full mt-2 p-2 border border-$figma-color-border rounded"
+        placeholder="Comma separated list of component instance names"
+      >
     </div>
   </div>
 </template>
