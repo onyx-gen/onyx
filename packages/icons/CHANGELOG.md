@@ -1,5 +1,11 @@
 # @onyx-gen/icons
 
+## 0.0.2
+
+### Patch Changes
+
+- Add eye icons
+
 ## 0.0.1
 
 ### Patch Changes
