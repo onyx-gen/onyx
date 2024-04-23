@@ -63,7 +63,6 @@ PluginMessages.on('variable-name-transformations-changed', async ({ variableName
 })
 
 PluginMessages.on('ignored-component-instances-changed', async ({ ignoredComponentInstances }) => {
-  console.log('ignored-component-instances-changed', ignoredComponentInstances)
   configurationManager.updateConfig({ ignoredComponentInstances }).then(generate)
 })
 
