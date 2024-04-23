@@ -154,7 +154,7 @@ const flattenedTree = computed(() => {
   </Wrapper>
 
   <div v-if="!isLoading" class="font-sans text-xs font-medium w-full text-right pt-0.5 color-$figma-color-text-secondary">
-    {{ executionTime }}ms!
+    {{ executionTime }}ms
   </div>
 </template>
 
