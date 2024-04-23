@@ -42,7 +42,7 @@ const options: SelectOption[] = [
 </script>
 
 <template>
-  <div class="font-sans text-xs font-semibold color-$figma-color-text flex gap-4">
+  <div class="font-sans text-xs font-semibold color-$figma-color-text flex gap-4 overflow-x-scroll w-full">
     <div>
       <h2>
         Mode
@@ -96,7 +96,7 @@ const options: SelectOption[] = [
 
       <input
         v-model="ignoredComponentInstancesModel"
-        class="w-full mt-2 p-2 border border-$figma-color-border rounded"
+        class="w-32 mt-2 p-2 border border-$figma-color-border rounded"
         placeholder="Comma separated list of component instance names"
       >
     </div>
