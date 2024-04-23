@@ -86,34 +86,44 @@ export default async function generate(config: Configuration): Promise<string | 
         sendSelectedMessage([])
     }
 
+    interface ComponentInstanceInfo {
+      node: ComponentNode
+      instanceName: string
+    }
+
     const instanceNodes = await Promise.all(
       nodes
         .flatMap(selectedNode => getInstanceNodes(selectedNode))
         .filter(instanceNode => !config.ignoredComponentInstances.includes(instanceNode.name))
-        .map(async instanceNode => await instanceNode.getMainComponentAsync())
-        .filter(c => c !== null) as Promise<ComponentNode>[],
+        .map(async instanceNode => ({
+          node: await instanceNode.getMainComponentAsync(),
+          instanceName: instanceNode.name,
+        }))
+        .filter(async c => (await c).node !== null) as Promise<ComponentInstanceInfo>[],
     )
     console.log('Found instanceNodes', instanceNodes)
 
     const generatedInstances: Record<string, string> = {}
 
-    instanceNodes.map(async (instanceNode) => {
-      console.log('Processing instanceNode', instanceNode.name)
+    const promises = instanceNodes.map(async (componentInstanceInfo) => {
+      console.log('Processing instanceNode....', componentInstanceInfo.instanceName)
 
       const parser = new FigmaNodeParser({ default: 'default' }, config)
-      const tree = await parser.parse(instanceNode)
+      const tree = await parser.parse(componentInstanceInfo.node)
 
       if (tree) {
         const generator = new HTMLGenerator([], {}, config)
-        generatedInstances[instanceNode.name] = await generator.generate(tree)
+        generatedInstances[componentInstanceInfo.instanceName] = await generator.generate(tree)
 
-        console.log('Generated HTML for instanceNode', instanceNode.name, generatedInstances[instanceNode.name])
+        console.log('Generated HTML for instanceNode', componentInstanceInfo.instanceName, generatedInstances[componentInstanceInfo.instanceName])
       }
       else {
         console.error('It was not possible to generate HTML code for the selected node.')
         figma.notify('Error during HTML generation')
       }
     })
+
+    await Promise.all(promises)
 
     // only send message if html is not empty
     if (html) {

@@ -64,6 +64,7 @@ export function sendSelectedMessage(nodes: SelectedNode[] | null): void {
  */
 export function sendGeneratedComponentsMessage(data: GeneratedComponentsPluginMessageData): void {
   const pluginMessage: GeneratedComponentsPluginMessage = { event: 'generated-components', data }
+  console.log('sent', pluginMessage)
   figma.ui.postMessage(pluginMessage)
 }
 

@@ -2,6 +2,7 @@
 import { codeToHtml } from 'shiki'
 import { computedAsync, useClipboard } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
 import { useTheme } from '@/composables/useTheme'
 import { useNotification } from '@/composables/useNotification'
 import { useCode } from '@/stores/useCode'
@@ -26,13 +27,37 @@ function onCopy() {
   copy(code.value)
   notify('Copied to clipboard!')
 }
+
+const componentList = computedAsync(async () => {
+  const promises = Object.entries((components.value?.components as Record<string, string> || {})).map(async ([componentName, componentCode]) => {
+    return {
+      name: componentName,
+      code: componentCode,
+      html: await codeToHtml(componentCode, {
+        lang: 'vue-html',
+        theme: theme.value,
+      }),
+    }
+  })
+
+  return await Promise.all(promises)
+})
 </script>
 
 <template>
   <Wrapper headline="Generated Code" :loading="isLoading">
-    <div>{{ components }}</div>
-
-    <div class="w-full" v-html="html" />
+    <TabGroup class="w-full" as="div">
+      <TabList>
+        <Tab v-for="c in componentList" :key="c.name">
+          Component {{ c.name }}
+        </Tab>
+      </TabList>
+      <TabPanels>
+        <TabPanel v-for="c in componentList" :key="c.name">
+          <div class="w-full" v-html="c.html" />
+        </TabPanel>
+      </TabPanels>
+    </TabGroup>
 
     <template #action>
       <button @click="onCopy">
