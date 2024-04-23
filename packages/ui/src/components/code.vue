@@ -130,6 +130,7 @@ const flattenedTree = computed(() => {
               font-sans text-xs font-medium
               px-4 py-2
               last:(!border-r-1 border-color-$divider-color-code)
+              focus:outline-none
             "
             :class="{
               'bg-$figma-color-bg': selected,
