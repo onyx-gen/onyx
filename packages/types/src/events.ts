@@ -65,6 +65,12 @@ interface VariableNameTransformationsChangedPluginMessageData {
   variableNameTransformations: VariableNameTransformations
 }
 
+export type IgnoredComponentInstancesChangedPluginMessage = BasePluginMessage<'ignored-component-instances-changed', IgnoredComponentInstancesChangedPluginMessageData>
+
+interface IgnoredComponentInstancesChangedPluginMessageData {
+  ignoredComponentInstances: string[]
+}
+
 export type NewBuilderChangedPluginMessage = BasePluginMessage<'new-builder-changed', NewBuilderChangedPluginMessageData>
 
 interface NewBuilderChangedPluginMessageData {
@@ -112,6 +118,7 @@ export type PluginMessage =
   | ModeChangedPluginMessage
   | NearestChangedPluginMessage
   | VariantGroupChangedPluginMessage
+  | IgnoredComponentInstancesChangedPluginMessage
   | VariableNameTransformationsChangedPluginMessage
   | NotificationPluginMessage
   | UnitChangedPluginMessage

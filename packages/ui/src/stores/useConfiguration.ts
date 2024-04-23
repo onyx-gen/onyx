@@ -23,6 +23,7 @@ export const useConfiguration = defineStore('configuration-store', () => {
     watch(() => configuration.value.variantGroup, (variantGroup: boolean) => emitPluginMessage('variant-group-changed', { variantGroup }))
     watch(() => configuration.value.mode, (mode: Mode) => emitPluginMessage('mode-changed', { mode }))
     watch(() => configuration.value.variableNameTransformations, (variableNameTransformations: VariableNameTransformations) => emitPluginMessage('variable-name-transformations-changed', { variableNameTransformations: toRaw(variableNameTransformations) }), { deep: true })
+    watch(() => configuration.value.ignoredComponentInstances, (ignoredComponentInstances: string[]) => emitPluginMessage('ignored-component-instances-changed', { ignoredComponentInstances: toRaw(ignoredComponentInstances) }))
     watch(() => configuration.value.newBuilder, (newBuilder: boolean) => emitPluginMessage('new-builder-changed', { newBuilder }))
   })
 

@@ -102,7 +102,10 @@ class FigmaNodeParser {
    * @param node - The instance node to process.
    * @returns {TreeNode} The generated tree node for the instance.
    */
-  private createInstanceNode(node: InstanceNode): TreeNode<InstanceNodeData> {
+  private createInstanceNode(node: InstanceNode): TreeNode<InstanceNodeData> | null {
+    if (this.config.ignoredComponentInstances.includes(node.name))
+      return null
+
     return {
       children: [],
       data: {

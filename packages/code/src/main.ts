@@ -59,8 +59,11 @@ PluginMessages.on('variant-group-changed', async ({ variantGroup }) => {
 })
 
 PluginMessages.on('variable-name-transformations-changed', async ({ variableNameTransformations }) => {
-  console.log('received event', variableNameTransformations)
   configurationManager.updateConfig({ variableNameTransformations }).then(generate)
+})
+
+PluginMessages.on('ignored-component-instances-changed', async ({ ignoredComponentInstances }) => {
+  configurationManager.updateConfig({ ignoredComponentInstances }).then(generate)
 })
 
 PluginMessages.on('new-builder-changed', async ({ newBuilder }) => {

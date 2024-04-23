@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import Switch from './inputs/switch.vue'
-import Select from './inputs/select.vue'
 import type { SelectOption } from './inputs/select.vue'
+import Select from './inputs/select.vue'
 import { useConfiguration } from '@/stores/useConfiguration'
 
 const { configuration } = storeToRefs(useConfiguration())
@@ -22,6 +22,13 @@ const shouldLowercaseVariableNames = computed({
   },
 })
 
+const ignoredComponentInstancesModel = computed({
+  get: () => configuration.value.ignoredComponentInstances.join(', '),
+  set: (ignoredComponentInstances) => {
+    configuration.value.ignoredComponentInstances = ignoredComponentInstances.split(',').map(name => name.trim()).filter(name => name.length > 0)
+  },
+})
+
 const options: SelectOption[] = [
   {
     value: 'inferred',
@@ -35,7 +42,7 @@ const options: SelectOption[] = [
 </script>
 
 <template>
-  <div class="font-sans text-xs font-semibold color-$figma-color-text flex gap-4">
+  <div class="font-sans text-xs font-semibold color-$figma-color-text flex gap-4 overflow-x-scroll w-full">
     <div>
       <h2>
         Mode
@@ -80,6 +87,18 @@ const options: SelectOption[] = [
       <h2>Old/New Builder</h2>
 
       <Switch v-model="configuration.newBuilder" class="mt-2" />
+    </div>
+
+    <div>
+      <h2>
+        Ignored Component Instances
+      </h2>
+
+      <input
+        v-model="ignoredComponentInstancesModel"
+        class="w-32 mt-2 p-2 border border-$figma-color-border rounded"
+        placeholder="Comma separated list of component instance names"
+      >
     </div>
   </div>
 </template>

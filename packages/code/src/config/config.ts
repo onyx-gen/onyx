@@ -22,6 +22,7 @@ const defaultConfig: IConfiguration = {
   variableNameTransformations: {
     lowercase: false,
   },
+  ignoredComponentInstances: [],
 }
 
 export class Configuration implements IConfiguration {
@@ -32,6 +33,7 @@ export class Configuration implements IConfiguration {
   public theme: IConfiguration['theme']
   public newBuilder: IConfiguration['newBuilder']
   public variableNameTransformations: IConfiguration['variableNameTransformations']
+  public ignoredComponentInstances: IConfiguration['ignoredComponentInstances']
 
   public readonly config: IConfiguration
 
@@ -51,6 +53,8 @@ export class Configuration implements IConfiguration {
     else
       this.config = defu(defaults[0], ...defaults.slice(1), defaultConfig) as IConfiguration
 
+    this.config.ignoredComponentInstances = config?.ignoredComponentInstances || defaultConfig.ignoredComponentInstances
+
     this.mode = this.config.mode
     this.unit = this.config.unit
     this.variantGroup = this.config.variantGroup
@@ -58,6 +62,7 @@ export class Configuration implements IConfiguration {
     this.theme = this.config.theme
     this.newBuilder = this.config.newBuilder
     this.variableNameTransformations = this.config.variableNameTransformations
+    this.ignoredComponentInstances = this.config.ignoredComponentInstances
   }
 
   public get colorLookup(): InferenceColorMap {
