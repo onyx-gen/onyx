@@ -13,7 +13,8 @@ const { selectedNodes, hasSelection } = storeToRefs(useCode())
 <template>
   <div>
     <div class="border-b border-color-$figma-color-border mb-4">
-      <Layout>
+      <Layout class="flex gap-2">
+        <i class="i-onyx-logo w-8 h-8" />
         <h1 class="text-2xl font-bold mb-4">
           Onyx
         </h1>
