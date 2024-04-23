@@ -1,3 +1,4 @@
+import type { ComponentTreeNode } from '@onyx-gen/types'
 import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
 import { getInstanceNodes, getSelectedNodes } from './utils'
@@ -86,53 +87,27 @@ export default async function generate(config: Configuration): Promise<string | 
         sendSelectedMessage([])
     }
 
-    interface ComponentInstanceInfo {
-      node: ComponentNode
-      instanceName: string
-    }
-
-    const instanceNodes = await Promise.all(
-      nodes
-        .flatMap(selectedNode => getInstanceNodes(selectedNode))
-        .filter(instanceNode => !config.ignoredComponentInstances.includes(instanceNode.name))
-        .map(async instanceNode => ({
-          node: await instanceNode.getMainComponentAsync(),
-          instanceName: instanceNode.name,
-        }))
-        .filter(async c => (await c).node !== null) as Promise<ComponentInstanceInfo>[],
+    const instanceNodes = nodes.flatMap(node => getInstanceNodes(node))
+    const mainComponentsOfInstanceNodes = await Promise.all(
+      instanceNodes
+        .map(instanceNode => instanceNode.getMainComponentAsync())
+        .filter((mainComponent): mainComponent is Promise<ComponentNode> => mainComponent !== null),
     )
-    console.log('Found instanceNodes', instanceNodes)
 
-    const generatedInstances: Record<string, string> = {}
+    const instances = await Promise.all(mainComponentsOfInstanceNodes.map(instanceNode => generateComponentTree(instanceNode, config)))
 
-    const promises = instanceNodes.map(async (componentInstanceInfo) => {
-      console.log('Processing instanceNode....', componentInstanceInfo.instanceName)
-
-      const parser = new FigmaNodeParser({ default: 'default' }, config)
-      const tree = await parser.parse(componentInstanceInfo.node)
-
-      if (tree) {
-        const generator = new HTMLGenerator([], {}, config)
-        generatedInstances[componentInstanceInfo.instanceName] = await generator.generate(tree)
-
-        console.log('Generated HTML for instanceNode', componentInstanceInfo.instanceName, generatedInstances[componentInstanceInfo.instanceName])
-      }
-      else {
-        console.error('It was not possible to generate HTML code for the selected node.')
-        figma.notify('Error during HTML generation')
-      }
-    })
-
-    await Promise.all(promises)
+    const componentTree: ComponentTreeNode = {
+      name: nodes[0].name,
+      figmaNode: nodes[0] as ComponentNode, // TODO MF: Should also work for other node types
+      code: html,
+      instances,
+    }
 
     // only send message if html is not empty
-    if (html) {
-      sendGeneratedComponentsMessage({
-        mainComponent: 'main',
-        components: { main: html, ...generatedInstances },
-      })
-    }
-    else { sendUnselectedMessage() }
+    if (html)
+      sendGeneratedComponentsMessage({ componentTree })
+
+    else sendUnselectedMessage()
   }
   catch (e) {
     figma.notify('Onyx: Unexpected Error')
@@ -143,5 +118,41 @@ export default async function generate(config: Configuration): Promise<string | 
     const executionTime = endTime - startTime
     sendIsLoadingMessage(false)
     sendExecutionTimeMessage(executionTime)
+  }
+}
+
+/**
+ * Recursively generates a component tree for given Figma nodes.
+ * Each node's HTML code is generated using FigmaNodeParser and HTMLGenerator.
+ *
+ * @param node - The initial node to generate the tree from.
+ * @param config - Configuration object containing settings and options for node processing.
+ * @returns A promise that resolves to a ComponentTreeNode representing the node hierarchy with generated HTML.
+ */
+async function generateComponentTree(node: ComponentNode, config: Configuration): Promise<ComponentTreeNode> {
+  const parser = new FigmaNodeParser({ default: 'default' }, config)
+  const generator = new HTMLGenerator([], {}, config)
+
+  const tree = await parser.parse(node)
+  const html = tree ? await generator.generate(tree) : ''
+
+  const instances: ComponentTreeNode[] = []
+
+  const instanceNodes = getInstanceNodes(node)
+  for (const instanceNode of instanceNodes) {
+    if (!config.ignoredComponentInstances.includes(instanceNode.name)) {
+      const mainComponent = await instanceNode.getMainComponentAsync()
+      if (mainComponent) {
+        const instanceTree = await generateComponentTree(mainComponent, config)
+        instances.push(instanceTree)
+      }
+    }
+  }
+
+  return {
+    name: node.name,
+    code: html,
+    figmaNode: node,
+    instances,
   }
 }

@@ -1,4 +1,4 @@
-import type { ComponentProps, IConfiguration, Mode, Unit, VariableNameTransformations } from './types'
+import type { ComponentProps, ComponentTreeNode, IConfiguration, Mode, Unit, VariableNameTransformations } from './types'
 
 export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
 
@@ -25,12 +25,8 @@ interface RendererPluginMessageData {
 
 export type GeneratedComponentsPluginMessage = BasePluginMessage<'generated-components', GeneratedComponentsPluginMessageData>
 
-type ComponentName = string
-type GeneratedComponent = string
-
 export interface GeneratedComponentsPluginMessageData {
-  mainComponent: string
-  components: Record<ComponentName, GeneratedComponent>
+  componentTree: ComponentTreeNode
 }
 
 export type ConfigurationPluginMessage = BasePluginMessage<'configuration', ConfigurationPluginMessageData>

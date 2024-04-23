@@ -1,6 +1,7 @@
-import type { App, Component } from 'vue'
-import { createApp } from 'vue'
+import type { App, ComponentOptions } from 'vue'
+import { createApp, defineComponent } from 'vue'
 import type {
+  ComponentTreeNode,
   GeneratedComponentsPluginMessageData,
 
   RendererPluginMessage,
@@ -13,36 +14,47 @@ let app: App | null = null
 
 // Listen for messages from the parent frame
 window.addEventListener('message', async (event: MessageEvent & { data: GeneratedComponentsPluginMessageData }) => {
+  console.log('[iFrame] Received message', event.data)
+
+  // Unmount the previous app
   if (app !== null)
     app.unmount()
 
   const data: GeneratedComponentsPluginMessageData = event.data
 
-  const mainComponentName = data.mainComponent
-  const mainComponentCode = data.components[mainComponentName]
+  // Construct Vue components recursively from the component tree
+  const rootComponentOptions = createVueComponent(data.componentTree)
 
-  // Remove the main component from the list of components and create a Vue component for each
-  const nonMainComponents: Record<string, Component> = Object.fromEntries(
-    Object.entries(data.components)
-      .filter(([name]) => name !== mainComponentName)
-      .map(([name, code]) => [name, { template: code }]),
-  )
-
+  // Create the Vue app and mount it to the root element
   try {
-    const vueComponent: Component = {
-      template: mainComponentCode,
-      components: nonMainComponents,
-    }
-
-    app = createApp(vueComponent)
+    app = createApp(rootComponentOptions)
+    app.mount('#app')
   }
   catch (e) {
     console.error('[iFrame] Error creating Vue app', e)
-    return
+  }
+})
+
+/**
+ * Recursively creates a Vue component from a component tree node.
+ *
+ * @param node - The current node of the component tree.
+ * @returns A Vue component options object representing the node and its children.
+ */
+function createVueComponent(node: ComponentTreeNode): ComponentOptions {
+  const childComponents: Record<string, ComponentOptions> = {}
+  node.instances.forEach((instance) => {
+    childComponents[instance.name] = createVueComponent(instance)
+  })
+
+  const options: ComponentOptions = {
+    name: node.name,
+    template: node.code,
+    components: childComponents,
   }
 
-  app.mount('#app')
-})
+  return defineComponent(options as any) as any
+}
 
 function observeHeight() {
   const targetElement = document.getElementById('app')!
