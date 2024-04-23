@@ -86,14 +86,14 @@ const componentList = computedAsync(async () => {
     </TabGroup>
 
     <template #action>
-      <button @click="onCopy">
+      <button id="copy" @click="onCopy">
         <i class="i-onyx-copy w-4 h-4" />
       </button>
     </template>
   </Wrapper>
 
   <div v-if="!isLoading" class="font-sans text-xs font-medium w-full text-right pt-0.5 color-$figma-color-text-secondary">
-    {{ executionTime }}ms
+    {{ executionTime }}ms!
   </div>
 </template>
 
@@ -105,7 +105,7 @@ code {
   font-feature-settings: "liga", "calt" !important;
 }
 
-.code-container:has(button:hover) {
+.code-container:has(#copy:hover) {
   .code-copy {
     background-color: var(--figma-color-bg-selected-tertiary);
     box-shadow: 0 0 0 1px var(--figma-color-border-selected) inset;
