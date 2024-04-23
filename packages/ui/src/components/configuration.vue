@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import Switch from './inputs/switch.vue'
-import Select from './inputs/select.vue'
 import type { SelectOption } from './inputs/select.vue'
+import Select from './inputs/select.vue'
 import { useConfiguration } from '@/stores/useConfiguration'
 
 const { configuration } = storeToRefs(useConfiguration())
@@ -25,7 +25,7 @@ const shouldLowercaseVariableNames = computed({
 const ignoredComponentInstancesModel = computed({
   get: () => configuration.value.ignoredComponentInstances.join(', '),
   set: (ignoredComponentInstances) => {
-    configuration.value.ignoredComponentInstances = ignoredComponentInstances.split(',').map(name => name.trim())
+    configuration.value.ignoredComponentInstances = ignoredComponentInstances.split(',').map(name => name.trim()).filter(name => name.length > 0)
   },
 })
 

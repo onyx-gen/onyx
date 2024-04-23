@@ -53,6 +53,8 @@ export class Configuration implements IConfiguration {
     else
       this.config = defu(defaults[0], ...defaults.slice(1), defaultConfig) as IConfiguration
 
+    this.config.ignoredComponentInstances = config?.ignoredComponentInstances || defaultConfig.ignoredComponentInstances
+
     this.mode = this.config.mode
     this.unit = this.config.unit
     this.variantGroup = this.config.variantGroup
