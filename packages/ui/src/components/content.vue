@@ -26,18 +26,21 @@ const { selectedNodes, hasSelection } = storeToRefs(useCode())
       </Layout>
     </div>
 
-    <div class="border-b border-color-$figma-color-border mb-4">
+    <div class="border-b border-color-$figma-color-border mb-4 pb-4">
       <Layout>
         <Configuration />
       </Layout>
     </div>
 
-    <div v-if="hasSelection" class="divide-y divide-$figma-color-border">
+    <div v-if="hasSelection" class="divide-y divide-$figma-color-border border-b border-color-$figma-color-border mb-4 pb-4">
       <Layout>
         <Code />
       </Layout>
 
-      <Layout v-if="hasSelection && selectedNodes?.length" class="mt-4">
+      <Layout
+        v-if="hasSelection && selectedNodes?.length"
+        class="mt-4 pt-4"
+      >
         <SelectedNodes :nodes="selectedNodes" />
       </Layout>
     </div>

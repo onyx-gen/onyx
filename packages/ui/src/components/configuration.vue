@@ -5,6 +5,7 @@ import Switch from './inputs/switch.vue'
 import type { SelectOption } from './inputs/select.vue'
 import Select from './inputs/select.vue'
 import { useConfiguration } from '@/stores/useConfiguration'
+import Disclosure from '@/components/disclosure.vue'
 
 const { configuration } = storeToRefs(useConfiguration())
 
@@ -42,63 +43,65 @@ const options: SelectOption[] = [
 </script>
 
 <template>
-  <div class="font-sans text-xs font-semibold color-$figma-color-text flex gap-4 overflow-x-scroll w-full">
-    <div>
-      <h2>
-        Mode
-      </h2>
+  <Disclosure headline="Configuration">
+    <div class="font-sans text-xs font-semibold color-$figma-color-text flex gap-4 overflow-x-scroll w-full">
+      <div>
+        <h2>
+          Mode
+        </h2>
 
-      <Select v-model="configuration.mode" :options="options" />
+        <Select v-model="configuration.mode" :options="options" />
+      </div>
+
+      <div>
+        <h2>
+          Nearest Inference
+        </h2>
+
+        <Switch v-model="configuration.nearestInference" class="mt-2" />
+      </div>
+
+      <div>
+        <h2>
+          Variant Group
+        </h2>
+
+        <Switch v-model="configuration.variantGroup" class="mt-2" />
+      </div>
+
+      <div>
+        <h2>
+          Unit (px/rem)
+        </h2>
+
+        <Switch v-model="isRem" class="mt-2" />
+      </div>
+
+      <div>
+        <h2>
+          Lowercase Variable Names
+        </h2>
+
+        <Switch v-model="shouldLowercaseVariableNames" class="mt-2" />
+      </div>
+
+      <div>
+        <h2>Old/New Builder</h2>
+
+        <Switch v-model="configuration.newBuilder" class="mt-2" />
+      </div>
+
+      <div>
+        <h2>
+          Ignored Component Instances
+        </h2>
+
+        <input
+          v-model="ignoredComponentInstancesModel"
+          class="w-32 mt-2 p-2 border border-$figma-color-border rounded"
+          placeholder="Comma separated list of component instance names"
+        >
+      </div>
     </div>
-
-    <div>
-      <h2>
-        Nearest Inference
-      </h2>
-
-      <Switch v-model="configuration.nearestInference" class="mt-2" />
-    </div>
-
-    <div>
-      <h2>
-        Variant Group
-      </h2>
-
-      <Switch v-model="configuration.variantGroup" class="mt-2" />
-    </div>
-
-    <div>
-      <h2>
-        Unit (px/rem)
-      </h2>
-
-      <Switch v-model="isRem" class="mt-2" />
-    </div>
-
-    <div>
-      <h2>
-        Lowercase Variable Names
-      </h2>
-
-      <Switch v-model="shouldLowercaseVariableNames" class="mt-2" />
-    </div>
-
-    <div>
-      <h2>Old/New Builder</h2>
-
-      <Switch v-model="configuration.newBuilder" class="mt-2" />
-    </div>
-
-    <div>
-      <h2>
-        Ignored Component Instances
-      </h2>
-
-      <input
-        v-model="ignoredComponentInstancesModel"
-        class="w-32 mt-2 p-2 border border-$figma-color-border rounded"
-        placeholder="Comma separated list of component instance names"
-      >
-    </div>
-  </div>
+  </Disclosure>
 </template>
