@@ -5,6 +5,8 @@
 <h1 align="center">Onyx</h1>
 <p align="center">A Figma plugin that helps to transform Figma Design Systems to Code</p>
 <p align="center">Generate Vue components with UnoCSS utility classes</p>
+<p align="center">https://www.figma.com/community/plugin/1363542562381428983/onyx-design-system-to-code</p>
+<br />
 
 ## Features
 
