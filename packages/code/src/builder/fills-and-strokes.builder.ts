@@ -55,6 +55,7 @@ class FillsAndStrokesBuilder implements IBuilder {
             fill,
             colorHandler,
             this.config.mode,
+            this.config.variableNameTransformations,
           )
           this.attributes.add(utilityClass)
         }
@@ -102,6 +103,7 @@ class FillsAndStrokesBuilder implements IBuilder {
           stroke,
           colorHandler,
           this.config.mode,
+          this.config.variableNameTransformations,
         )
 
         this.attributes.add(utilityClass)
@@ -138,6 +140,7 @@ class FillsAndStrokesBuilder implements IBuilder {
         strokeWeight,
         dimensionHandler,
         this.config.mode,
+        this.config.variableNameTransformations,
       )
 
       this.attributes.add(utilityClass)
@@ -210,6 +213,7 @@ class FillsAndStrokesBuilder implements IBuilder {
       },
       createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
       this.config.mode,
+      this.config.variableNameTransformations,
     )
 
     attrs.forEach(element => this.attributes.add(element))

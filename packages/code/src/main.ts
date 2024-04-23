@@ -58,6 +58,11 @@ PluginMessages.on('variant-group-changed', async ({ variantGroup }) => {
   configurationManager.updateConfig({ variantGroup }).then(generate)
 })
 
+PluginMessages.on('variable-name-transformations-changed', async ({ variableNameTransformations }) => {
+  console.log('received event', variableNameTransformations)
+  configurationManager.updateConfig({ variableNameTransformations }).then(generate)
+})
+
 PluginMessages.on('new-builder-changed', async ({ newBuilder }) => {
   configurationManager.updateConfig({ newBuilder }).then(generate)
 })

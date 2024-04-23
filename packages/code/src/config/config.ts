@@ -19,6 +19,9 @@ const defaultConfig: IConfiguration = {
   nearestInference: true,
   theme,
   newBuilder: true,
+  variableNameTransformations: {
+    lowercase: false,
+  },
 }
 
 export class Configuration implements IConfiguration {
@@ -28,6 +31,7 @@ export class Configuration implements IConfiguration {
   public nearestInference: IConfiguration['nearestInference']
   public theme: IConfiguration['theme']
   public newBuilder: IConfiguration['newBuilder']
+  public variableNameTransformations: IConfiguration['variableNameTransformations']
 
   public readonly config: IConfiguration
 
@@ -53,6 +57,7 @@ export class Configuration implements IConfiguration {
     this.nearestInference = this.config.nearestInference
     this.theme = this.config.theme
     this.newBuilder = this.config.newBuilder
+    this.variableNameTransformations = this.config.variableNameTransformations
   }
 
   public get colorLookup(): InferenceColorMap {

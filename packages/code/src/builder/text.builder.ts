@@ -156,6 +156,7 @@ class TextBuilder implements IBuilder {
         fontName.family,
         createFontNameHandler(this.config.nearestInference),
         this.config.mode,
+        this.config.variableNameTransformations,
       )
 
       this.attributes.add(utilityClass)
@@ -185,6 +186,7 @@ class TextBuilder implements IBuilder {
         fontSize,
         createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
         this.config.mode,
+        this.config.variableNameTransformations,
       )
 
       this.attributes.add(utilityClass)
@@ -216,6 +218,7 @@ class TextBuilder implements IBuilder {
         space,
         createLetterSpacingHandler(letterSpacing.unit, this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
         this.config.mode,
+        this.config.variableNameTransformations,
       )
 
       this.attributes.add(utilityClass)
@@ -248,6 +251,7 @@ class TextBuilder implements IBuilder {
           value,
           createLineHeightHandler(lineHeight.unit, this.config.dimensionsLookup, this.config.nearestInference, this.config.unit),
           this.config.mode,
+          this.config.variableNameTransformations,
         )
 
         this.attributes.add(utilityClass)
@@ -264,7 +268,7 @@ class TextBuilder implements IBuilder {
    * @private
    */
   private buildTypographyCompositionToken(node: SceneNode & NonResizableTextMixin) {
-    const typographyToken = getToken(node, Properties.typography)!
+    const typographyToken = getToken(node, Properties.typography, this.config.variableNameTransformations)!
 
     const utilityValue: GenericUtilityValue = {
       mode: 'variable',

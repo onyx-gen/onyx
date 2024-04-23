@@ -1,4 +1,4 @@
-import type { ComponentProps, IConfiguration, Mode, Unit } from './types'
+import type { ComponentProps, IConfiguration, Mode, Unit, VariableNameTransformations } from './types'
 
 export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
 
@@ -59,6 +59,12 @@ interface VariantGroupChangedPluginMessageData {
   variantGroup: boolean
 }
 
+export type VariableNameTransformationsChangedPluginMessage = BasePluginMessage<'variable-name-transformations-changed', VariableNameTransformationsChangedPluginMessageData>
+
+interface VariableNameTransformationsChangedPluginMessageData {
+  variableNameTransformations: VariableNameTransformations
+}
+
 export type NewBuilderChangedPluginMessage = BasePluginMessage<'new-builder-changed', NewBuilderChangedPluginMessageData>
 
 interface NewBuilderChangedPluginMessageData {
@@ -106,6 +112,7 @@ export type PluginMessage =
   | ModeChangedPluginMessage
   | NearestChangedPluginMessage
   | VariantGroupChangedPluginMessage
+  | VariableNameTransformationsChangedPluginMessage
   | NotificationPluginMessage
   | UnitChangedPluginMessage
   | ConfigurationPluginMessage
