@@ -7,7 +7,7 @@ import { useNotification } from '@/composables/useNotification'
 import { useCode } from '@/stores/useCode'
 import Wrapper from '@/components/layout/wrapper.vue'
 
-const { code, isLoading, executionTime } = storeToRefs(useCode())
+const { code, isLoading, executionTime, components } = storeToRefs(useCode())
 
 const { theme } = useTheme()
 
@@ -30,6 +30,8 @@ function onCopy() {
 
 <template>
   <Wrapper headline="Generated Code" :loading="isLoading">
+    <div>{{ components }}</div>
+
     <div class="w-full" v-html="html" />
 
     <template #action>
