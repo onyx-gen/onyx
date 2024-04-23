@@ -24,9 +24,6 @@ export default async function generate(config: Configuration): Promise<string | 
   try {
     const nodes = getSelectedNodes()
 
-    const instanceNodes = getInstanceNodes(nodes[0])
-    console.log('instanceNodes', instanceNodes)
-
     // Early return if no node is selected
     if (nodes.length === 0) {
       sendUnselectedMessage()
@@ -89,11 +86,40 @@ export default async function generate(config: Configuration): Promise<string | 
         sendSelectedMessage([])
     }
 
+    const instanceNodes = await Promise.all(
+      nodes
+        .flatMap(selectedNode => getInstanceNodes(selectedNode))
+        .filter(instanceNode => !config.ignoredComponentInstances.includes(instanceNode.name))
+        .map(async instanceNode => await instanceNode.getMainComponentAsync())
+        .filter(c => c !== null) as Promise<ComponentNode>[],
+    )
+    console.log('Found instanceNodes', instanceNodes)
+
+    const generatedInstances: Record<string, string> = {}
+
+    instanceNodes.map(async (instanceNode) => {
+      console.log('Processing instanceNode', instanceNode.name)
+
+      const parser = new FigmaNodeParser({ default: 'default' }, config)
+      const tree = await parser.parse(instanceNode)
+
+      if (tree) {
+        const generator = new HTMLGenerator([], {}, config)
+        generatedInstances[instanceNode.name] = await generator.generate(tree)
+
+        console.log('Generated HTML for instanceNode', instanceNode.name, generatedInstances[instanceNode.name])
+      }
+      else {
+        console.error('It was not possible to generate HTML code for the selected node.')
+        figma.notify('Error during HTML generation')
+      }
+    })
+
     // only send message if html is not empty
     if (html) {
       sendGeneratedComponentsMessage({
         mainComponent: 'main',
-        components: { main: html },
+        components: { main: html, ...generatedInstances },
       })
     }
     else { sendUnselectedMessage() }
