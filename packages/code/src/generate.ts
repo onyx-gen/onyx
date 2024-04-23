@@ -116,6 +116,8 @@ export default async function generate(config: Configuration): Promise<string | 
       instances,
     }
 
+    console.log('### COMPONENT TREE ###', componentTree)
+
     // only send message if html is not empty
     if (html)
       sendGeneratedComponentsMessage({ componentTree })
@@ -162,8 +164,17 @@ async function generateComponentTree(node: ComponentNode, config: Configuration)
     }
   }
 
+  let nodeName = node.name
+
+  if (node.type === 'COMPONENT') {
+    const hasComponentSetParent = node.parent?.type === 'COMPONENT_SET'
+
+    if (hasComponentSetParent)
+      nodeName = node.parent.name
+  }
+
   return {
-    name: node.name,
+    name: nodeName,
     code: html,
     figmaNode: node,
     instances,
