@@ -1,6 +1,6 @@
 import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
-import { getSelectedNodes } from './utils'
+import { getInstanceNodes, getSelectedNodes } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
 import {
   sendExecutionTimeMessage,
@@ -23,6 +23,9 @@ export default async function generate(config: Configuration): Promise<string | 
 
   try {
     const nodes = getSelectedNodes()
+
+    const instanceNodes = getInstanceNodes(nodes[0])
+    console.log('instanceNodes', instanceNodes)
 
     // Early return if no node is selected
     if (nodes.length === 0) {

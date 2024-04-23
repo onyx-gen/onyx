@@ -36,6 +36,28 @@ export function getSelectedNode(): SceneNode | null {
 }
 
 /**
+ * Checks if the node is an instance node.
+ * @param node - The node to check.
+ */
+function isInstanceNode(node: SceneNode): node is InstanceNode {
+  return node.type === 'INSTANCE'
+}
+
+/**
+ * Retrieves all instance nodes in the node tree.
+ * @param node
+ */
+export function getInstanceNodes(node: SceneNode): InstanceNode[] {
+  if (isInstanceNode(node))
+    return [node]
+
+  else if ('children' in node)
+    return node.children.flatMap(getInstanceNodes)
+
+  else return []
+}
+
+/**
  * Zips two arrays together, creating pairs of corresponding elements.
  *
  * @template T - The type of elements in the arrays.
