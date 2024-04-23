@@ -7,7 +7,6 @@ import { usePluginMessage } from './usePluginMessage'
 export const useCode = defineStore('code', () => {
   const components = ref<GeneratedComponentsPluginMessageData | null>(null)
 
-  const code = ref('')
   const selectedNodes = ref<SelectedNode[] | null>(null)
   const hasSelection = computed(() => selectedNodes.value !== null)
   const isLoading = ref(false)
@@ -23,7 +22,6 @@ export const useCode = defineStore('code', () => {
     onPluginMessage('generated-components', (_components) => {
       components.value = _components
       console.log('Received generated components', _components)
-      code.value = _components.components[_components.mainComponent]
     })
 
     onPluginMessage('unselected', () => {
@@ -45,7 +43,6 @@ export const useCode = defineStore('code', () => {
 
   return {
     listen,
-    code,
     selectedNodes,
     hasSelection,
     isLoading,

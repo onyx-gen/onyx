@@ -3,28 +3,31 @@ import { codeToHtml } from 'shiki'
 import { computedAsync, useClipboard } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
+import { computed } from 'vue'
 import { useTheme } from '@/composables/useTheme'
 import { useNotification } from '@/composables/useNotification'
 import { useCode } from '@/stores/useCode'
 import Wrapper from '@/components/layout/wrapper.vue'
 
-const { code, isLoading, executionTime, components } = storeToRefs(useCode())
+const { isLoading, executionTime, components } = storeToRefs(useCode())
 
 const { theme } = useTheme()
 
-const html = computedAsync(
-  async () => codeToHtml(code.value, {
-    lang: 'vue-html',
-    theme: theme.value,
-  }),
-  '',
-)
+// Get the main component code
+const mainComponentCode = computed(() => {
+  const mainComponentName = components.value?.mainComponent
 
-const { copy } = useClipboard({ source: code, legacy: true })
+  if (mainComponentName)
+    return components.value?.components[mainComponentName] || ''
+
+  return ''
+})
+
+const { copy } = useClipboard({ source: mainComponentCode, legacy: true })
 const { notify } = useNotification()
 
 function onCopy() {
-  copy(code.value)
+  copy(mainComponentCode.value)
   notify('Copied to clipboard!')
 }
 
