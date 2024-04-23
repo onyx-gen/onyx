@@ -113,7 +113,6 @@ const flattenedTree = computed(() => {
         as="div"
         class="
           flex
-          items-center
           color-$figma-color-text-secondary
           border-b-1 border-l-1 border-color-$divider-color-code
           divide-x divide-color-$divider-color-code
@@ -127,6 +126,7 @@ const flattenedTree = computed(() => {
         >
           <button
             class="
+              shrink-0
               font-sans text-xs font-medium
               px-4 py-2
               last:(!border-r-1 border-color-$divider-color-code)
