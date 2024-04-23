@@ -15,6 +15,14 @@ const isRem = computed({
   },
 })
 
+const shouldLowercaseVariableNames = computed({
+  get: () => configuration.value.variableNameTransformations.lowercase,
+  set: (lowercaseVariableNames) => {
+    console.log('set', lowercaseVariableNames)
+    configuration.value.variableNameTransformations.lowercase = lowercaseVariableNames
+  },
+})
+
 const options: SelectOption[] = [
   {
     value: 'inferred',
@@ -59,6 +67,14 @@ const options: SelectOption[] = [
       </h2>
 
       <Switch v-model="isRem" class="mt-2" />
+    </div>
+
+    <div>
+      <h2>
+        Lowercase Variable Names
+      </h2>
+
+      <Switch v-model="shouldLowercaseVariableNames" class="mt-2" />
     </div>
 
     <div>

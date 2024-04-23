@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import type { IConfiguration, Mode, Unit } from '@onyx-gen/types'
+import type { IConfiguration, Mode, Unit, VariableNameTransformations } from '@onyx-gen/types'
 import type { Ref } from 'vue'
-import { ref, watch } from 'vue'
+import { ref, toRaw, watch } from 'vue'
 import { usePluginMessage } from './usePluginMessage'
 
 export const useConfiguration = defineStore('configuration-store', () => {
@@ -22,6 +22,7 @@ export const useConfiguration = defineStore('configuration-store', () => {
     watch(() => configuration.value.nearestInference, (nearestColor: boolean) => emitPluginMessage('nearest-changed', { nearestColor }))
     watch(() => configuration.value.variantGroup, (variantGroup: boolean) => emitPluginMessage('variant-group-changed', { variantGroup }))
     watch(() => configuration.value.mode, (mode: Mode) => emitPluginMessage('mode-changed', { mode }))
+    watch(() => configuration.value.variableNameTransformations, (variableNameTransformations: VariableNameTransformations) => emitPluginMessage('variable-name-transformations-changed', { variableNameTransformations: toRaw(variableNameTransformations) }), { deep: true })
     watch(() => configuration.value.newBuilder, (newBuilder: boolean) => emitPluginMessage('new-builder-changed', { newBuilder }))
   })
 
