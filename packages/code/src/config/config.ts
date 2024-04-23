@@ -20,7 +20,7 @@ const defaultConfig: IConfiguration = {
   theme,
   newBuilder: true,
   variableNameTransformations: {
-    lowercase: true,
+    lowercase: false,
   },
 }
 

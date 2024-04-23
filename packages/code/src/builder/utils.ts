@@ -73,7 +73,7 @@ export function hexToRGB(hex: string, scale: boolean = false): { r: number, g: n
 export function getToken(
   node: SceneNode,
   type: Properties,
-  variableNameTransformations: VariableNameTransformations = { lowercase: false }, // TODO: Remove default value
+  variableNameTransformations: VariableNameTransformations,
 ): string | null {
   const tokens = getAppliedTokens(node)
   const tokenValue = tokens.get(type) || null
