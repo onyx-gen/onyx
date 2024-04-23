@@ -22,4 +22,5 @@ export interface IConfiguration {
   theme: Theme
   newBuilder: boolean
   variableNameTransformations: VariableNameTransformations
+  ignoredComponentInstances: string[]
 }

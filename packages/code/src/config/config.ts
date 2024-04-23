@@ -22,6 +22,7 @@ const defaultConfig: IConfiguration = {
   variableNameTransformations: {
     lowercase: false,
   },
+  ignoredComponentInstances: ['_DS/resizer'],
 }
 
 export class Configuration implements IConfiguration {
@@ -32,6 +33,7 @@ export class Configuration implements IConfiguration {
   public theme: IConfiguration['theme']
   public newBuilder: IConfiguration['newBuilder']
   public variableNameTransformations: IConfiguration['variableNameTransformations']
+  public ignoredComponentInstances: IConfiguration['ignoredComponentInstances']
 
   public readonly config: IConfiguration
 
@@ -58,6 +60,7 @@ export class Configuration implements IConfiguration {
     this.theme = this.config.theme
     this.newBuilder = this.config.newBuilder
     this.variableNameTransformations = this.config.variableNameTransformations
+    this.ignoredComponentInstances = this.config.ignoredComponentInstances
   }
 
   public get colorLookup(): InferenceColorMap {
