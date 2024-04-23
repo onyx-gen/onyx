@@ -1,10 +1,11 @@
+import type { ComponentTreeNode } from '@onyx-gen/types'
 import FigmaNodeParser from './parsers/figma-node.parser'
 import HTMLGenerator from './generators/html.generator'
-import { getSelectedNodes } from './utils'
+import { getSelectedNodes, getUniqueInstanceNodes } from './utils'
 import ComponentSetProcessor from './set/component-set-processor'
 import {
   sendExecutionTimeMessage,
-  sendHtmlMessage,
+  sendGeneratedComponentsMessage,
   sendIsLoadingMessage,
   sendSelectedMessage,
   sendUnselectedMessage,
@@ -86,11 +87,42 @@ export default async function generate(config: Configuration): Promise<string | 
         sendSelectedMessage([])
     }
 
+    const instanceNodes = (await Promise.all(nodes.map(node => getUniqueInstanceNodes(node)))).flat()
+
+    const mainComponentsOfInstanceNodes = await Promise.all(
+      instanceNodes
+        .map(instanceNode => instanceNode.getMainComponentAsync())
+        .filter((mainComponent): mainComponent is Promise<ComponentNode> => mainComponent !== null),
+    )
+
+    const instances = await Promise.all(mainComponentsOfInstanceNodes.map(instanceNode => generateComponentTree(instanceNode, config)))
+
+    console.log('SELECTED NODE', nodes[0])
+
+    const mainNode = nodes[0]
+    let mainNodeName = mainNode.name
+
+    if (mainNode.type === 'COMPONENT') {
+      const hasComponentSetParent = mainNode.parent?.type === 'COMPONENT_SET'
+
+      if (hasComponentSetParent)
+        mainNodeName = mainNode.parent.name
+    }
+
+    const componentTree: ComponentTreeNode = {
+      name: mainNodeName,
+      figmaNode: nodes[0] as ComponentNode, // TODO MF: Should also work for other node types
+      code: html,
+      instances,
+    }
+
+    console.log('### COMPONENT TREE ###', componentTree)
+
     // only send message if html is not empty
     if (html)
-      sendHtmlMessage(html)
-    else
-      sendUnselectedMessage()
+      sendGeneratedComponentsMessage({ componentTree })
+
+    else sendUnselectedMessage()
   }
   catch (e) {
     figma.notify('Onyx: Unexpected Error')
@@ -101,5 +133,50 @@ export default async function generate(config: Configuration): Promise<string | 
     const executionTime = endTime - startTime
     sendIsLoadingMessage(false)
     sendExecutionTimeMessage(executionTime)
+  }
+}
+
+/**
+ * Recursively generates a component tree for given Figma nodes.
+ * Each node's HTML code is generated using FigmaNodeParser and HTMLGenerator.
+ *
+ * @param node - The initial node to generate the tree from.
+ * @param config - Configuration object containing settings and options for node processing.
+ * @returns A promise that resolves to a ComponentTreeNode representing the node hierarchy with generated HTML.
+ */
+async function generateComponentTree(node: ComponentNode, config: Configuration): Promise<ComponentTreeNode> {
+  const parser = new FigmaNodeParser({ default: 'default' }, config)
+  const generator = new HTMLGenerator([], {}, config)
+
+  const tree = await parser.parse(node)
+  const html = tree ? await generator.generate(tree) : ''
+
+  const instances: ComponentTreeNode[] = []
+
+  const instanceNodes = await getUniqueInstanceNodes(node)
+  for (const instanceNode of instanceNodes) {
+    if (!config.ignoredComponentInstances.includes(instanceNode.name)) {
+      const mainComponent = await instanceNode.getMainComponentAsync()
+      if (mainComponent) {
+        const instanceTree = await generateComponentTree(mainComponent, config)
+        instances.push(instanceTree)
+      }
+    }
+  }
+
+  let nodeName = node.name
+
+  if (node.type === 'COMPONENT') {
+    const hasComponentSetParent = node.parent?.type === 'COMPONENT_SET'
+
+    if (hasComponentSetParent)
+      nodeName = node.parent.name
+  }
+
+  return {
+    name: nodeName,
+    code: html,
+    figmaNode: node,
+    instances,
   }
 }

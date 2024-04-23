@@ -24,3 +24,10 @@ export interface IConfiguration {
   variableNameTransformations: VariableNameTransformations
   ignoredComponentInstances: string[]
 }
+
+export interface ComponentTreeNode {
+  name: string
+  code: string
+  figmaNode: ComponentNode
+  instances: ComponentTreeNode[]
+}

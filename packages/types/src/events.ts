@@ -1,4 +1,4 @@
-import type { ComponentProps, IConfiguration, Mode, Unit, VariableNameTransformations } from './types'
+import type { ComponentProps, ComponentTreeNode, IConfiguration, Mode, Unit, VariableNameTransformations } from './types'
 
 export type PluginMessageEvent = MessageEvent<{ pluginMessage: PluginMessage }>
 
@@ -23,10 +23,10 @@ interface RendererPluginMessageData {
   height: number
 }
 
-export type HtmlPluginMessage = BasePluginMessage<'html', HtmlPluginMessageData>
+export type GeneratedComponentsPluginMessage = BasePluginMessage<'generated-components', GeneratedComponentsPluginMessageData>
 
-interface HtmlPluginMessageData {
-  html: string
+export interface GeneratedComponentsPluginMessageData {
+  componentTree: ComponentTreeNode
 }
 
 export type ConfigurationPluginMessage = BasePluginMessage<'configuration', ConfigurationPluginMessageData>
@@ -110,7 +110,7 @@ interface SelectedPluginMessageData {
 
 export type PluginMessage =
   | RendererPluginMessage
-  | HtmlPluginMessage
+  | GeneratedComponentsPluginMessage
   | UnselectedPluginMessage
   | ExecutionTimePluginMessage
   | IsLoadingPluginMessage

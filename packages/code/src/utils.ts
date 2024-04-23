@@ -36,6 +36,52 @@ export function getSelectedNode(): SceneNode | null {
 }
 
 /**
+ * Checks if the node is an instance node.
+ * @param node - The node to check.
+ */
+function isInstanceNode(node: SceneNode): node is InstanceNode {
+  return node.type === 'INSTANCE'
+}
+
+/**
+ * Retrieves all instance nodes in the node tree.
+ * @param node
+ */
+export function getInstanceNodes(node: SceneNode): InstanceNode[] {
+  if (isInstanceNode(node))
+    return [node]
+
+  else if ('children' in node)
+    return node.children.flatMap(getInstanceNodes)
+
+  else return []
+}
+
+/**
+ * Retrieves all unique instance nodes in the node tree.
+ * @param node
+ */
+export async function getUniqueInstanceNodes(node: SceneNode): Promise<InstanceNode[]> {
+  const instanceNodes = getInstanceNodes(node)
+
+  const mainComponentsInstanceNodePairs = (
+    await Promise.all(
+      instanceNodes
+        .map(async (node) => {
+          const mainComponent = await node.getMainComponentAsync()
+          return [node, mainComponent] as [InstanceNode, ComponentNode | null]
+        }),
+    )
+  ).filter((d): d is [InstanceNode, ComponentNode] => d[1] !== null)
+
+  const uniqueMainComponentIds = Array.from(new Set(mainComponentsInstanceNodePairs.map(([_, mainComponent]) => mainComponent.id)))
+  return uniqueMainComponentIds.map((id) => {
+    const foundPair = mainComponentsInstanceNodePairs.find(([_, mainComponent]) => mainComponent.id === id)
+    return foundPair![0]
+  })
+}
+
+/**
  * Zips two arrays together, creating pairs of corresponding elements.
  *
  * @template T - The type of elements in the arrays.

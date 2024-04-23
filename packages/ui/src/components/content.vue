@@ -13,31 +13,35 @@ const { selectedNodes, hasSelection } = storeToRefs(useCode())
 <template>
   <div>
     <div class="border-b border-color-$figma-color-border mb-4">
-      <Layout>
+      <Layout class="flex gap-2">
+        <i class="i-onyx-logo w-8 h-8" />
         <h1 class="text-2xl font-bold mb-4">
           Onyx
         </h1>
       </Layout>
     </div>
 
-    <div v-if="hasSelection" class="border-b border-color-$figma-color-border mb-4">
+    <div v-if="hasSelection" class="border-b border-color-$figma-color-border pb-4 mb-4">
       <Layout>
         <Preview />
       </Layout>
     </div>
 
-    <div class="border-b border-color-$figma-color-border mb-4">
-      <Layout class="mb-4">
+    <div class="border-b border-color-$figma-color-border mb-4 pb-4">
+      <Layout>
         <Configuration />
       </Layout>
     </div>
 
-    <div v-if="hasSelection" class="divide-y divide-$figma-color-border">
+    <div v-if="hasSelection" class="divide-y divide-$figma-color-border border-b border-color-$figma-color-border mb-4 pb-4">
       <Layout>
         <Code />
       </Layout>
 
-      <Layout v-if="hasSelection && selectedNodes?.length" class="mt-4">
+      <Layout
+        v-if="hasSelection && selectedNodes?.length"
+        class="mt-4 pt-4"
+      >
         <SelectedNodes :nodes="selectedNodes" />
       </Layout>
     </div>

@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { SelectedNode } from '@onyx-gen/types'
+import type { GeneratedComponentsPluginMessageData, SelectedNode } from '@onyx-gen/types'
 import { whenever } from '@vueuse/core'
 import { usePluginMessage } from './usePluginMessage'
 
 export const useCode = defineStore('code', () => {
-  const code = ref('')
+  const components = ref<GeneratedComponentsPluginMessageData | null>(null)
+
   const selectedNodes = ref<SelectedNode[] | null>(null)
   const hasSelection = computed(() => selectedNodes.value !== null)
   const isLoading = ref(false)
@@ -18,8 +19,9 @@ export const useCode = defineStore('code', () => {
 
     const { onPluginMessage } = usePluginMessage()
 
-    onPluginMessage('html', ({ html }) => {
-      code.value = html
+    onPluginMessage('generated-components', (_components) => {
+      components.value = _components
+      console.log('Received generated components', _components)
     })
 
     onPluginMessage('unselected', () => {
@@ -41,10 +43,10 @@ export const useCode = defineStore('code', () => {
 
   return {
     listen,
-    code,
     selectedNodes,
     hasSelection,
     isLoading,
     executionTime,
+    components,
   }
 })

@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.91.0",
-    "@onyx-gen/icons": "0.0.1",
+    "@onyx-gen/icons": "0.0.3",
     "@onyx-gen/tsconfig": "workspace:^",
     "@onyx-gen/types": "workspace:^",
     "@unocss/transformer-variant-group": "^0.59.4",
