@@ -32,7 +32,7 @@ const attrs = useAttrs()
       <slot name="action" />
     </div>
 
-    <div class="code-copy max-h-82 overflow-scroll relative">
+    <div class="max-h-82 overflow-scroll relative">
       <div
         v-bind="attrs"
         class="px-3 py-2"

@@ -80,7 +80,7 @@ const componentList = computedAsync(async () => {
       </TabList>
       <TabPanels>
         <TabPanel v-for="c in componentList" :key="c.name">
-          <div class="w-full px-3 py-2" v-html="c.html" />
+          <div class="w-full px-3 py-2 code-copy" v-html="c.html" />
         </TabPanel>
       </TabPanels>
     </TabGroup>
