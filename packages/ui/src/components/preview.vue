@@ -3,14 +3,10 @@ import { onMounted, ref, toRaw, watch } from 'vue'
 import html from 'virtual:preview-renderer'
 import { storeToRefs } from 'pinia'
 import type { GeneratedComponentsPluginMessageData } from '@onyx-gen/types'
-import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-} from '@headlessui/vue'
 import { useCode } from '@/stores/useCode'
 import Wrapper from '@/components/layout/wrapper.vue'
 import { usePluginMessage } from '@/stores/usePluginMessage'
+import Disclosure from '@/components/disclosure.vue'
 
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 
@@ -57,33 +53,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <Disclosure v-slot="{ open }" as="div" class="space-y-4">
-      <div class="flex justify-between">
-        <div class="font-sans text-xs font-semibold color-$figma-color-text">
-          Preview
-        </div>
-
-        <DisclosureButton>
-          <i
-            class="w-4 h-4"
-            :class="{
-              'i-onyx-eye-slash': open,
-              'i-onyx-eye': !open,
-            }"
-          />
-        </DisclosureButton>
-      </div>
-
-      <DisclosurePanel>
-        <Wrapper headline="Preview">
-          <iframe
-            ref="iframeRef"
-            :src="blobUrl"
-            class="w-full min-h-24 bg-$figma-color-bg-secondary rounded-sm"
-          />
-        </Wrapper>
-      </DisclosurePanel>
-    </Disclosure>
-  </div>
+  <Disclosure headline="Preview">
+    <Wrapper headline="Preview">
+      <iframe
+        ref="iframeRef"
+        :src="blobUrl"
+        class="w-full min-h-24 bg-$figma-color-bg-secondary rounded-sm"
+      />
+    </Wrapper>
+  </Disclosure>
 </template>
