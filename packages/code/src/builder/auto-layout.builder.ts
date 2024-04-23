@@ -123,6 +123,7 @@ class AutoLayoutBuilder implements IBuilder {
         node.itemSpacing,
         dimensionHandler,
         this.config.mode,
+        this.config.variableNameTransformations,
       )
 
       this.attributes.add(gap)
@@ -198,6 +199,7 @@ class AutoLayoutBuilder implements IBuilder {
         },
         dimensionHandler,
         this.config.mode,
+        this.config.variableNameTransformations,
       )
 
       attrs.forEach(element => this.attributes.add(element))

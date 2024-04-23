@@ -1,3 +1,4 @@
+import type { VariableNameTransformations } from '@onyx-gen/types'
 import { getAppliedTokens } from '../tokens/tokens'
 import type { Properties } from '../tokens/properties'
 
@@ -66,11 +67,20 @@ export function hexToRGB(hex: string, scale: boolean = false): { r: number, g: n
  *
  * @param {SceneNode} node - The scene node from which to retrieve the token value.
  * @param {Properties} type - The type of token to retrieve.
+ * @param {VariableNameTransformations} variableNameTransformations - The transformations to apply to the token value.
  * @return {string|null} - The token value of the specified type if found, otherwise null.
  */
-export function getToken(node: SceneNode, type: Properties): string | null {
+export function getToken(
+  node: SceneNode,
+  type: Properties,
+  variableNameTransformations: VariableNameTransformations = { lowercase: false }, // TODO: Remove default value
+): string | null {
   const tokens = getAppliedTokens(node)
-  return tokens.get(type) || null
+  const tokenValue = tokens.get(type) || null
+  if (variableNameTransformations.lowercase)
+    return tokenValue?.toLowerCase() || null
+  else
+    return tokenValue
 }
 
 /**

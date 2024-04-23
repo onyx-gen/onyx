@@ -213,6 +213,7 @@ class Builder implements IBuilder {
           width,
           dimensionHandler,
           this.config.mode,
+          this.config.variableNameTransformations,
         )
 
         this.attributes.add(utilityClass)
@@ -227,6 +228,7 @@ class Builder implements IBuilder {
           minWidth,
           dimensionHandler,
           this.config.mode,
+          this.config.variableNameTransformations,
         )
 
         this.attributes.add(utilityClass)
@@ -241,6 +243,7 @@ class Builder implements IBuilder {
           maxWidth,
           dimensionHandler,
           this.config.mode,
+          this.config.variableNameTransformations,
         )
 
         this.attributes.add(utilityClass)
@@ -257,6 +260,7 @@ class Builder implements IBuilder {
           height,
           dimensionHandler,
           this.config.mode,
+          this.config.variableNameTransformations,
         )
 
         this.attributes.add(utilityClass)
@@ -271,6 +275,7 @@ class Builder implements IBuilder {
           minHeight,
           dimensionHandler,
           this.config.mode,
+          this.config.variableNameTransformations,
         )
 
         this.attributes.add(utilityClass)
@@ -285,6 +290,7 @@ class Builder implements IBuilder {
           maxHeight,
           dimensionHandler,
           this.config.mode,
+          this.config.variableNameTransformations,
         )
 
         this.attributes.add(utilityClass)

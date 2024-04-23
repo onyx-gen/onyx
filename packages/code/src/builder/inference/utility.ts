@@ -1,4 +1,4 @@
-import type { Mode } from '@onyx-gen/types'
+import type { Mode, VariableNameTransformations } from '@onyx-gen/types'
 import type { BaseUtilityValue } from '../types'
 import { isColorUtility } from '../types'
 import type { Properties } from '../../tokens/properties'
@@ -67,6 +67,7 @@ type UtilityValuesRectSides = {
  * @param figmaValue The raw value from Figma to be processed.
  * @param handler A function to process the figmaValue into a utility value.
  * @param mode Specifies how to handle the utility value (e.g., as a variable).
+ * @param variableNameTransformations The transformations to apply to the variable name.
  * @returns The resulting utility value after processing.
  * @throws If no utility value can be found or processed.
  */
@@ -77,11 +78,12 @@ function getUtilityValue<T extends BaseUtilityValue, V>(
   figmaValue: V,
   handler: (val: V) => T,
   mode: Mode,
+  variableNameTransformations: VariableNameTransformations,
 ): BaseUtilityValue {
   let utilityValue: BaseUtilityValue | null = null
 
   if (mode === 'variables') {
-    const token = getToken(node, property)
+    const token = getToken(node, property, variableNameTransformations)
 
     if (token) {
       utilityValue = {
@@ -111,6 +113,7 @@ function getUtilityValue<T extends BaseUtilityValue, V>(
  * @param figmaValue The raw value from Figma to be processed.
  * @param handler A function to process the figmaValue into a utility value.
  * @param mode Specifies how to handle the utility value (e.g., as a variable).
+ * @param variableNameTransformations The transformations to apply to the variable name.
  * @returns The full utility class string.
  */
 export function getUtilityClass<T extends BaseUtilityValue, V>(
@@ -121,8 +124,9 @@ export function getUtilityClass<T extends BaseUtilityValue, V>(
   figmaValue: V,
   handler: (val: V) => T,
   mode: Mode,
+  variableNameTransformations: VariableNameTransformations,
 ): string {
-  const utilityValue = getUtilityValue(node, type, property, figmaValue, handler, mode)
+  const utilityValue = getUtilityValue(node, type, property, figmaValue, handler, mode, variableNameTransformations)
 
   return `${utilityClassPrefix}-${translateUtilityValue(utilityValue)}`
 }
@@ -165,6 +169,7 @@ function has<V>(side: RectSide, map: TokenPropertyUtilityClassPrefixMap<V>): boo
  * @param sideShortcuts - Shortcuts for generating classes when values are equal on all sides, or on horizontal/vertical axes.
  * @param handler - A handler function to transform Figma values into utility values.
  * @param mode - The mode to use for generating utility values.
+ * @param variableNameTransformations - The transformations to apply to the variable name.
  * @returns A set of utility class strings.
  */
 export function getUtilityClassForSides<T extends BaseUtilityValue, V>(
@@ -174,10 +179,11 @@ export function getUtilityClassForSides<T extends BaseUtilityValue, V>(
   sideShortcuts: SideShortcuts,
   handler: (val: V) => T,
   mode: Mode,
+  variableNameTransformations: VariableNameTransformations,
 ) {
   const valuesForProperties: UtilityValuesRectSides = Object.fromEntries(
     Object.entries(rectSideMap).map(([side, sideMapEntry]) => {
-      return [side as RectSide, getUtilityValue(node, type, sideMapEntry.property, sideMapEntry.figmaValue, handler, mode)]
+      return [side as RectSide, getUtilityValue(node, type, sideMapEntry.property, sideMapEntry.figmaValue, handler, mode, variableNameTransformations)]
     }),
   ) as UtilityValuesRectSides
 
