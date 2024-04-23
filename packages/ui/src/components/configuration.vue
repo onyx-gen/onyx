@@ -18,7 +18,6 @@ const isRem = computed({
 const shouldLowercaseVariableNames = computed({
   get: () => configuration.value.variableNameTransformations.lowercase,
   set: (lowercaseVariableNames) => {
-    console.log('set', lowercaseVariableNames)
     configuration.value.variableNameTransformations.lowercase = lowercaseVariableNames
   },
 })
