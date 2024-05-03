@@ -107,8 +107,8 @@ const flattenedTree = computed(() => {
 </script>
 
 <template>
-  <Wrapper headline="Generated Code" :loading="isLoading" class="!p-0">
-    <TabGroup class="w-full" as="div">
+  <Wrapper headline="Generated Code" :loading="isLoading" class="!p-0 w-full mb-2">
+    <TabGroup class="w-full h-full grid" as="div">
       <TabList
         as="div"
         class="
@@ -141,9 +141,10 @@ const flattenedTree = computed(() => {
           </button>
         </Tab>
       </TabList>
-      <TabPanels>
+
+      <TabPanels class="w-full h-full overflow-scroll">
         <TabPanel v-for="c in flattenedTree" :key="c.name">
-          <div class="w-full px-3 py-2 code-copy overflow-scroll" v-html="c.html" />
+          <div class="w-full mx-3 mt-2 code-copy h-full" v-html="c.html" />
         </TabPanel>
       </TabPanels>
     </TabGroup>

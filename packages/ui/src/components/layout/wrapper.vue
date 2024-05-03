@@ -32,7 +32,7 @@ const attrs = useAttrs()
       <slot name="action" />
     </div>
 
-    <div class="max-h-82 relative">
+    <div class="max-h-82 relative flex">
       <div
         v-bind="attrs"
         class="px-3 py-2"
