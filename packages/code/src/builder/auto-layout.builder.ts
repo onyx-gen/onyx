@@ -1,6 +1,5 @@
 import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
-import { Log } from '../decoratos/log'
 import { createDimensionHandler } from './inference/dimension'
 import type { TokenPropertyUtilityClassPrefixMap } from './inference/utility'
 import { getUtilityClass, getUtilityClassForSides } from './inference/utility'
@@ -13,7 +12,7 @@ import { isAutoLayoutMixin, isInferredAutoLayout } from './mixins'
  * for certain values like gaps. The generated string can be used to style elements
  * with CSS utility class frameworks like TailwindCSS or UnoCSS.
  */
-@Log
+// @Log
 class AutoLayoutBuilder implements IBuilder {
   private attributes: Set<string> = new Set()
 

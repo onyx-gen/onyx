@@ -1,6 +1,5 @@
 import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
-import { Log } from '../decoratos/log'
 import type { IBuilder } from './types'
 import { isIndividualStrokesMixin, isMinimalFillsMixin, isMinimalStrokesMixin } from './mixins'
 import { createColorHandler } from './inference/color'
@@ -11,7 +10,7 @@ import {
 } from './inference/utility'
 import { createDimensionHandler } from './inference/dimension'
 
-@Log
+// @Log
 class FillsAndStrokesBuilder implements IBuilder {
   private attributes: Set<string> = new Set()
 

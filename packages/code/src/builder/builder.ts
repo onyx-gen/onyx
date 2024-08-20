@@ -1,6 +1,5 @@
 import { Properties } from '../tokens/properties'
 import type { Configuration } from '../config/config'
-import { Log } from '../decoratos/log'
 import type { IBuilder, RectCornersNew } from './types'
 import AutoLayoutBuilder from './auto-layout.builder'
 import { getUtilityClass, translateUtilityValue } from './inference/utility'
@@ -19,7 +18,7 @@ import TextBuilder from './text.builder'
  * It supports various mixins to handle different properties like auto layout, dimensions,
  * fills, and strokes. The builder uses configuration for dimension and color inference.
  */
-@Log
+// @Log
 class Builder implements IBuilder {
   private attributes: Set<string> = new Set()
 
