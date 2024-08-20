@@ -21,7 +21,9 @@ const { selectedNodes, hasSelection } = storeToRefs(useCode())
       </Layout>
     </div>
 
-    <div v-if="hasSelection" class="border-b border-color-$figma-color-border pb-4 mb-4">
+    <div
+      class="border-b border-color-$figma-color-border pb-4 mb-4"
+    >
       <Layout>
         <Preview />
       </Layout>
