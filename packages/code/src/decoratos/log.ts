@@ -208,8 +208,12 @@ function logInvocation(type: 'start' | 'end', className: string, methodName: str
     parameters: argsWithNames,
   }
 
-  if (result)
-    message.result = result
+  if (result) {
+    if (result instanceof Set || result instanceof Map)
+      message.result = Array.from(result)
+    else
+      message.result = result
+  }
 
   consola
     .withDefaults({
