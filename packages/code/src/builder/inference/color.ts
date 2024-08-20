@@ -92,7 +92,8 @@ export function findNearestColor(
 
   nearestColorCache.set(cacheKey, closestColorHEX)
 
-  return colorMap[closestColorHEX][0]
+  // return the first color which does not have an uppercase letter, if there is none return the first color in the array
+  return colorMap[closestColorHEX].find(color => !/[A-Z]/.test(color)) || colorMap[closestColorHEX][0]
 }
 
 /**
