@@ -204,9 +204,10 @@ function logInvocation(type: 'start' | 'end', className: string, methodName: str
     type,
   }
 
-  const message: any = {
-    parameters: argsWithNames,
-  }
+  const message: any = {}
+
+  if (Object.keys(argsWithNames).length)
+    message.parameters = argsWithNames
 
   if (result) {
     if (result instanceof Set || result instanceof Map)
@@ -220,5 +221,5 @@ function logInvocation(type: 'start' | 'end', className: string, methodName: str
       level: 5,
       tag: JSON.stringify(tag),
     })
-    .debug(message)
+    .debug(Object.keys(message).length ? message : '')
 }
