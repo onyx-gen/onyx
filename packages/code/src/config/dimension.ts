@@ -41,7 +41,7 @@ const values: number[] = [
 ]
 
 function remToUnitless(r: string): number {
-  return Number.parseFloat(round(Number.parseFloat(r.replace('rem', '')) * 16))
+  return Number.parseFloat(round(Number.parseFloat(r.replace('rem', ''))))
 }
 
 function createComputedDimensions() {
