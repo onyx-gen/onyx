@@ -7,6 +7,7 @@ import CssTraverser from '../traverser/css.traverser'
 import VueGenerator from '../generators/vue.generator'
 import { variantKey } from '../merge/utils'
 import type { Configuration } from '../config/config'
+import { Log } from '../decoratos/log'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 import type {
   ComponentCollection,
@@ -23,6 +24,7 @@ import type {
  * The class is responsible for orchestrating the entire process of
  * generating code from the given set of components.
  */
+@Log
 class ComponentSetProcessor {
   /**
    * Constructs an instance of ComponentSetProcessor.
