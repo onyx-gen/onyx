@@ -28,12 +28,10 @@ defineProps<{
       </DisclosureButton>
     </div>
 
-    <DisclosurePanel>
-      <slot />
-    </DisclosurePanel>
+    <div v-show="open">
+      <DisclosurePanel static>
+        <slot />
+      </DisclosurePanel>
+    </div>
   </Disclosure>
 </template>
-
-<style scoped>
-
-</style>
