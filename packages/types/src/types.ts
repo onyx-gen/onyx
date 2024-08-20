@@ -20,7 +20,6 @@ export interface IConfiguration {
   variantGroup: boolean
   nearestInference: boolean
   theme: Theme
-  newBuilder: boolean
   variableNameTransformations: VariableNameTransformations
   ignoredComponentInstances: string[]
 }

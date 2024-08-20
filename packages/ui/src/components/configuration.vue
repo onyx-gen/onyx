@@ -86,12 +86,6 @@ const options: SelectOption[] = [
       </div>
 
       <div>
-        <h2>Old/New Builder</h2>
-
-        <Switch v-model="configuration.newBuilder" class="mt-2" />
-      </div>
-
-      <div>
         <h2>
           Ignored Component Instances
         </h2>

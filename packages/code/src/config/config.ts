@@ -18,7 +18,6 @@ const defaultConfig: IConfiguration = {
   variantGroup: true,
   nearestInference: true,
   theme,
-  newBuilder: true,
   variableNameTransformations: {
     lowercase: false,
   },
@@ -31,7 +30,6 @@ export class Configuration implements IConfiguration {
   public variantGroup: IConfiguration['variantGroup']
   public nearestInference: IConfiguration['nearestInference']
   public theme: IConfiguration['theme']
-  public newBuilder: IConfiguration['newBuilder']
   public variableNameTransformations: IConfiguration['variableNameTransformations']
   public ignoredComponentInstances: IConfiguration['ignoredComponentInstances']
 
@@ -60,7 +58,6 @@ export class Configuration implements IConfiguration {
     this.variantGroup = this.config.variantGroup
     this.nearestInference = this.config.nearestInference
     this.theme = this.config.theme
-    this.newBuilder = this.config.newBuilder
     this.variableNameTransformations = this.config.variableNameTransformations
     this.ignoredComponentInstances = this.config.ignoredComponentInstances
   }

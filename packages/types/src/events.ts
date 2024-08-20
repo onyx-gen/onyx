@@ -71,12 +71,6 @@ interface IgnoredComponentInstancesChangedPluginMessageData {
   ignoredComponentInstances: string[]
 }
 
-export type NewBuilderChangedPluginMessage = BasePluginMessage<'new-builder-changed', NewBuilderChangedPluginMessageData>
-
-interface NewBuilderChangedPluginMessageData {
-  newBuilder: boolean
-}
-
 export type NotificationPluginMessage = BasePluginMessage<'notification', NotificationPluginMessageData>
 
 interface NotificationPluginMessageData {
@@ -123,4 +117,3 @@ export type PluginMessage =
   | NotificationPluginMessage
   | UnitChangedPluginMessage
   | ConfigurationPluginMessage
-  | NewBuilderChangedPluginMessage

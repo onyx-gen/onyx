@@ -66,10 +66,6 @@ PluginMessages.on('ignored-component-instances-changed', async ({ ignoredCompone
   configurationManager.updateConfig({ ignoredComponentInstances }).then(generate)
 })
 
-PluginMessages.on('new-builder-changed', async ({ newBuilder }) => {
-  configurationManager.updateConfig({ newBuilder }).then(generate)
-})
-
 PluginMessages.on('unit-changed', async ({ unit }) => {
   configurationManager.updateConfig({ unit }).then(generate)
 })
