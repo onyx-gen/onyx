@@ -8,6 +8,7 @@ import VueGenerator from '../generators/vue.generator'
 import { variantKey } from '../merge/utils'
 import type { Configuration } from '../config/config'
 import { Log } from '../decoratos/log'
+import { appendToVariantCSS } from '../css'
 import { getComponentProperties, groupComponentsByProp } from './utils'
 import type {
   ComponentCollection,
@@ -378,6 +379,13 @@ class ComponentSetProcessor {
         previousStates.push(state)
       }
     })
+
+    // root tree node should have the 'group' CSS class
+    if (mergedTree.data.type === 'container' && mergedTree.data.css) {
+      Object.keys(mergedTree.data.css).forEach((variant) => {
+        mergedTree.data.css[variant] = appendToVariantCSS(mergedTree.data.css[variant], 'group')
+      })
+    }
 
     return mergedTree
   }

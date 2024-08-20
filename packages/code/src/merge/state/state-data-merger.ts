@@ -20,12 +20,12 @@ class StateDataMerger extends AbstractDataMerger {
     return variantKey(this.variantPermutation)
   }
 
-  protected mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData): ContainerNodeData {
+  protected mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData, isRoot: boolean): ContainerNodeData {
     const calculateVariantCSSDifference1 = calculateVariantCSSDifference(data2.css?.[this.variant], data1.css?.[this.variant])
     const hasDifferences = calculateVariantCSSDifference1.css.length > 0
 
     if (hasDifferences) {
-      const variantCSSIfState = wrapInVariant(this.state, calculateVariantCSSDifference1)
+      const variantCSSIfState = wrapInVariant(isRoot ? this.state : `group-${this.state}`, calculateVariantCSSDifference1)
       const newVariantCSS = calculateVariantCSSUnion(data1.css?.[this.variant], variantCSSIfState)
 
       data1.css = data1.css || {}

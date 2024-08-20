@@ -7,13 +7,14 @@ abstract class AbstractDataMerger implements IDataMerger {
    *
    * @param data1 The first TreeNodeData to merge.
    * @param data2 The second TreeNodeData to merge.
+   * @param isRoot Whether the data is the root node of the tree.
    * @returns TreeNodeData representing the merged result of data1 and data2.
    */
-  public merge(data1: TreeNodeData, data2: TreeNodeData): TreeNodeData {
+  public merge(data1: TreeNodeData, data2: TreeNodeData, isRoot: boolean): TreeNodeData {
     // Merge based on the type of TreeNodeData
     switch (data1.type) {
       case 'container':
-        return this.mergeContainerData(data1, data2 as ContainerNodeData)
+        return this.mergeContainerData(data1, data2 as ContainerNodeData, isRoot)
       case 'text':
         return this.mergeTextData(data1, data2 as TextNodeData)
       case 'instance':
@@ -30,9 +31,10 @@ abstract class AbstractDataMerger implements IDataMerger {
    *
    * @param data1 The first ContainerNodeData to merge.
    * @param data2 The second ContainerNodeData to merge.
+   * @param isRoot Whether the data is the root node of the tree.
    * @returns ContainerNodeData representing the merged result.
    */
-  protected abstract mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData): ContainerNodeData
+  protected abstract mergeContainerData(data1: ContainerNodeData, data2: ContainerNodeData, isRoot: boolean): ContainerNodeData
 
   /**
    * Merges TextNodeData objects.

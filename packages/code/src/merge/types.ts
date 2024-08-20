@@ -27,5 +27,5 @@ export interface IDataMerger {
    * @param {TreeNodeData} data2 - The second TreeNodeData object to merge.
    * @return {TreeNodeData} - The merged TreeNodeData object.
    */
-  merge: (data1: TreeNodeData, data2: TreeNodeData) => TreeNodeData
+  merge: (data1: TreeNodeData, data2: TreeNodeData, isRoot: boolean) => TreeNodeData
 }

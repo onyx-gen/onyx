@@ -27,7 +27,7 @@ abstract class AbstractTreeMerger implements ITreeMerger {
       return this.diverge(tree1, tree2)
     }
 
-    return this.mergeNodes(tree1, tree2)
+    return this.mergeNodes(tree1, tree2, true)
   }
 
   /**
@@ -125,10 +125,11 @@ abstract class AbstractTreeMerger implements ITreeMerger {
    *
    * @param node1 The first TreeNode to merge. Can be undefined if the node does not exist in the first tree.
    * @param node2 The second TreeNode to merge. Can be undefined if the node does not exist in the second tree.
+   * @param isRoot Whether the nodes are the root nodes of the trees being merged.
    * @returns A merged TreeNode. In case of a conflict, a container node with both nodes as children is returned.
    *          If one node is undefined, the other node is returned.
    */
-  private mergeNodes(node1: TreeNode | undefined, node2: TreeNode | undefined): TreeNode {
+  private mergeNodes(node1: TreeNode | undefined, node2: TreeNode | undefined, isRoot: boolean = false): TreeNode {
     if (!node1 && !node2)
       throw new Error('Both nodes are undefined')
 
@@ -146,7 +147,7 @@ abstract class AbstractTreeMerger implements ITreeMerger {
     }
 
     // Assuming similar structure, merge TreeNodeData
-    const mergedData = this.dataMerger.merge(node1.data, node2.data)
+    const mergedData = this.dataMerger.merge(node1.data, node2.data, isRoot)
 
     // Merge children
     const children = this.mergeChildren(node1.children, node2.children)
