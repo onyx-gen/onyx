@@ -207,14 +207,10 @@ function logInvocation(type: 'start' | 'end', className: string, methodName: str
   const message: any = {}
 
   if (Object.keys(argsWithNames).length)
-    message.parameters = argsWithNames
+    message.parameters = transformSetsAndMaps(argsWithNames)
 
-  if (result) {
-    if (result instanceof Set || result instanceof Map)
-      message.result = Array.from(result)
-    else
-      message.result = result
-  }
+  if (result)
+    message.result = transformSetsAndMaps(result)
 
   consola
     .withDefaults({
@@ -222,4 +218,35 @@ function logInvocation(type: 'start' | 'end', className: string, methodName: str
       tag: JSON.stringify(tag),
     })
     .debug(Object.keys(message).length ? message : '')
+}
+
+/**
+ * Transforms Sets and Maps to arrays for logging purposes.
+ * @param obj
+ */
+function transformSetsAndMaps(obj: any): any {
+  if (obj === null || typeof obj !== 'object')
+    return obj
+
+  if (obj instanceof Set)
+    return Array.from(obj)
+
+  if (obj instanceof Map) {
+    const transformedMap: Record<any, any> = {}
+    obj.forEach((value, key) => {
+      transformedMap[key] = transformSetsAndMaps(value)
+    })
+    return transformedMap
+  }
+
+  if (Array.isArray(obj))
+    return obj.map(item => transformSetsAndMaps(item))
+
+  const transformedObj: Record<any, any> = {}
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key))
+      transformedObj[key] = transformSetsAndMaps(obj[key])
+  }
+
+  return transformedObj
 }
