@@ -381,9 +381,10 @@ class ComponentSetProcessor {
     })
 
     // root tree node should have the 'group' CSS class
-    if (mergedTree.data.type === 'container' && mergedTree.data.css) {
+    if (mergedTree && mergedTree.data.type === 'container' && mergedTree.data.css) {
       Object.keys(mergedTree.data.css).forEach((variant) => {
-        mergedTree.data.css[variant] = appendToVariantCSS(mergedTree.data.css[variant], 'group')
+        if (mergedTree && mergedTree.data.type === 'container' && mergedTree.data.css)
+          mergedTree.data.css[variant] = appendToVariantCSS(mergedTree.data.css[variant], 'group')
       })
     }
 
