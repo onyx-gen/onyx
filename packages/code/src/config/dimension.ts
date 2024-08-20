@@ -89,6 +89,9 @@ export function createDimensionLookup(
 
   addToResults(filteredRemDimensions)
   addToResults(createComputedDimensions())
+  addToResults({
+    px: '0.0625rem',
+  })
 
   return result
 }
