@@ -3,7 +3,6 @@ import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
 import Builder from '../builder/builder'
 import type { Configuration } from '../config/config'
-import { UnocssBuilder } from '../builder/unocss-builder'
 import type { IBuilder } from '../builder/types'
 import { Log } from '../decoratos/log'
 
@@ -66,10 +65,7 @@ class FigmaNodeParser {
 
       let builder: IBuilder
 
-      if (this.config.newBuilder)
-        builder = new Builder(this.config)
-      else
-        builder = new UnocssBuilder(node, this.config)
+      builder = new Builder(this.config)
 
       const css = builder.build(node)
 
@@ -124,10 +120,7 @@ class FigmaNodeParser {
   private async parseNode(node: SceneNode): Promise<TreeNode | null> {
     let builder: IBuilder
 
-    if (this.config.newBuilder)
-      builder = new Builder(this.config)
-    else
-      builder = new UnocssBuilder(node, this.config)
+    builder = new Builder(this.config)
 
     const css = builder.build(node)
 
