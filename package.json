@@ -18,7 +18,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "update-dependencies": "taze major -Ir",
-    "publish-packages": "turbo codegen && changeset && changeset version && changeset publish"
+    "publish-packages": "turbo codegen && changeset && changeset version && changeset publish",
+    "taze:major": "taze major -wIr",
+    "taze:minor": "taze minor -wIr"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.15.0",
