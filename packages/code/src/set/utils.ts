@@ -35,7 +35,9 @@ export function getComponentProperties(
       .map(([key, value]) => {
         value = removeNonAlphanumericChars(value.replaceAll(' ', ''))
         return [key, value]
-      }),
+      })
+      // lowercase all values
+      .map(([key, value]) => ([key, value.toLowerCase()])),
   )
 }
 
