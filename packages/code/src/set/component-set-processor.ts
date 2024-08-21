@@ -32,6 +32,13 @@ class ComponentSetProcessor {
    */
   constructor(private readonly config: Configuration) {}
 
+  /**
+   * Processes the given data, which can be either a ComponentSetNode or an array of SceneNodes.
+   * Calculates permutations and groups components by state, then performs further processing on the permutations.
+   *
+   * @param {ComponentSetNode | SceneNode[]} data - The data to be processed.
+   * @return {Promise<string>} - A promise that resolves to a string.
+   */
   public async process(data: ComponentSetNode | SceneNode[]): Promise<string> {
     const nodes = Array.isArray(data) ? data : [...data.children]
 
@@ -41,6 +48,17 @@ class ComponentSetProcessor {
     return await this.processPermutations(permutations, componentCollectionGroupedByState)
   }
 
+  /**
+   * Processes permutations of component collections grouped by state to generate a variant tree.
+   *
+   * @param {VariantPermutation[]} permutations - An array of component permutations.
+   * @param {GroupedComponentCollection<ComponentPropsWithState>} componentCollectionGroupedByState - Component collections grouped by state.
+   *
+   * @throws {Error} If the array of permutations is empty.
+   * @throws {Error} If no variant trees were generated.
+   *
+   * @returns {Promise<string>} A promise that resolves to the generated Vue code.
+   */
   private async processPermutations(
     permutations: VariantPermutation[],
     componentCollectionGroupedByState: GroupedComponentCollection<ComponentPropsWithState>,
