@@ -116,13 +116,9 @@ class FigmaNodeParser {
    * @returns {TreeNode|null} The generated tree node, or null if not applicable.
    */
   private async parseNode(node: SceneNode): Promise<TreeNode | null> {
-    let builder: IBuilder
-
-    builder = new Builder(this.config)
-
+    const builder: IBuilder = new Builder(this.config)
     const css = builder.build(node)
-
-    const hasChildren = 'children' in node && node.children.length > 0
+    const hasChildren = this.nodeHasChildren(node)
 
     // Skip leaf nodes with empty CSS
     if (!hasChildren && css.size === 0) {
@@ -131,6 +127,16 @@ class FigmaNodeParser {
     }
 
     return node.type === 'TEXT' ? this.createTextNode(node, css) : await this.createContainerNode(node, css, hasChildren)
+  }
+
+  /**
+   * Checks if a given node has any children.
+   *
+   * @param {SceneNode} node - The node to check for children.
+   * @return {boolean} - Returns true if the node has children, false otherwise.
+   */
+  private nodeHasChildren(node: SceneNode): boolean {
+    return 'children' in node && node.children.length > 0
   }
 
   /**
