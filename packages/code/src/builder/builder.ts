@@ -101,7 +101,7 @@ class Builder implements IBuilder {
 
     if (cornerRadius !== figma.mixed) {
       if (cornerRadius !== 0) {
-        const dimensionHandler = createDimensionHandler(this.config.dimensionsLookup, this.config.nearestInference, this.config.unit)
+        const dimensionHandler = createDimensionHandler(this.config.borderRadiusLookup, this.config.nearestInference, this.config.unit)
         this.attributes.add(`rounded-${translateUtilityValue(dimensionHandler(cornerRadius))}`)
       }
     }

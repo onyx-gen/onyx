@@ -9,7 +9,7 @@ import { createDimensionLookup } from './dimension'
 interface LookupCache {
   color: InferenceColorMap | null
   dimensions: InferenceDimensionMap | null
-  borderDimensions: InferenceDimensionMap | null
+  borderRadiusDimensions: InferenceDimensionMap | null
 }
 
 const defaultConfig: IConfiguration = {
@@ -45,7 +45,7 @@ export class Configuration implements IConfiguration {
   private lookupCache: LookupCache = {
     color: null,
     dimensions: null,
-    borderDimensions: null,
+    borderRadiusDimensions: null,
   }
 
   constructor(
@@ -99,6 +99,22 @@ export class Configuration implements IConfiguration {
 
     const lookup = createDimensionLookup(this.theme.spacing || {})
     this.lookupCache.dimensions = lookup
+
+    return lookup
+  }
+
+  /**
+   * Retrieves the border radius lookup for the component.
+   * If the lookup cache already contains the border dimensions, it returns the cached value.
+   * Otherwise, it creates and caches the border dimensions using the theme's border radius.
+   * @return {InferenceDimensionMap} - The border radius lookup
+   */
+  public get borderRadiusLookup(): InferenceDimensionMap {
+    if (this.lookupCache.borderRadiusDimensions)
+      return this.lookupCache.borderRadiusDimensions
+
+    const lookup = createDimensionLookup(this.theme.borderRadius || {})
+    this.lookupCache.borderRadiusDimensions = lookup
 
     return lookup
   }
