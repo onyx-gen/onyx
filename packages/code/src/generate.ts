@@ -12,6 +12,7 @@ import {
 } from './messages'
 import { getComponentProperties } from './set/utils'
 import type { Configuration } from './config/config'
+import type { ContainerNodeData, HTMLStringNodeData, TreeNode } from './interfaces'
 
 /**
  * Generate HTML code for the selected Figma nodes.
@@ -97,8 +98,6 @@ export default async function generate(config: Configuration): Promise<string | 
 
     const instances = await Promise.all(mainComponentsOfInstanceNodes.map(instanceNode => generateComponentTree(instanceNode, config)))
 
-    console.log('SELECTED NODE', nodes[0])
-
     const mainNode = nodes[0]
     let mainNodeName = mainNode.name
 
@@ -137,6 +136,45 @@ export default async function generate(config: Configuration): Promise<string | 
 }
 
 /**
+ * Generates a remote component tree based on a given ComponentNode and Configuration.
+ *
+ * @param node - The ComponentNode to generate the remote component tree from.
+ * @param config - The Configuration object that defines the generation settings.
+ * @return A Promise that resolves to a ComponentTreeNode representing the remote component tree.
+ */
+async function generateRemoteComponentTree(node: ComponentNode, config: Configuration): Promise<ComponentTreeNode> {
+  const svg = await node.exportAsync({ format: 'SVG_STRING' })
+
+  const svgNode: TreeNode<HTMLStringNodeData> = {
+    data: {
+      type: 'html',
+      html: svg,
+    },
+    children: [],
+  }
+
+  const rootNode: TreeNode<ContainerNodeData> = {
+    data: {
+      type: 'container',
+      element: 'div',
+    },
+    children: [svgNode],
+  }
+
+  const generator = new HTMLGenerator([], {}, config)
+  const html = await generator.generate(rootNode)
+
+  const componentTreeNode: ComponentTreeNode = {
+    name: getNodeName(node),
+    code: html,
+    figmaNode: node,
+    instances: [],
+  }
+
+  return Promise.resolve(componentTreeNode)
+}
+
+/**
  * Recursively generates a component tree for given Figma nodes.
  * Each node's HTML code is generated using FigmaNodeParser and HTMLGenerator.
  *
@@ -145,6 +183,9 @@ export default async function generate(config: Configuration): Promise<string | 
  * @returns A promise that resolves to a ComponentTreeNode representing the node hierarchy with generated HTML.
  */
 async function generateComponentTree(node: ComponentNode, config: Configuration): Promise<ComponentTreeNode> {
+  if (node.remote)
+    return generateRemoteComponentTree(node, config)
+
   const parser = new FigmaNodeParser({ default: 'default' }, config)
   const generator = new HTMLGenerator([], {}, config)
 
@@ -164,6 +205,15 @@ async function generateComponentTree(node: ComponentNode, config: Configuration)
     }
   }
 
+  return {
+    name: getNodeName(node),
+    code: html,
+    figmaNode: node,
+    instances,
+  }
+}
+
+function getNodeName(node: ComponentNode): string {
   let nodeName = node.name
 
   if (node.type === 'COMPONENT') {
@@ -173,10 +223,5 @@ async function generateComponentTree(node: ComponentNode, config: Configuration)
       nodeName = node.parent.name
   }
 
-  return {
-    name: nodeName,
-    code: html,
-    figmaNode: node,
-    instances,
-  }
+  return nodeName
 }

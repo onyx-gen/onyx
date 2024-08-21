@@ -80,6 +80,9 @@ class HTMLGenerator {
       tag: this.getInstanceNodeHTMLTag,
       attrs: this.getInstanceNodeHTMLAttrs,
     },
+    html: {
+      html: treeNode => treeNode.data.html,
+    },
   }
 
   /**
@@ -185,6 +188,9 @@ class HTMLGenerator {
     // Handle text nodes separately
     if (treeNode.data.type === 'text') {
       html += `${treeNode.data.text}\n`
+    }
+    else if (treeNode.data.type === 'html') {
+      html += `${treeNode.data.html}\n`
     }
     else if (tag) {
       // Start tag construction for non-text nodes
