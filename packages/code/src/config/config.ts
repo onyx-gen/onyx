@@ -24,6 +24,12 @@ const defaultConfig: IConfiguration = {
   ignoredComponentInstances: [],
 }
 
+/**
+ * The Configuration class represents the configuration settings for the application.
+ *
+ * @class Configuration
+ * @implements IConfiguration
+ */
 export class Configuration implements IConfiguration {
   public mode: IConfiguration['mode']
   public unit: IConfiguration['unit']
@@ -35,6 +41,7 @@ export class Configuration implements IConfiguration {
 
   public readonly config: IConfiguration
 
+  // The lookupCache object is used to store cached values for quick lookup.
   private lookupCache: LookupCache = {
     color: null,
     dimensions: null,
@@ -62,6 +69,13 @@ export class Configuration implements IConfiguration {
     this.ignoredComponentInstances = this.config.ignoredComponentInstances
   }
 
+  /**
+   * Retrieves the color lookup object for the current theme.
+   * If the color lookup object is already cached, it will be returned.
+   * If not, a new color lookup object will be created based on the theme colors and cached.
+   *
+   * @return {InferenceColorMap} The color lookup object for the current theme.
+   */
   public get colorLookup(): InferenceColorMap {
     if (this.lookupCache.color)
       return this.lookupCache.color
@@ -72,6 +86,13 @@ export class Configuration implements IConfiguration {
     return lookup
   }
 
+  /**
+   * Retrieves the dimensions lookup from the cache if it exists.
+   * Otherwise, creates a new dimensions lookup and stores it in the cache before returning it.
+   *
+   * @return {InferenceDimensionMap} The dimensions lookup.
+   *
+   */
   public get dimensionsLookup(): InferenceDimensionMap {
     if (this.lookupCache.dimensions)
       return this.lookupCache.dimensions
