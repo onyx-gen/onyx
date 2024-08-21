@@ -63,9 +63,7 @@ class FigmaNodeParser {
       const mainComponent = await node.getMainComponentAsync()
       const iconName = mainComponent?.name
 
-      let builder: IBuilder
-
-      builder = new Builder(this.config)
+      const builder: IBuilder = new Builder(this.config)
 
       const css = builder.build(node)
 
