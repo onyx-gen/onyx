@@ -213,6 +213,14 @@ async function generateComponentTree(node: ComponentNode, config: Configuration)
   }
 }
 
+/**
+ * Returns the name of a given node.
+ *
+ * @param {ComponentNode} node - The node for which the name is to be retrieved.
+ *
+ * @return {string} The name of the node, or the name of the parent node if
+ * the given node is a component and its parent is a component set.
+ */
 function getNodeName(node: ComponentNode): string {
   let nodeName = node.name
 
