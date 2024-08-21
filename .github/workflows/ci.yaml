@@ -36,6 +36,7 @@ jobs:
           FIGMA_PERSONAL_ACCESS_TOKEN: ${{ secrets.FIGMA_PERSONAL_ACCESS_TOKEN }}
           FIGMA_FILE: ${{ vars.FIGMA_FILE }}
           FIGMA_USE_CACHE: ${{ vars.FIGMA_USE_CACHE }}
+          FETCH_FROM_FIGMA: ${{ vars.FETCH_FROM_FIGMA }}
 
       - name: Test
         run: pnpm test
