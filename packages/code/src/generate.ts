@@ -13,6 +13,7 @@ import {
 import { getComponentProperties } from './set/utils'
 import type { Configuration } from './config/config'
 import type { ContainerNodeData, HTMLStringNodeData, TreeNode } from './interfaces'
+import { getInstanceNodeHTMLTag } from './generators/utils'
 
 /**
  * Generate HTML code for the selected Figma nodes.
@@ -99,17 +100,12 @@ export default async function generate(config: Configuration): Promise<string | 
     const instances = await Promise.all(mainComponentsOfInstanceNodes.map(instanceNode => generateComponentTree(instanceNode, config)))
 
     const mainNode = nodes[0]
-    let mainNodeName = mainNode.name
 
-    if (mainNode.type === 'COMPONENT') {
-      const hasComponentSetParent = mainNode.parent?.type === 'COMPONENT_SET'
-
-      if (hasComponentSetParent)
-        mainNodeName = mainNode.parent.name
-    }
+    const nodeName = getNodeName(mainNode)
 
     const componentTree: ComponentTreeNode = {
-      name: mainNodeName,
+      rawName: nodeName,
+      name: getInstanceNodeHTMLTag(nodeName),
       figmaNode: nodes[0] as ComponentNode, // TODO MF: Should also work for other node types
       code: html,
       instances,
@@ -164,8 +160,11 @@ async function generateRemoteComponentTree(node: ComponentNode, config: Configur
   const generator = new HTMLGenerator([], {}, config)
   const html = await generator.generate(rootNode)
 
+  const nodeName = getNodeName(node)
+
   const componentTreeNode: ComponentTreeNode = {
-    name: getNodeName(node),
+    rawName: nodeName,
+    name: getInstanceNodeHTMLTag(nodeName),
     code: html,
     figmaNode: node,
     instances: [],
@@ -205,8 +204,11 @@ async function generateComponentTree(node: ComponentNode, config: Configuration)
     }
   }
 
+  const rawNodeName = getNodeName(node)
+
   return {
-    name: getNodeName(node),
+    rawName: rawNodeName,
+    name: getInstanceNodeHTMLTag(rawNodeName),
     code: html,
     figmaNode: node,
     instances,
@@ -216,12 +218,12 @@ async function generateComponentTree(node: ComponentNode, config: Configuration)
 /**
  * Returns the name of a given node.
  *
- * @param {ComponentNode} node - The node for which the name is to be retrieved.
+ * @param {SceneNode} node - The node for which the name is to be retrieved.
  *
  * @return {string} The name of the node, or the name of the parent node if
  * the given node is a component and its parent is a component set.
  */
-function getNodeName(node: ComponentNode): string {
+function getNodeName(node: SceneNode): string {
   let nodeName = node.name
 
   if (node.type === 'COMPONENT') {
