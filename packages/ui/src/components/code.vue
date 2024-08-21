@@ -20,6 +20,10 @@ const mainComponentCode = computed(() => componentTree.value?.code || '')
 const { copy } = useClipboard({ source: mainComponentCode, legacy: true })
 const { notify } = useNotification()
 
+/**
+ * Copies the value of the mainComponentCode input element to the clipboard and notifies the user.
+ * The main component is the root component of the tree; not its instances.
+ */
 function onCopy() {
   copy(mainComponentCode.value)
   notify('Copied to clipboard!')
@@ -63,6 +67,10 @@ async function generateHtmlFromCode(code: string): Promise<string> {
   })
 }
 
+/**
+ * Represents a flattened tree node.
+ * @interface
+ */
 interface FlattenedTreeNode {
   name: string
   code: string
@@ -105,6 +113,15 @@ const flattenedTree = computed(() => {
   return flattenTree(componentTreeWithHTML.value)
 })
 
+/**
+ * Computed variable that returns a flattened and unduplicated tree.
+ *
+ * Duplications can occur when a component is used multiple times as instance nodes in Figma.
+ * The backend sends the same component multiple times in its nested structure.
+ * This function ensures that the tree is flattened and unduplicated.
+ *
+ * @returns {Array<FlattenedTreeNode>} The flattened and unduplicated tree as an array of FlattenedTreeNode objects.
+ */
 const flattenedUnduplicatedTree = computed(() => {
   const map = new Map<string, FlattenedTreeNode>()
   for (const node of flattenedTree.value)
