@@ -104,6 +104,14 @@ const flattenedTree = computed(() => {
 
   return flattenTree(componentTreeWithHTML.value)
 })
+
+const flattenedUnduplicatedTree = computed(() => {
+  const map = new Map<string, FlattenedTreeNode>()
+  for (const node of flattenedTree.value)
+    map.set(node.name, node)
+
+  return Array.from(map.values())
+})
 </script>
 
 <template>
@@ -120,7 +128,7 @@ const flattenedTree = computed(() => {
         "
       >
         <Tab
-          v-for="c in flattenedTree"
+          v-for="c in flattenedUnduplicatedTree"
           :key="c.name"
           v-slot="{ selected }"
           as="template"
