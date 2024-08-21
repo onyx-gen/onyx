@@ -182,7 +182,7 @@ async function generateRemoteComponentTree(node: ComponentNode, config: Configur
  * @returns A promise that resolves to a ComponentTreeNode representing the node hierarchy with generated HTML.
  */
 async function generateComponentTree(node: ComponentNode, config: Configuration): Promise<ComponentTreeNode> {
-  if (node.remote)
+  if (node.remote || node.name.toLowerCase().includes('icon'))
     return generateRemoteComponentTree(node, config)
 
   const parser = new FigmaNodeParser({ default: 'default' }, config)
