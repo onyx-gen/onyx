@@ -3,7 +3,7 @@ import { codeToHtml } from 'shiki'
 import { computedAsync, useClipboard } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { ComponentTreeNode } from '@onyx-gen/types'
 import { useTheme } from '@/composables/useTheme'
 import { useNotification } from '@/composables/useNotification'
@@ -129,11 +129,26 @@ const flattenedUnduplicatedTree = computed(() => {
 
   return Array.from(map.values())
 })
+
+const selectedTab = ref(0)
+
+function changeTab(index) {
+  selectedTab.value = index
+}
+
+watch(components, () => {
+  selectedTab.value = 0
+})
 </script>
 
 <template>
   <Wrapper headline="Generated Code" :loading="isLoading" class="!p-0 w-full mb-2">
-    <TabGroup class="w-full h-full grid" as="div">
+    <TabGroup
+      class="w-full h-full grid"
+      as="div"
+      :selected-index="selectedTab"
+      @change="changeTab"
+    >
       <TabList
         as="div"
         class="
