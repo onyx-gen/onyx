@@ -44,7 +44,7 @@ const options: SelectOption[] = [
 
 <template>
   <Disclosure headline="Configuration">
-    <div class="font-sans text-xs font-semibold color-$figma-color-text flex gap-4 overflow-x-scroll w-full">
+    <div class="font-sans text-xs font-semibold color-$figma-color-text flex gap-4 overflow-x-scroll px-2 h-26 w-full">
       <div>
         <h2>
           Mode
