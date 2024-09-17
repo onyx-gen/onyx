@@ -65,3 +65,16 @@ export function toPascalCase(string: string): string {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join('')
 }
+
+/**
+ * This method is used to generate a string that represents the HTML tag for an instance node.
+ * @param treeNode - The TreeNode of type InstanceNodeData for which the HTML tag string is to be generated.
+ * @returns A string representing the HTML tag for the given instance node.
+ */
+export function getInstanceNodeHTMLTag(nodeName: string): string {
+  return toPascalCase(nodeName
+    .replaceAll('\\', '_')
+    .replaceAll('/', '_')
+    .replaceAll(' ', '_')
+    .replaceAll(/^_+/g, '')) // Remove leading underscores
+}

@@ -7,8 +7,8 @@ type AttributeValue = StaticAttributeValue | DynamicAttributeValue
 export interface Attributes { [key: string]: AttributeValue }
 
 export interface CSSAttributes {
-  'static'?: StaticAttributeValue
-  'dynamic'?: DynamicAttributeValue
+  static?: StaticAttributeValue
+  dynamic?: DynamicAttributeValue
 }
 
 type MaybePromise<T> = T | Promise<T>
@@ -16,6 +16,7 @@ type MaybePromise<T> = T | Promise<T>
 type AttrsFunction<T extends TreeNodeData> = (node: TreeNode<T>) => MaybePromise<Attributes>
 type ConditionalFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string | undefined
 type TagFunction<T extends TreeNodeData> = ((node: TreeNode<T>) => string) | string
+type HTMLFunction<T extends TreeNodeData> = (node: TreeNode<T>) => string
 
 type ExtractedNodeDataType<K extends TreeNodeData['type']> = Extract<TreeNodeData, { type: K }>
 
@@ -29,6 +30,7 @@ type ExtractedNodeDataType<K extends TreeNodeData['type']> = Extract<TreeNodeDat
 export type NodeTypeToTagMap = {
   [K in TreeNodeData['type']]: {
     tag?: TagFunction<ExtractedNodeDataType<K>>
+    html?: HTMLFunction<ExtractedNodeDataType<K>>
     attrs?: AttrsFunction<ExtractedNodeDataType<K>>
     if?: ConditionalFunction<ExtractedNodeDataType<K>>
   }

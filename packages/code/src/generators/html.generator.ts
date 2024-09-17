@@ -6,7 +6,7 @@ import type { VariantKey, VariantPermutation } from '../set/types'
 import { variantKey } from '../merge/utils'
 import type { Configuration } from '../config/config'
 import { Log } from '../decoratos/log'
-import { simplifyConditionalString, transformPropKey } from './utils'
+import { getInstanceNodeHTMLTag, simplifyConditionalString, transformPropKey } from './utils'
 import type {
   Attributes,
   CSSAttributes,
@@ -79,6 +79,9 @@ class HTMLGenerator {
     instance: {
       tag: this.getInstanceNodeHTMLTag,
       attrs: this.getInstanceNodeHTMLAttrs,
+    },
+    html: {
+      html: treeNode => treeNode.data.html,
     },
   }
 
@@ -186,6 +189,9 @@ class HTMLGenerator {
     if (treeNode.data.type === 'text') {
       html += `${treeNode.data.text}\n`
     }
+    else if (treeNode.data.type === 'html') {
+      html += `${treeNode.data.html}\n`
+    }
     else if (tag) {
       // Start tag construction for non-text nodes
       html += `<${tag}`
@@ -236,10 +242,7 @@ class HTMLGenerator {
    * @returns A string representing the HTML tag for the given instance node.
    */
   private getInstanceNodeHTMLTag(treeNode: TreeNode<InstanceNodeData>): string {
-    return treeNode.data.name
-      .replaceAll('\\', '_')
-      .replaceAll('/', '_')
-      .replaceAll(' ', '_')
+    return getInstanceNodeHTMLTag(treeNode.data.name)
   }
 
   /**

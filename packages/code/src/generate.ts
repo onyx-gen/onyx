@@ -12,6 +12,8 @@ import {
 } from './messages'
 import { getComponentProperties } from './set/utils'
 import type { Configuration } from './config/config'
+import type { ContainerNodeData, HTMLStringNodeData, TreeNode } from './interfaces'
+import { getInstanceNodeHTMLTag } from './generators/utils'
 
 /**
  * Generate HTML code for the selected Figma nodes.
@@ -97,20 +99,13 @@ export default async function generate(config: Configuration): Promise<string | 
 
     const instances = await Promise.all(mainComponentsOfInstanceNodes.map(instanceNode => generateComponentTree(instanceNode, config)))
 
-    console.log('SELECTED NODE', nodes[0])
-
     const mainNode = nodes[0]
-    let mainNodeName = mainNode.name
 
-    if (mainNode.type === 'COMPONENT') {
-      const hasComponentSetParent = mainNode.parent?.type === 'COMPONENT_SET'
-
-      if (hasComponentSetParent)
-        mainNodeName = mainNode.parent.name
-    }
+    const nodeName = getNodeName(mainNode)
 
     const componentTree: ComponentTreeNode = {
-      name: mainNodeName,
+      rawName: nodeName,
+      name: getInstanceNodeHTMLTag(nodeName),
       figmaNode: nodes[0] as ComponentNode, // TODO MF: Should also work for other node types
       code: html,
       instances,
@@ -137,6 +132,48 @@ export default async function generate(config: Configuration): Promise<string | 
 }
 
 /**
+ * Generates a remote component tree based on a given ComponentNode and Configuration.
+ *
+ * @param node - The ComponentNode to generate the remote component tree from.
+ * @param config - The Configuration object that defines the generation settings.
+ * @return A Promise that resolves to a ComponentTreeNode representing the remote component tree.
+ */
+async function generateRemoteComponentTree(node: ComponentNode, config: Configuration): Promise<ComponentTreeNode> {
+  const svg = await node.exportAsync({ format: 'SVG_STRING' })
+
+  const svgNode: TreeNode<HTMLStringNodeData> = {
+    data: {
+      type: 'html',
+      html: svg,
+    },
+    children: [],
+  }
+
+  const rootNode: TreeNode<ContainerNodeData> = {
+    data: {
+      type: 'container',
+      element: 'div',
+    },
+    children: [svgNode],
+  }
+
+  const generator = new HTMLGenerator([], {}, config)
+  const html = await generator.generate(rootNode)
+
+  const nodeName = getNodeName(node)
+
+  const componentTreeNode: ComponentTreeNode = {
+    rawName: nodeName,
+    name: getInstanceNodeHTMLTag(nodeName),
+    code: html,
+    figmaNode: node,
+    instances: [],
+  }
+
+  return Promise.resolve(componentTreeNode)
+}
+
+/**
  * Recursively generates a component tree for given Figma nodes.
  * Each node's HTML code is generated using FigmaNodeParser and HTMLGenerator.
  *
@@ -145,6 +182,9 @@ export default async function generate(config: Configuration): Promise<string | 
  * @returns A promise that resolves to a ComponentTreeNode representing the node hierarchy with generated HTML.
  */
 async function generateComponentTree(node: ComponentNode, config: Configuration): Promise<ComponentTreeNode> {
+  if (node.remote || node.name.toLowerCase().includes('icon'))
+    return generateRemoteComponentTree(node, config)
+
   const parser = new FigmaNodeParser({ default: 'default' }, config)
   const generator = new HTMLGenerator([], {}, config)
 
@@ -164,6 +204,26 @@ async function generateComponentTree(node: ComponentNode, config: Configuration)
     }
   }
 
+  const rawNodeName = getNodeName(node)
+
+  return {
+    rawName: rawNodeName,
+    name: getInstanceNodeHTMLTag(rawNodeName),
+    code: html,
+    figmaNode: node,
+    instances,
+  }
+}
+
+/**
+ * Returns the name of a given node.
+ *
+ * @param {SceneNode} node - The node for which the name is to be retrieved.
+ *
+ * @return {string} The name of the node, or the name of the parent node if
+ * the given node is a component and its parent is a component set.
+ */
+function getNodeName(node: SceneNode): string {
   let nodeName = node.name
 
   if (node.type === 'COMPONENT') {
@@ -173,10 +233,5 @@ async function generateComponentTree(node: ComponentNode, config: Configuration)
       nodeName = node.parent.name
   }
 
-  return {
-    name: nodeName,
-    code: html,
-    figmaNode: node,
-    instances,
-  }
+  return nodeName
 }

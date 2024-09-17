@@ -3,7 +3,7 @@ import { codeToHtml } from 'shiki'
 import { computedAsync, useClipboard } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { ComponentTreeNode } from '@onyx-gen/types'
 import { useTheme } from '@/composables/useTheme'
 import { useNotification } from '@/composables/useNotification'
@@ -20,6 +20,10 @@ const mainComponentCode = computed(() => componentTree.value?.code || '')
 const { copy } = useClipboard({ source: mainComponentCode, legacy: true })
 const { notify } = useNotification()
 
+/**
+ * Copies the value of the mainComponentCode input element to the clipboard and notifies the user.
+ * The main component is the root component of the tree; not its instances.
+ */
 function onCopy() {
   copy(mainComponentCode.value)
   notify('Copied to clipboard!')
@@ -63,6 +67,10 @@ async function generateHtmlFromCode(code: string): Promise<string> {
   })
 }
 
+/**
+ * Represents a flattened tree node.
+ * @interface
+ */
 interface FlattenedTreeNode {
   name: string
   code: string
@@ -104,11 +112,43 @@ const flattenedTree = computed(() => {
 
   return flattenTree(componentTreeWithHTML.value)
 })
+
+/**
+ * Computed variable that returns a flattened and unduplicated tree.
+ *
+ * Duplications can occur when a component is used multiple times as instance nodes in Figma.
+ * The backend sends the same component multiple times in its nested structure.
+ * This function ensures that the tree is flattened and unduplicated.
+ *
+ * @returns {Array<FlattenedTreeNode>} The flattened and unduplicated tree as an array of FlattenedTreeNode objects.
+ */
+const flattenedUnduplicatedTree = computed(() => {
+  const map = new Map<string, FlattenedTreeNode>()
+  for (const node of flattenedTree.value)
+    map.set(node.name, node)
+
+  return Array.from(map.values())
+})
+
+const selectedTab = ref(0)
+
+function changeTab(index) {
+  selectedTab.value = index
+}
+
+watch(components, () => {
+  selectedTab.value = 0
+})
 </script>
 
 <template>
   <Wrapper headline="Generated Code" :loading="isLoading" class="!p-0 w-full mb-2">
-    <TabGroup class="w-full h-full grid" as="div">
+    <TabGroup
+      class="w-full h-full grid"
+      as="div"
+      :selected-index="selectedTab"
+      @change="changeTab"
+    >
       <TabList
         as="div"
         class="
@@ -120,7 +160,7 @@ const flattenedTree = computed(() => {
         "
       >
         <Tab
-          v-for="c in flattenedTree"
+          v-for="c in flattenedUnduplicatedTree"
           :key="c.name"
           v-slot="{ selected }"
           as="template"

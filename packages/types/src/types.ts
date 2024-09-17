@@ -26,6 +26,7 @@ export interface IConfiguration {
 
 export interface ComponentTreeNode {
   name: string
+  rawName: string
   code: string
   figmaNode: ComponentNode
   instances: ComponentTreeNode[]

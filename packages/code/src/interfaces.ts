@@ -20,6 +20,7 @@ export type TreeNodeData =
   | InstanceNodeData
   | IconNodeData
   | TextNodeData
+  | HTMLStringNodeData
 
 /**
  * Represents a VariantCSS object with variant and css properties.
@@ -77,6 +78,15 @@ export interface ContainerNodeData extends AbstractNodeData, HasNodeCSSData {
 export interface TextNodeData extends AbstractNodeData {
   type: 'text'
   text: string
+}
+
+/**
+ * Represents the data for an HTML string node.
+ * @interface
+ */
+export interface HTMLStringNodeData extends AbstractNodeData {
+  type: 'html'
+  html: string
 }
 
 /**
